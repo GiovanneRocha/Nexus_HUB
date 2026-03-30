@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusHUB - Sign Up</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <header>
+            <img src="Images\atomo.png" alt="Logo" class="logo">
+            <h1>Criar Conta</h1>
+            <p>Crie sua conta!</p>
+        </header>
+
+        <form id="signupForm">
+            <div class="input-group">
+                <i class="fa-regular fa-user"></i>
+                <input type="text" placeholder="Nome Completo" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="email" placeholder="E-mail" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="pass" placeholder="Senha" required>
+            </div>
+
+            <div class="input-group">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="confirmPass" placeholder="Confirmar Senha" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Cadastrar</button>
+        </form>
+
+        <div class="signup-section">
+            Já tem uma conta? <a href="index.html">Faça Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('pass').value;
+            const p2 = document.getElementById('confirmPass').value;
+
+            if(p1 !== p2) {
+                alert("As senhas não conferem!");
+            } else {
+                alert("Conta criada com sucesso!");
+                window.location.href = "index.html";
+            }
+        });
+    </script>
+</body>
+</html>

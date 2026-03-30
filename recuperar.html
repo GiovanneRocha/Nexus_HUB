@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusHUB - Recuperar Senha</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <div class="login-container">
+        <header>
+            <i class="fa-solid fa-unlock-keyhole" style="font-size: 3rem; color: #c54a92; margin-bottom: 20px;"></i>
+            <h1>Recuperar Senha</h1>
+            <p>Insira seu e-mail para receber as instruções de recuperação.</p>
+        </header>
+
+        <form id="recoverForm">
+            <div class="input-group">
+                <i class="fa-regular fa-envelope"></i>
+                <input type="email" placeholder="E-mail cadastrado" required>
+            </div>
+
+            <button type="submit" class="btn-primary">Enviar Link</button>
+        </form>
+
+        <div class="signup-section">
+            Lembrou a senha? <a href="index.html">Voltar para o Login</a>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('recoverForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            alert("Se este e-mail estiver cadastrado, você receberá um link em breve!");
+            window.location.href = "index.html";
+        });
+    </script>
+</body>
+</html>
