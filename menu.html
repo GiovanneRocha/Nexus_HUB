@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus HUB - Login</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">Nexus HUB</div>
+                <div class="busca-global">
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+
+            <nav class="menu-navegacao">
+                <div class="perfil-status">
+                    <div class="avatar-mini">Ado ado ado    </div>
+                    <div>
+                        <p class="nome-empresa">texto teste</p>
+                        <p class="tag-empresa">texto teste</p>
+                    </div>
+                </div>
+
+                <ul>
+                    <li class="item-ativo">📊 Dashboard</li>
+                    <li>📦 Inventário</li>
+                    <li>💰 Vendas</li>
+                    <li>🏢 Criar empresa</li>
+                    <li>📄 Criar relatório</li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">🔔</div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="Images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                    
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">⋮</button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <a href="#">⚙️ Configurações</a>
+                            <a href="#">🎧 Suporte</a>
+                            <hr>
+                            <a href="index.html" class="logout">🚪 Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="sessao-metricas">
+                <div class="titulo-pagina">
+                    <h1>Performance do meu saco</h1>
+                    <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+
+                <div class="grade-cards">
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica">VENDAS TOTAIS</p>
+                        <h3>$482,900.00</h3>
+                        <span class="tendencia positiva">+12.5%</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica">INVENTÁRIO</p>
+                        <h3>12,482 <small>Units</small></h3>
+                        <span class="tendencia negativa">-2.4%</span>
+                    </div>
+                    <div class="card-metrica destaque-escuro">
+                        <p class="rotulo-metrica">CLIENTES ATIVOS</p>
+                        <h3>24,510</h3>
+                        <span class="tendencia">+842</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica">LUCRO LÍQUIDO</p>
+                        <h3>$82,140.00</h3>
+                        <span class="tendencia positiva">+4.1%</span>
+                    </div>
+                </div>
+
+                <div class="area-graficos">
+                    <div class="card-grafico-principal">
+                        <h4>Meses de Sexo Incansável</h4>
+                        <div class="simulador-grafico">
+                            <div class="barra" style="height: 40%;"></div>
+                            <div class="barra" style="height: 60%;"></div>
+                            <div class="barra" style="height: 45%;"></div>
+                            <div class="barra destaque" style="height: 80%;"></div>
+                            <div class="barra" style="height: 55%;"></div>
+                            <div class="barra" style="height: 70%;"></div>
+                        </div>
+                    </div>
+                    <div class="card-atividade">
+                        <h4>Recentes</h4>
+                        <div class="lista-vazia">Aguardando dados...</div>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        function alternarMenu() {
+            const menu = document.getElementById('menuSuspenso');
+            menu.classList.toggle('visivel');
+        }
+
+        // Fechar menu ao clicar fora
+        window.onclick = function(event) {
+            if (!event.target.matches('.botao-menu-trigger')) {
+                const menus = document.getElementsByClassName("menu-suspenso");
+                for (let i = 0; i < menus.length; i++) {
+                    if (menus[i].classList.contains('visivel')) {
+                        menus[i].classList.remove('visivel');
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>

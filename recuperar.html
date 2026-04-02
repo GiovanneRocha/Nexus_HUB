@@ -3,51 +3,52 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusHUB - Recuperar Senha</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>Digital Atheneum - Recuperação</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="login-container">
-        <header>
-            <i class="fa-solid fa-unlock-keyhole" style="font-size: 3rem; color: #c54a92; margin-bottom: 20px;"></i>
-            <h1>Recuperar Senha</h1>
-            <p>Insira seu e-mail para receber as instruções de recuperação.</p>
-        </header>
-
-        <form id="recoverForm">
-            <div class="input-group">
-                <i class="fa-regular fa-envelope"></i>
-                <input type="email" placeholder="E-mail cadastrado" required>
+    <div class="container-principal">
+        <div class="secao-apresentacao fundo-recuperacao">
+            <div class="conteudo-apresentacao">
+                <div class="box-editorial">
+                    <h1>ADO ADO ADO</h1>
+                    <p>Recuperando o acesso do viado.</p>
+                </div>
             </div>
+        </div>
 
-            <button type="submit" class="btn-primary">Enviar Link</button>
-        </form>
+        <div class="secao-formulario">
+            <div class="botao-voltar">
+                <a href="index.html">&larr; VOLTAR AO LOGIN</a>
+            </div>
+            
+            <div class="caixa-formulario">
+                <h2>Esqueceu a senha?</h2>
+                <p class="subtitulo-formulario">Insira o e-mail da sua conta para receber as instruções.</p>
+                
+                <form id="formRecuperar">
+                    <div class="bloco-campo">
+                        <label>Email Corporativo</label>
+                        <input type="email" placeholder="nome@suaorg.com.br" required>
+                    </div>
 
-        <div class="signup-section">
-            Lembrou a senha? <a href="index.html">Voltar para o Login</a>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <br>
-            <p3 style="position: fixed; bottom: 20px; right: 20px; margin: 0; opacity: 0.2;"> Sexo </p3>
+                    <button type="submit" class="botao-acao">Enviar Instruções</button>
+                </form>
+
+                <div class="alerta-suporte">
+                    <strong>Precisa de ajuda imediata?</strong>
+                    <p>Nossa equipe está disponível para verificação de identidade manual.</p>
+                </div>
+
+                <div class="rodape-centralizado">
+                    <div class="links-institucionais">
+                        <a href="#">SEXO</a>
+                        <a href="#">SEXO</a>
+                        <a href="#">SEXO</a>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <script>
-        document.getElementById('recoverForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            alert("Se este e-mail estiver cadastrado, você receberá um link em breve!");
-            window.location.href = "index.html";
-        });
-    </script>
 </body>
 </html>
