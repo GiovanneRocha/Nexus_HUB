@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Revisão de OS - Sistema OS</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">Nexus HUB</div>
+                <div class="busca-global">
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+
+            <nav class="menu-navegacao">
+                <div class="perfil-status">
+                    <div class="avatar-mini">OS</div>
+                    <div>
+                        <p class="nome-empresa">Sistema de OS</p>
+                        <p class="tag-empresa">v1.0</p>
+                    </div>
+                </div>
+
+                <ul>
+                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
+                    <li class="item-ativo"><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">🔔</div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="Images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                </div>
+            </header>
+
+            <section class="sessao-metricas">
+                <div class="titulo-pagina">
+                    <h1>Painel de Revisão Administrativa</h1>
+                    <p>Analise, corrija e aprove os atendimentos registrados</p>
+                </div>
+
+                <div class="filtros-revisao">
+                    <select id="filtro-status" class="filtro-select">
+                        <option value="">Todos os Status</option>
+                        <option value="pendente_revisao">Pendente Revisão</option>
+                        <option value="em_analise">Em Análise</option>
+                        <option value="aprovado">Aprovado</option>
+                        <option value="rejeitado">Rejeitado</option>
+                    </select>
+                </div>
+
+                <div id="lista-os-container" class="lista-os-container">
+                    <p class="mensagem-vazia">Carregando atendimentos...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal para Edição -->
+    <div id="modalEdicao" class="modal">
+        <div class="modal-conteudo">
+            <div class="modal-cabecalho">
+                <h2>Editar Atendimento #<span id="modal-id"></span></h2>
+                <button class="fechar-modal" onclick="fecharModal()">&times;</button>
+            </div>
+            <div class="modal-corpo">
+                <form id="formEdicao">
+                    <div class="secao-formulario-novo">
+                        <h4>Dados do Cliente</h4>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label>Nome</label>
+                                <input type="text" id="edit-cliente-nome" class="campo-modal">
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label>Telefone</label>
+                                <input type="tel" id="edit-cliente-telefone" class="campo-modal">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="secao-formulario-novo">
+                        <h4>Dados do Serviço</h4>
+                        <div class="bloco-campo-novo">
+                            <label>Descrição</label>
+                            <textarea id="edit-servico-descricao" rows="3" class="campo-modal"></textarea>
+                        </div>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label>Valor (R$)</label>
+                                <input type="number" id="edit-servico-valor" step="0.01" class="campo-modal">
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label>Status</label>
+                                <select id="edit-status" class="campo-modal">
+                                    <option value="em_analise">Em Análise</option>
+                                    <option value="aprovado">Aprovado</option>
+                                    <option value="rejeitado">Rejeitado</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="bloco-campo-novo">
+                        <label>Observações Administrativas</label>
+                        <textarea id="edit-observacoes-admin" rows="3" class="campo-modal" placeholder="Notas da revisão..."></textarea>
+                    </div>
+
+                    <div class="area-botoes-modal">
+                        <button type="submit" class="botao-acao">💾 Salvar Alterações</button>
+                        <button type="button" class="botao-cancelar" onclick="fecharModal()">❌ Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let atendimentoEmEdicao = null;
+
+        function carregarAtendimentos() {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const statusFiltro = document.getElementById('filtro-status').value;
+            const container = document.getElementById('lista-os-container');
+
+            let atendimentosFiltrados = atendimentos;
+            if (statusFiltro) {
+                atendimentosFiltrados = atendimentos.filter(a => a.status === statusFiltro);
+            }
+
+            if (atendimentosFiltrados.length === 0) {
+                container.innerHTML = '<p class="mensagem-vazia">Nenhum atendimento encontrado.</p>';
+                return;
+            }
+
+            container.innerHTML = atendimentosFiltrados.map(atendimento => `
+                <div class="card-os" data-id="${atendimento.id}">
+                    <div class="cabecalho-card-os">
+                        <div class="info-basica-os">
+                            <h4>OS #${atendimento.id}</h4>
+                            <p class="status-badge status-${atendimento.status}">${getStatusBadge(atendimento.status)}</p>
+                        </div>
+                        <div class="data-criacao">${atendimento.dataCriacao}</div>
+                    </div>
+
+                    <div class="corpo-card-os">
+                        <div class="coluna-cliente">
+                            <strong>Cliente:</strong> ${atendimento.cliente.nome}<br>
+                            <strong>Telefone:</strong> ${atendimento.cliente.telefone}<br>
+                            <strong>Placa:</strong> ${atendimento.veiculo.placa}
+                        </div>
+                        <div class="coluna-servico">
+                            <strong>Tipo:</strong> ${atendimento.servico.tipo}<br>
+                            <strong>Valor:</strong> R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}<br>
+                            <strong>Data:</strong> ${atendimento.servico.data}
+                        </div>
+                    </div>
+
+                    <div class="descricao-servico-card">
+                        <strong>Descrição:</strong> ${atendimento.servico.descricao}
+                    </div>
+
+                    <div class="rodape-card-os">
+                        <button class="botao-editar" onclick="abrirModal(${atendimento.id})">✏️ Revisar</button>
+                        <button class="botao-deletar" onclick="deletarAtendimento(${atendimento.id})">🗑️ Deletar</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function getStatusBadge(status) {
+            const badges = {
+                'pendente_revisao': '⏳ Pendente Revisão',
+                'em_analise': '🔍 Em Análise',
+                'aprovado': '✅ Aprovado',
+                'rejeitado': '❌ Rejeitado'
+            };
+            return badges[status] || status;
+        }
+
+        function abrirModal(id) {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            atendimentoEmEdicao = atendimentos.find(a => a.id === id);
+
+            if (atendimentoEmEdicao) {
+                document.getElementById('modal-id').textContent = id;
+                document.getElementById('edit-cliente-nome').value = atendimentoEmEdicao.cliente.nome;
+                document.getElementById('edit-cliente-telefone').value = atendimentoEmEdicao.cliente.telefone;
+                document.getElementById('edit-servico-descricao').value = atendimentoEmEdicao.servico.descricao;
+                document.getElementById('edit-servico-valor').value = atendimentoEmEdicao.servico.valor;
+                document.getElementById('edit-status').value = atendimentoEmEdicao.status;
+                document.getElementById('edit-observacoes-admin').value = atendimentoEmEdicao.observacoes_admin || '';
+
+                document.getElementById('modalEdicao').style.display = 'block';
+            }
+        }
+
+        function fecharModal() {
+            document.getElementById('modalEdicao').style.display = 'none';
+            atendimentoEmEdicao = null;
+        }
+
+        document.getElementById('formEdicao').addEventListener('submit', function(evento) {
+            evento.preventDefault();
+
+            if (!atendimentoEmEdicao) return;
+
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const index = atendimentos.findIndex(a => a.id === atendimentoEmEdicao.id);
+
+            if (index !== -1) {
+                atendimentos[index].cliente.nome = document.getElementById('edit-cliente-nome').value;
+                atendimentos[index].cliente.telefone = document.getElementById('edit-cliente-telefone').value;
+                atendimentos[index].servico.descricao = document.getElementById('edit-servico-descricao').value;
+                atendimentos[index].servico.valor = parseFloat(document.getElementById('edit-servico-valor').value);
+                atendimentos[index].status = document.getElementById('edit-status').value;
+                atendimentos[index].observacoes_admin = document.getElementById('edit-observacoes-admin').value;
+
+                localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+                alert('✅ Atendimento atualizado com sucesso!');
+                fecharModal();
+                carregarAtendimentos();
+            }
+        });
+
+        function deletarAtendimento(id) {
+            if (confirm('Tem certeza que deseja deletar este atendimento?')) {
+                let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+                atendimentos = atendimentos.filter(a => a.id !== id);
+                localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+                alert('✅ Atendimento deletado com sucesso!');
+                carregarAtendimentos();
+            }
+        }
+
+        document.getElementById('filtro-status').addEventListener('change', carregarAtendimentos);
+
+        // Fechar modal ao clicar fora
+        window.onclick = function(evento) {
+            const modal = document.getElementById('modalEdicao');
+            if (evento.target === modal) {
+                fecharModal();
+            }
+        }
+
+        // Carregar ao iniciar
+        carregarAtendimentos();
+    </script>
+</body>
+</html>
