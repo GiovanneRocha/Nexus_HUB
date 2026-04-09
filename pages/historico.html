@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico de OS - Sistema OS</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">Nexus HUB</div>
+                <div class="busca-global">
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+
+            <nav class="menu-navegacao">
+                <div class="perfil-status">
+                    <div class="avatar-mini">OS</div>
+                    <div>
+                        <p class="nome-empresa">Sistema de OS</p>
+                        <p class="tag-empresa">v1.0</p>
+                    </div>
+                </div>
+
+                <ul>
+                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
+                    <li class="item-ativo"><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">🔔</div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                </div>
+            </header>
+
+            <section class="sessao-metricas">
+                <div class="titulo-pagina">
+                    <h1>Arquivo de Histórico</h1>
+                    <p>Consulte todas as Ordens de Serviço finalizadas e histórico de clientes</p>
+                </div>
+
+                <div class="filtros-historico">
+                    <input type="text" id="busca-cliente" class="filtro-input" placeholder="🔍 Buscar por cliente ou placa...">
+                    <select id="filtro-mes" class="filtro-select">
+                        <option value="">Todos os Períodos</option>
+                        <option value="janeiro">Janeiro</option>
+                        <option value="fevereiro">Fevereiro</option>
+                        <option value="marco">Março</option>
+                        <option value="abril">Abril</option>
+                        <option value="maio">Maio</option>
+                        <option value="junho">Junho</option>
+                        <option value="julho">Julho</option>
+                        <option value="agosto">Agosto</option>
+                        <option value="setembro">Setembro</option>
+                        <option value="outubro">Outubro</option>
+                        <option value="novembro">Novembro</option>
+                        <option value="dezembro">Dezembro</option>
+                    </select>
+                    <button id="btn-exportar" class="botao-acao" style="margin-left: 10px;">📄 Exportar para PDF</button>
+                </div>
+
+                <div id="historico-container" class="tabela-historico-container">
+                    <p class="mensagem-vazia">Carregando histórico...</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+    <script>
+        function carregarHistorico() {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const buscaCliente = document.getElementById('busca-cliente').value.toLowerCase();
+            const container = document.getElementById('historico-container');
+
+            // Filtrar apenas atendimentos aprovados
+            let atendimentosAprovados = atendimentos.filter(a => a.status === 'aprovado');
+
+            if (buscaCliente) {
+                atendimentosAprovados = atendimentosAprovados.filter(a => 
+                    a.cliente.nome.toLowerCase().includes(buscaCliente) ||
+                    a.veiculo.placa.toLowerCase().includes(buscaCliente)
+                );
+            }
+
+            // Ordenar por data de criação (mais recente primeiro)
+            atendimentosAprovados.sort((a, b) => new Date(b.dataCriacao) - new Date(a.dataCriacao));
+
+            if (atendimentosAprovados.length === 0) {
+                container.innerHTML = '<p class="mensagem-vazia">Nenhum atendimento finalizado encontrado.</p>';
+                return;
+            }
+
+            let html = '<table class="tabela-historico"><thead><tr>';
+            html += '<th>ID OS</th><th>Cliente</th><th>Telefone</th><th>Placa</th><th>Modelo</th>';
+            html += '<th>Tipo de Serviço</th><th>Valor (R$)</th><th>Data</th><th>Ações</th></tr></thead><tbody>';
+
+            atendimentosAprovados.forEach(atendimento => {
+                html += `<tr>
+                    <td>#${atendimento.id}</td>
+                    <td>${atendimento.cliente.nome}</td>
+                    <td>${atendimento.cliente.telefone}</td>
+                    <td>${atendimento.veiculo.placa}</td>
+                    <td>${atendimento.veiculo.modelo}</td>
+                    <td>${atendimento.servico.tipo}</td>
+                    <td>R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}</td>
+                    <td>${atendimento.servico.data}</td>
+                    <td>
+                        <button class="botao-pequeno" onclick="gerarPDFIndividual(${atendimento.id})">📥 PDF</button>
+                        <button class="botao-pequeno-info" onclick="exibirDetalhes(${atendimento.id})">👁️ Ver</button>
+                    </td>
+                </tr>`;
+            });
+
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function exibirDetalhes(id) {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const atendimento = atendimentos.find(a => a.id === id);
+
+            if (atendimento) {
+                alert(`
+📋 DETALHES DO ATENDIMENTO #${id}
+
+👤 CLIENTE:
+Nome: ${atendimento.cliente.nome}
+Telefone: ${atendimento.cliente.telefone}
+Email: ${atendimento.cliente.email || 'N/A'}
+Endereço: ${atendimento.cliente.endereco || 'N/A'}
+
+🚗 VEÍCULO:
+Placa: ${atendimento.veiculo.placa}
+Modelo: ${atendimento.veiculo.modelo}
+Ano: ${atendimento.veiculo.ano}
+Cor: ${atendimento.veiculo.cor || 'N/A'}
+
+🔧 SERVIÇO:
+Tipo: ${atendimento.servico.tipo}
+Descrição: ${atendimento.servico.descricao}
+Valor: R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}
+Data: ${atendimento.servico.data}
+
+📝 Observações: ${atendimento.servico.observacoes || 'N/A'}
+
+✅ Status: ${atendimento.status}
+Criado em: ${atendimento.dataCriacao}
+                `);
+            }
+        }
+
+        function gerarPDFIndividual(id) {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const atendimento = atendimentos.find(a => a.id === id);
+
+            if (!atendimento) return;
+
+            const elemento = document.createElement('div');
+            elemento.style.padding = '20px';
+            elemento.style.fontFamily = 'Arial, sans-serif';
+            elemento.innerHTML = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #0f1221;">ORDEM DE SERVIÇO</h1>
+                    <p style="font-size: 18px; color: #666;">Nº ${atendimento.id}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="border-bottom: 2px solid #0f1221; padding-bottom: 10px;">DADOS DO CLIENTE</h3>
+                    <p><strong>Nome:</strong> ${atendimento.cliente.nome}</p>
+                    <p><strong>Telefone:</strong> ${atendimento.cliente.telefone}</p>
+                    <p><strong>Email:</strong> ${atendimento.cliente.email || 'N/A'}</p>
+                    <p><strong>Endereço:</strong> ${atendimento.cliente.endereco || 'N/A'}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="border-bottom: 2px solid #0f1221; padding-bottom: 10px;">DADOS DO VEÍCULO</h3>
+                    <p><strong>Placa:</strong> ${atendimento.veiculo.placa}</p>
+                    <p><strong>Modelo:</strong> ${atendimento.veiculo.modelo}</p>
+                    <p><strong>Ano:</strong> ${atendimento.veiculo.ano}</p>
+                    <p><strong>Cor:</strong> ${atendimento.veiculo.cor || 'N/A'}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="border-bottom: 2px solid #0f1221; padding-bottom: 10px;">SERVIÇO REALIZADO</h3>
+                    <p><strong>Tipo:</strong> ${atendimento.servico.tipo}</p>
+                    <p><strong>Descrição:</strong> ${atendimento.servico.descricao}</p>
+                    <p><strong>Data:</strong> ${atendimento.servico.data}</p>
+                    <p><strong>Valor:</strong> R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}</p>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <h3 style="border-bottom: 2px solid #0f1221; padding-bottom: 10px;">OBSERVAÇÕES</h3>
+                    <p>${atendimento.servico.observacoes || 'Sem observações'}</p>
+                </div>
+
+                <div style="margin-top: 40px; text-align: center; color: #666; font-size: 12px;">
+                    <p>Documento gerado em: ${new Date().toLocaleString('pt-BR')}</p>
+                    <p>Status: ${atendimento.status}</p>
+                </div>
+            `;
+
+            const opt = {
+                margin: 10,
+                filename: `OS_${atendimento.id}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(elemento).save();
+        }
+
+        document.getElementById('busca-cliente').addEventListener('input', carregarHistorico);
+        document.getElementById('filtro-mes').addEventListener('change', carregarHistorico);
+        
+        document.getElementById('btn-exportar').addEventListener('click', function() {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const atendimentosAprovados = atendimentos.filter(a => a.status === 'aprovado');
+
+            if (atendimentosAprovados.length === 0) {
+                alert('Nenhum atendimento aprovado para exportar.');
+                return;
+            }
+
+            const elemento = document.createElement('div');
+            elemento.style.padding = '20px';
+            elemento.style.fontFamily = 'Arial, sans-serif';
+            
+            let html = `
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h1 style="color: #0f1221;">RELATÓRIO DE ORDENS DE SERVIÇO</h1>
+                    <p style="color: #666;">Gerado em ${new Date().toLocaleString('pt-BR')}</p>
+                </div>
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="background-color: #0f1221; color: white;">
+                            <th style="border: 1px solid #ddd; padding: 8px;">OS</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Cliente</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Placa</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Serviço</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Valor</th>
+                            <th style="border: 1px solid #ddd; padding: 8px;">Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+            `;
+
+            let totalValor = 0;
+            atendimentosAprovados.forEach(atendimento => {
+                totalValor += parseFloat(atendimento.servico.valor);
+                html += `
+                    <tr>
+                        <td style="border: 1px solid #ddd; padding: 8px;">#${atendimento.id}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${atendimento.cliente.nome}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${atendimento.veiculo.placa}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${atendimento.servico.tipo}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}</td>
+                        <td style="border: 1px solid #ddd; padding: 8px;">${atendimento.servico.data}</td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                    </tbody>
+                </table>
+                <div style="margin-top: 20px; text-align: right;">
+                    <p><strong>Total de Atendimentos:</strong> ${atendimentosAprovados.length}</p>
+                    <p><strong>Valor Total:</strong> R$ ${totalValor.toFixed(2)}</p>
+                </div>
+            `;
+
+            elemento.innerHTML = html;
+
+            const opt = {
+                margin: 10,
+                filename: `Relatorio_OS_${new Date().getTime()}.pdf`,
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2 },
+                jsPDF: { orientation: 'portrait', unit: 'mm', format: 'a4' }
+            };
+
+            html2pdf().set(opt).from(elemento).save();
+            alert('✅ Relatório exportado com sucesso!');
+        });
+
+        carregarHistorico();
+    </script>
+</body>
+</html>
+

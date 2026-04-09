@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Novo Atendimento - Sistema OS</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">Nexus HUB</div>
+                <div class="busca-global">
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+
+            <nav class="menu-navegacao">
+                <div class="perfil-status">
+                    <div class="avatar-mini">OS</div>
+                    <div>
+                        <p class="nome-empresa">Sistema de OS</p>
+                        <p class="tag-empresa">v1.0</p>
+                    </div>
+                </div>
+
+                <ul>
+                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
+                    <li class="item-ativo"><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">🔔</div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Técnico de Serviço</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                </div>
+            </header>
+
+            <section class="sessao-metricas">
+                <div class="titulo-pagina">
+                    <h1>Registrar Novo Atendimento</h1>
+                    <p>Preencha os dados do serviço realizado no veículo</p>
+                </div>
+
+                <div class="container-formulario-novo-atendimento">
+                    <form id="formNovoAtendimento">
+                        <!-- Seção de Cliente -->
+                        <div class="secao-formulario-novo">
+                            <h3>Informações do Cliente</h3>
+                            
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label for="cliente-nome">Nome do Cliente*</label>
+                                    <input type="text" id="cliente-nome" placeholder="João Silva" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label for="cliente-telefone">Telefone*</label>
+                                    <input type="tel" id="cliente-telefone" placeholder="(11) 99999-9999" required>
+                                </div>
+                            </div>
+
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label for="cliente-email">E-mail</label>
+                                    <input type="email" id="cliente-email" placeholder="cliente@email.com">
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label for="cliente-endereco">Endereço</label>
+                                    <input type="text" id="cliente-endereco" placeholder="Rua..., nº...">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Veículo -->
+                        <div class="secao-formulario-novo">
+                            <h3>Informações do Veículo</h3>
+                            
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label for="veiculo-placa">Placa do Veículo*</label>
+                                    <input type="text" id="veiculo-placa" placeholder="ABC-1234" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label for="veiculo-modelo">Modelo*</label>
+                                    <input type="text" id="veiculo-modelo" placeholder="Exemplo: Gol 1.0" required>
+                                </div>
+                            </div>
+
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label for="veiculo-ano">Ano*</label>
+                                    <input type="number" id="veiculo-ano" placeholder="2020" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label for="veiculo-cor">Cor</label>
+                                    <input type="text" id="veiculo-cor" placeholder="Prata">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Seção de Serviço -->
+                        <div class="secao-formulario-novo">
+                            <h3>Serviço Realizado</h3>
+                            
+                            <div class="bloco-campo-novo">
+                                <label for="servico-tipo">Tipo de Serviço*</label>
+                                <select id="servico-tipo" required>
+                                    <option value="">Selecione...</option>
+                                    <option value="manutencao">Manutenção Preventiva</option>
+                                    <option value="reparo">Reparo Geral</option>
+                                    <option value="troca-oleo">Troca de Óleo</option>
+                                    <option value="suspensao">Suspensão</option>
+                                    <option value="freios">Freios</option>
+                                    <option value="eletrica">Elétrica</option>
+                                    <option value="ar-condicionado">Ar Condicionado</option>
+                                    <option value="outro">Outro</option>
+                                </select>
+                            </div>
+
+                            <div class="bloco-campo-novo">
+                                <label for="servico-descricao">Descrição do Serviço*</label>
+                                <textarea id="servico-descricao" rows="4" placeholder="Detalhe o serviço realizado..." required></textarea>
+                            </div>
+
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label for="servico-valor">Valor do Serviço (R$)*</label>
+                                    <input type="number" id="servico-valor" placeholder="0.00" step="0.01" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label for="servico-data">Data do Serviço*</label>
+                                    <input type="date" id="servico-data" required>
+                                </div>
+                            </div>
+
+                            <div class="bloco-campo-novo">
+                                <label for="servico-observacoes">Observações Adicionais</label>
+                                <textarea id="servico-observacoes" rows="3" placeholder="Anotações importantes..."></textarea>
+                            </div>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="area-botoes">
+                            <button type="submit" class="botao-acao">💾 Registrar Atendimento</button>
+                            <button type="reset" class="botao-secundario">🔄 Limpar Formulário</button>
+                            <a href="menu.html" class="botao-cancelar">❌ Cancelar</a>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Preencher data atual
+        document.getElementById('servico-data').valueAsDate = new Date();
+
+        document.getElementById('formNovoAtendimento').addEventListener('submit', function(evento) {
+            evento.preventDefault();
+
+            // Capturar dados
+            const dados = {
+                cliente: {
+                    nome: document.getElementById('cliente-nome').value,
+                    telefone: document.getElementById('cliente-telefone').value,
+                    email: document.getElementById('cliente-email').value,
+                    endereco: document.getElementById('cliente-endereco').value
+                },
+                veiculo: {
+                    placa: document.getElementById('veiculo-placa').value,
+                    modelo: document.getElementById('veiculo-modelo').value,
+                    ano: document.getElementById('veiculo-ano').value,
+                    cor: document.getElementById('veiculo-cor').value
+                },
+                servico: {
+                    tipo: document.getElementById('servico-tipo').value,
+                    descricao: document.getElementById('servico-descricao').value,
+                    valor: parseFloat(document.getElementById('servico-valor').value),
+                    data: document.getElementById('servico-data').value,
+                    observacoes: document.getElementById('servico-observacoes').value
+                }
+            };
+
+            // Armazenar no localStorage
+            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const novoAtendimento = {
+                id: Date.now(),
+                ...dados,
+                status: 'pendente_revisao',
+                dataCriacao: new Date().toLocaleString('pt-BR')
+            };
+            atendimentos.push(novoAtendimento);
+            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+
+            alert('✅ Atendimento registrado com sucesso! ID: ' + novoAtendimento.id);
+            document.getElementById('formNovoAtendimento').reset();
+            document.getElementById('servico-data').valueAsDate = new Date();
+        });
+    </script>
+</body>
+</html>
+
