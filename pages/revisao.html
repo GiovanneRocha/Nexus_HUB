@@ -3,28 +3,59 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Revisão de OS - Sistema OS</title>
+    <title>Revisão de OS - Nexus HUB</title>
     <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        /* Estilos para o Modal de Verificação */
+        .modal-revisao {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-conteudo {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 25px;
+            width: 70%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .bloco-detalhe-veiculo {
+            background: #f8f9fd;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4f46e5;
+        }
+        .tabela-mini-servicos {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+        .tabela-mini-servicos th { color: #777; padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        .tabela-mini-servicos td { padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
         <aside class="barra-lateral">
             <div class="topo-lateral">
                 <div class="logo-erp">Nexus HUB</div>
-                <div class="busca-global">
-                    <input type="text" placeholder="Busca Global...">
-                </div>
             </div>
-
             <nav class="menu-navegacao">
                 <div class="perfil-status">
                     <div class="avatar-mini">OS</div>
-                    <div>
-                        <p class="nome-empresa">Sistema de OS</p>
-                        <p class="tag-empresa">v1.0</p>
-                    </div>
+                    <div><p class="nome-empresa">Sistema de OS</p><p class="tag-empresa">v1.0</p></div>
                 </div>
-
                 <ul>
                     <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
                     <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
@@ -37,229 +68,129 @@
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="alerta-notificacao">🔔</div>
-                <div class="perfil-usuario">
-                    <div class="info-usuario">
-                        <p class="usuario-nome">Julian Vane</p>
-                        <p class="usuario-cargo">Administrador</p>
-                    </div>
-                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                <div class="info-usuario">
+                    <p class="usuario-nome">Julian Vane</p>
+                    <p class="usuario-cargo">Administrador</p>
                 </div>
+                <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
             </header>
 
-            <section class="sessao-metricas">
-                <div class="titulo-pagina">
-                    <h1>Painel de Revisão Administrativa</h1>
-                    <p>Analise, corrija e aprove os atendimentos registrados</p>
-                </div>
-
-                <div class="filtros-revisao">
-                    <select id="filtro-status" class="filtro-select">
-                        <option value="">Todos os Status</option>
-                        <option value="pendente_revisao">Pendente Revisão</option>
-                        <option value="em_analise">Em Análise</option>
-                        <option value="aprovado">Aprovado</option>
-                        <option value="rejeitado">Rejeitado</option>
-                    </select>
-                </div>
-
-                <div id="lista-os-container" class="lista-os-container">
-                    <p class="mensagem-vazia">Carregando atendimentos...</p>
-                </div>
+            <section class="titulo-pagina">
+                <h1>Ordens de Serviço em Revisão</h1>
+                <p>Clique em "Ver Detalhes" para conferir os itens de cada veículo antes de aprovar.</p>
             </section>
+
+            <div class="card-os" style="background: white; border-radius: 25px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 30px; width: 100%;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="background: #f8f9fd; border-bottom: 2px solid #eee;">
+                        <tr>
+                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">DATA</th>
+                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">CLIENTE</th>
+                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">FROTA</th>
+                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">TOTAL</th>
+                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800; text-align: center;">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-revisao-corpo"></tbody>
+                </table>
+            </div>
         </main>
     </div>
 
-    <!-- Modal para Edição -->
-    <div id="modalEdicao" class="modal">
+    <div id="modalVerificacao" class="modal-revisao">
         <div class="modal-conteudo">
-            <div class="modal-cabecalho">
-                <h2>Editar Atendimento #<span id="modal-id"></span></h2>
-                <button class="fechar-modal" onclick="fecharModal()">&times;</button>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="color: var(--azul-escuro);">Verificação Final da OS</h2>
+                <button onclick="fecharModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
             </div>
-            <div class="modal-corpo">
-                <form id="formEdicao">
-                    <div class="secao-formulario-novo">
-                        <h4>Dados do Cliente</h4>
-                        <div class="linha-campos">
-                            <div class="bloco-campo-novo">
-                                <label>Nome</label>
-                                <input type="text" id="edit-cliente-nome" class="campo-modal">
-                            </div>
-                            <div class="bloco-campo-novo">
-                                <label>Telefone</label>
-                                <input type="tel" id="edit-cliente-telefone" class="campo-modal">
-                            </div>
-                        </div>
-                    </div>
+            
+            <div id="detalhes-os-modal">
+                </div>
 
-                    <div class="secao-formulario-novo">
-                        <h4>Dados do Serviço</h4>
-                        <div class="bloco-campo-novo">
-                            <label>Descrição</label>
-                            <textarea id="edit-servico-descricao" rows="3" class="campo-modal"></textarea>
-                        </div>
-                        <div class="linha-campos">
-                            <div class="bloco-campo-novo">
-                                <label>Valor (R$)</label>
-                                <input type="number" id="edit-servico-valor" step="0.01" class="campo-modal">
-                            </div>
-                            <div class="bloco-campo-novo">
-                                <label>Status</label>
-                                <select id="edit-status" class="campo-modal">
-                                    <option value="em_analise">Em Análise</option>
-                                    <option value="aprovado">Aprovado</option>
-                                    <option value="rejeitado">Rejeitado</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bloco-campo-novo">
-                        <label>Observações Administrativas</label>
-                        <textarea id="edit-observacoes-admin" rows="3" class="campo-modal" placeholder="Notas da revisão..."></textarea>
-                    </div>
-
-                    <div class="area-botoes-modal">
-                        <button type="submit" class="botao-acao">💾 Salvar Alterações</button>
-                        <button type="button" class="botao-cancelar" onclick="fecharModal()">❌ Cancelar</button>
-                    </div>
-                </form>
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button id="btnAprovarModal" class="botao-acao" style="background: #2ecc71; flex: 1; padding: 20px;">✅ Aprovar e Finalizar</button>
+                <button onclick="fecharModal()" class="botao-secundario" style="flex: 1; padding: 20px; border: 1px solid #ddd;">Voltar</button>
             </div>
         </div>
     </div>
 
     <script>
-        let atendimentoEmEdicao = null;
-
-        function carregarAtendimentos() {
+        function renderizarRevisao() {
             const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const statusFiltro = document.getElementById('filtro-status').value;
-            const container = document.getElementById('lista-os-container');
+            const emRevisao = atendimentos.filter(a => a.status === 'pendente_revisao');
+            const corpo = document.getElementById('tabela-revisao-corpo');
 
-            let atendimentosFiltrados = atendimentos;
-            if (statusFiltro) {
-                atendimentosFiltrados = atendimentos.filter(a => a.status === statusFiltro);
-            }
-
-            if (atendimentosFiltrados.length === 0) {
-                container.innerHTML = '<p class="mensagem-vazia">Nenhum atendimento encontrado.</p>';
+            if (emRevisao.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="5" style="padding: 60px; text-align: center; color: #999;">Nenhuma OS pendente.</td></tr>`;
                 return;
             }
 
-            container.innerHTML = atendimentosFiltrados.map(atendimento => `
-                <div class="card-os" data-id="${atendimento.id}">
-                    <div class="cabecalho-card-os">
-                        <div class="info-basica-os">
-                            <h4>OS #${atendimento.id}</h4>
-                            <p class="status-badge status-${atendimento.status}">${getStatusBadge(atendimento.status)}</p>
-                        </div>
-                        <div class="data-criacao">${atendimento.dataCriacao}</div>
-                    </div>
-
-                    <div class="corpo-card-os">
-                        <div class="coluna-cliente">
-                            <strong>Cliente:</strong> ${atendimento.cliente.nome}<br>
-                            <strong>Telefone:</strong> ${atendimento.cliente.telefone}<br>
-                            <strong>Placa:</strong> ${atendimento.veiculo.placa}
-                        </div>
-                        <div class="coluna-servico">
-                            <strong>Tipo:</strong> ${atendimento.servico.tipo}<br>
-                            <strong>Valor:</strong> R$ ${parseFloat(atendimento.servico.valor).toFixed(2)}<br>
-                            <strong>Data:</strong> ${atendimento.servico.data}
-                        </div>
-                    </div>
-
-                    <div class="descricao-servico-card">
-                        <strong>Descrição:</strong> ${atendimento.servico.descricao}
-                    </div>
-
-                    <div class="rodape-card-os">
-                        <button class="botao-editar" onclick="abrirModal(${atendimento.id})">✏️ Revisar</button>
-                        <button class="botao-deletar" onclick="deletarAtendimento(${atendimento.id})">🗑️ Deletar</button>
-                    </div>
-                </div>
+            corpo.innerHTML = emRevisao.map(os => `
+                <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 20px 25px;">${os.dataRegistro || 'Recém criada'}</td>
+                    <td style="padding: 20px 25px;"><strong style="color: var(--azul-escuro);">${os.cliente}</strong></td>
+                    <td style="padding: 20px 25px;">${os.frota ? os.frota.length : 1} Veículo(s)</td>
+                    <td style="padding: 20px 25px;"><strong style="color: var(--verde-agua);">R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</strong></td>
+                    <td style="padding: 20px 25px; text-align: center;">
+                        <button onclick="abrirVerificacao(${os.id})" style="background: #f0f4ff; color: #4f46e5; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;">🔍 Ver Detalhes</button>
+                    </td>
+                </tr>
             `).join('');
         }
 
-        function getStatusBadge(status) {
-            const badges = {
-                'pendente_revisao': '⏳ Pendente Revisão',
-                'em_analise': '🔍 Em Análise',
-                'aprovado': '✅ Aprovado',
-                'rejeitado': '❌ Rejeitado'
-            };
-            return badges[status] || status;
-        }
-
-        function abrirModal(id) {
+        function abrirVerificacao(id) {
             const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            atendimentoEmEdicao = atendimentos.find(a => a.id === id);
+            const os = atendimentos.find(a => a.id == id);
+            const container = document.getElementById('detalhes-os-modal');
+            
+            let htmlVeiculos = os.frota.map((item, index) => `
+                <div class="bloco-detalhe-veiculo">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>Veículo ${index + 1}: ${item.dadosVeiculo.modelo}</strong>
+                        <span style="color: #4f46e5; font-weight: bold;">PLACA: ${item.dadosVeiculo.placa}</span>
+                    </div>
+                    <table class="tabela-mini-servicos">
+                        <thead>
+                            <tr><th>Serviço</th><th>Descrição</th><th>Valor</th></tr>
+                        </thead>
+                        <tbody>
+                            ${item.servicos.map(s => `
+                                <tr>
+                                    <td>${s.tipo.replace('_', ' ')}</td>
+                                    <td style="color: #666;">${s.descricao}</td>
+                                    <td style="font-weight: bold;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                </div>
+            `).join('');
 
-            if (atendimentoEmEdicao) {
-                document.getElementById('modal-id').textContent = id;
-                document.getElementById('edit-cliente-nome').value = atendimentoEmEdicao.cliente.nome;
-                document.getElementById('edit-cliente-telefone').value = atendimentoEmEdicao.cliente.telefone;
-                document.getElementById('edit-servico-descricao').value = atendimentoEmEdicao.servico.descricao;
-                document.getElementById('edit-servico-valor').value = atendimentoEmEdicao.servico.valor;
-                document.getElementById('edit-status').value = atendimentoEmEdicao.status;
-                document.getElementById('edit-observacoes-admin').value = atendimentoEmEdicao.observacoes_admin || '';
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Cliente:</strong> ${os.cliente}</p>
+                    <p><strong>Total da OS:</strong> <span style="color: var(--verde-agua); font-weight: 800;">R$ ${parseFloat(os.valorTotalOS).toFixed(2)}</span></p>
+                </div>
+                ${htmlVeiculos}
+            `;
 
-                document.getElementById('modalEdicao').style.display = 'block';
-            }
+            document.getElementById('btnAprovarModal').onclick = () => aprovarOS(id);
+            document.getElementById('modalVerificacao').style.display = 'block';
         }
 
-        function fecharModal() {
-            document.getElementById('modalEdicao').style.display = 'none';
-            atendimentoEmEdicao = null;
+        function fecharModal() { document.getElementById('modalVerificacao').style.display = 'none'; }
+
+        function aprovarOS(id) {
+            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const idx = atendimentos.findIndex(a => a.id == id);
+            atendimentos[idx].status = 'finalizada';
+            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+            alert("OS Aprovada e enviada para o Histórico!");
+            fecharModal();
+            renderizarRevisao();
         }
 
-        document.getElementById('formEdicao').addEventListener('submit', function(evento) {
-            evento.preventDefault();
-
-            if (!atendimentoEmEdicao) return;
-
-            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const index = atendimentos.findIndex(a => a.id === atendimentoEmEdicao.id);
-
-            if (index !== -1) {
-                atendimentos[index].cliente.nome = document.getElementById('edit-cliente-nome').value;
-                atendimentos[index].cliente.telefone = document.getElementById('edit-cliente-telefone').value;
-                atendimentos[index].servico.descricao = document.getElementById('edit-servico-descricao').value;
-                atendimentos[index].servico.valor = parseFloat(document.getElementById('edit-servico-valor').value);
-                atendimentos[index].status = document.getElementById('edit-status').value;
-                atendimentos[index].observacoes_admin = document.getElementById('edit-observacoes-admin').value;
-
-                localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
-                alert('✅ Atendimento atualizado com sucesso!');
-                fecharModal();
-                carregarAtendimentos();
-            }
-        });
-
-        function deletarAtendimento(id) {
-            if (confirm('Tem certeza que deseja deletar este atendimento?')) {
-                let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-                atendimentos = atendimentos.filter(a => a.id !== id);
-                localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
-                alert('✅ Atendimento deletado com sucesso!');
-                carregarAtendimentos();
-            }
-        }
-
-        document.getElementById('filtro-status').addEventListener('change', carregarAtendimentos);
-
-        // Fechar modal ao clicar fora
-        window.onclick = function(evento) {
-            const modal = document.getElementById('modalEdicao');
-            if (evento.target === modal) {
-                fecharModal();
-            }
-        }
-
-        // Carregar ao iniciar
-        carregarAtendimentos();
+        window.onload = renderizarRevisao;
     </script>
 </body>
 </html>
-

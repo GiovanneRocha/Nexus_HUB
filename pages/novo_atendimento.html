@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Novo Atendimento - Sistema OS</title>
+    <title>Novo Atendimento - Nexus HUB</title>
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body class="corpo-dashboard">
@@ -11,20 +11,13 @@
         <aside class="barra-lateral">
             <div class="topo-lateral">
                 <div class="logo-erp">Nexus HUB</div>
-                <div class="busca-global">
-                    <input type="text" placeholder="Busca Global...">
-                </div>
+                <div class="busca-global"><input type="text" placeholder="Busca Global..."></div>
             </div>
-
             <nav class="menu-navegacao">
                 <div class="perfil-status">
                     <div class="avatar-mini">OS</div>
-                    <div>
-                        <p class="nome-empresa">Sistema de OS</p>
-                        <p class="tag-empresa">v1.0</p>
-                    </div>
+                    <div><p class="nome-empresa">Sistema de OS</p><p class="tag-empresa">v1.0</p></div>
                 </div>
-
                 <ul>
                     <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
                     <li class="item-ativo"><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
@@ -41,173 +34,240 @@
                 <div class="perfil-usuario">
                     <div class="info-usuario">
                         <p class="usuario-nome">Julian Vane</p>
-                        <p class="usuario-cargo">Técnico de Serviço</p>
+                        <p class="usuario-cargo">Administrador</p>
                     </div>
                     <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
                 </div>
+
+                <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">⋮</button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <a href="#">⚙️ Configurações</a>
+                            <a href="#">🎧 Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout">🚪 Logout</a>
+                        </div>
+                    </div>
             </header>
 
-            <section class="sessao-metricas">
-                <div class="titulo-pagina">
-                    <h1>Registrar Novo Atendimento</h1>
-                    <p>Preencha os dados do serviço realizado no veículo</p>
-                </div>
-
-                <div class="container-formulario-novo-atendimento">
-                    <form id="formNovoAtendimento">
-                        <!-- Seção de Cliente -->
-                        <div class="secao-formulario-novo">
-                            <h3>Informações do Cliente</h3>
-                            
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label for="cliente-nome">Nome do Cliente*</label>
-                                    <input type="text" id="cliente-nome" placeholder="João Silva" required>
-                                </div>
-                                <div class="bloco-campo-novo">
-                                    <label for="cliente-telefone">Telefone*</label>
-                                    <input type="tel" id="cliente-telefone" placeholder="(11) 99999-9999" required>
-                                </div>
-                            </div>
-
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label for="cliente-email">E-mail</label>
-                                    <input type="email" id="cliente-email" placeholder="cliente@email.com">
-                                </div>
-                                <div class="bloco-campo-novo">
-                                    <label for="cliente-endereco">Endereço</label>
-                                    <input type="text" id="cliente-endereco" placeholder="Rua..., nº...">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Seção de Veículo -->
-                        <div class="secao-formulario-novo">
-                            <h3>Informações do Veículo</h3>
-                            
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label for="veiculo-placa">Placa do Veículo*</label>
-                                    <input type="text" id="veiculo-placa" placeholder="ABC-1234" required>
-                                </div>
-                                <div class="bloco-campo-novo">
-                                    <label for="veiculo-modelo">Modelo*</label>
-                                    <input type="text" id="veiculo-modelo" placeholder="Exemplo: Gol 1.0" required>
-                                </div>
-                            </div>
-
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label for="veiculo-ano">Ano*</label>
-                                    <input type="number" id="veiculo-ano" placeholder="2020" required>
-                                </div>
-                                <div class="bloco-campo-novo">
-                                    <label for="veiculo-cor">Cor</label>
-                                    <input type="text" id="veiculo-cor" placeholder="Prata">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Seção de Serviço -->
-                        <div class="secao-formulario-novo">
-                            <h3>Serviço Realizado</h3>
-                            
-                            <div class="bloco-campo-novo">
-                                <label for="servico-tipo">Tipo de Serviço*</label>
-                                <select id="servico-tipo" required>
-                                    <option value="">Selecione...</option>
-                                    <option value="manutencao">Manutenção Preventiva</option>
-                                    <option value="reparo">Reparo Geral</option>
-                                    <option value="troca-oleo">Troca de Óleo</option>
-                                    <option value="suspensao">Suspensão</option>
-                                    <option value="freios">Freios</option>
-                                    <option value="eletrica">Elétrica</option>
-                                    <option value="ar-condicionado">Ar Condicionado</option>
-                                    <option value="outro">Outro</option>
-                                </select>
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label for="servico-descricao">Descrição do Serviço*</label>
-                                <textarea id="servico-descricao" rows="4" placeholder="Detalhe o serviço realizado..." required></textarea>
-                            </div>
-
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label for="servico-valor">Valor do Serviço (R$)*</label>
-                                    <input type="number" id="servico-valor" placeholder="0.00" step="0.01" required>
-                                </div>
-                                <div class="bloco-campo-novo">
-                                    <label for="servico-data">Data do Serviço*</label>
-                                    <input type="date" id="servico-data" required>
-                                </div>
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label for="servico-observacoes">Observações Adicionais</label>
-                                <textarea id="servico-observacoes" rows="3" placeholder="Anotações importantes..."></textarea>
-                            </div>
-                        </div>
-
-                        <!-- Botões de Ação -->
-                        <div class="area-botoes">
-                            <button type="submit" class="botao-acao">💾 Registrar Atendimento</button>
-                            <button type="reset" class="botao-secundario">🔄 Limpar Formulário</button>
-                            <a href="menu.html" class="botao-cancelar">❌ Cancelar</a>
-                        </div>
-                    </form>
-                </div>
+            <section class="titulo-pagina">
+                <h1>Registrar Novo Atendimento</h1>
+                <p>O sistema impede a seleção de serviços duplicados para o mesmo veículo.</p>
             </section>
+
+            <form id="formNovoAtendimento" style="width: 100%;">
+                <div class="card-os" style="background: white; padding: 40px; border-radius: 25px; margin-bottom: 30px; width: 100%;">
+                    <h3 style="margin-bottom: 25px; color: var(--azul-escuro);">Informações do Cliente</h3>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                        <div class="bloco-campo-novo">
+                            <label style="font-weight: 800; font-size: 0.75rem;">BUSCAR EMPRESA *</label>
+                            <select id="selecao-empresa" required onchange="preencherDadosEmpresa()" style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5; background: #fbfcfe;">
+                                <option value="">Selecione a empresa...</option>
+                            </select>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label style="font-weight: 800; font-size: 0.75rem;">CNPJ</label>
+                            <input type="text" id="display-cnpj" readonly style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5; background: #f8f9fd;">
+                        </div>
+                    </div>
+                </div>
+
+                <div id="container-veiculos"></div>
+
+                <div style="margin-bottom: 30px;">
+                    <button type="button" onclick="adicionarCamposVeiculo()" style="background: #f0f4ff; color: #4a90e2; border: 2px dashed #4a90e2; width: 100%; padding: 20px; border-radius: 15px; font-weight: bold; cursor: pointer;">
+                        🚚 Adicionar outro caminhão à frota
+                    </button>
+                </div>
+
+                <div class="card-os" style="background: white; padding: 40px; border-radius: 25px; width: 100%;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                        <h3 style="color: var(--azul-escuro);">Total Consolidado da OS</h3>
+                        <h2 id="total-geral-display" style="color: var(--verde-agua); font-size: 2.2rem; margin: 0;">R$ 0,00</h2>
+                    </div>
+
+                    <button type="submit" class="botao-acao" style="width: 100%; padding: 22px; background: var(--azul-escuro); font-size: 1.1rem; border-radius: 15px; margin-bottom: 15px;">
+                        💾 Registrar Atendimento Completo
+                    </button>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <button type="button" onclick="limparFormulario()" style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; background: white; cursor: pointer; font-weight: bold; color: #666;">
+                            🧹 Limpar Dados
+                        </button>
+                        <button type="button" onclick="window.location.href='menu.html'" style="padding: 15px; border-radius: 12px; border: 1px solid #ff4757; background: white; cursor: pointer; font-weight: bold; color: #ff4757;">
+                            ❌ Cancelar Atendimento
+                        </button>
+                    </div>
+                </div>
+            </form>
         </main>
     </div>
 
     <script>
-        // Preencher data atual
-        document.getElementById('servico-data').valueAsDate = new Date();
+        const CONFIG_SERVICOS = {
+            "Manutencao_Preventiva": { nome: "Manutenção Preventiva", valor: 450.00, desc: "Revisão geral de itens de segurança e fluidos." },
+            "Troca_Oleo": { nome: "Troca de Óleo", valor: 850.00, desc: "Troca de óleo do motor e substituição de filtros." },
+            "Suspensao": { nome: "Suspensão", valor: 1200.00, desc: "Manutenção de batentes, buchas e amortecedores." },
+            "Freios": { nome: "Freios", valor: 600.00, desc: "Substituição de pastilhas e retífica de discos/tambores." },
+            "Eletrica": { nome: "Elétrica", valor: 300.00, desc: "Diagnóstico elétrico e troca de lâmpadas/fusíveis." }
+        };
 
-        document.getElementById('formNovoAtendimento').addEventListener('submit', function(evento) {
-            evento.preventDefault();
+        let contagemVeiculos = 0;
 
-            // Capturar dados
-            const dados = {
-                cliente: {
-                    nome: document.getElementById('cliente-nome').value,
-                    telefone: document.getElementById('cliente-telefone').value,
-                    email: document.getElementById('cliente-email').value,
-                    endereco: document.getElementById('cliente-endereco').value
-                },
-                veiculo: {
-                    placa: document.getElementById('veiculo-placa').value,
-                    modelo: document.getElementById('veiculo-modelo').value,
-                    ano: document.getElementById('veiculo-ano').value,
-                    cor: document.getElementById('veiculo-cor').value
-                },
-                servico: {
-                    tipo: document.getElementById('servico-tipo').value,
-                    descricao: document.getElementById('servico-descricao').value,
-                    valor: parseFloat(document.getElementById('servico-valor').value),
-                    data: document.getElementById('servico-data').value,
-                    observacoes: document.getElementById('servico-observacoes').value
+        function adicionarCamposVeiculo() {
+            contagemVeiculos++;
+            const container = document.getElementById('container-veiculos');
+            const div = document.createElement('div');
+            div.className = 'card-os bloco-veiculo';
+            div.style = 'background: white; padding: 40px; border-radius: 25px; margin-bottom: 30px; border-left: 8px solid #3498db; position: relative; width: 100%;';
+            
+            div.innerHTML = `
+                ${contagemVeiculos > 1 ? '<button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 20px; right: 20px; background: #fff0f0; color: #d63031; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">Excluir Veículo</button>' : ''}
+                <h3 style="margin-bottom: 25px; color: var(--azul-escuro);">Veículo ${contagemVeiculos}</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                    <input type="text" class="v-placa" placeholder="Placa *" required style="padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+                    <input type="text" class="v-modelo" placeholder="Modelo *" required style="padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+                    <input type="number" class="v-ano" placeholder="Ano *" required style="padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+                    <input type="text" class="v-cor" placeholder="Cor *" required style="padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 25px;">
+                <div class="container-servicos-veiculo"></div>
+                <button type="button" onclick="adicionarServicoAoVeiculo(this)" style="background: #eef2ff; color: #4f46e5; border: 1px dashed #4f46e5; padding: 15px 25px; border-radius: 12px; cursor: pointer; font-size: 0.9rem; font-weight: bold;">＋ Adicionar serviço para este veículo</button>
+            `;
+            container.appendChild(div);
+            adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+        }
+
+        function adicionarServicoAoVeiculo(botao) {
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            const container = blocoVeiculo.querySelector('.container-servicos-veiculo');
+            const servicosJaUsados = Array.from(container.querySelectorAll('.s-tipo')).map(s => s.value);
+            
+            if (servicosJaUsados.length >= Object.keys(CONFIG_SERVICOS).length) {
+                alert("Todos os serviços disponíveis já foram adicionados para este veículo.");
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'item-servico';
+            div.style = 'background: #fbfcfe; padding: 25px; border-radius: 20px; border: 1px solid #f0f2f5; margin-bottom: 20px; position: relative; border-left: 5px solid #4f46e5;';
+            
+            let optionsHTML = '<option value="">Selecione o tipo...</option>';
+            for (const key in CONFIG_SERVICOS) {
+                if (!servicosJaUsados.includes(key)) {
+                    optionsHTML += `<option value="${key}">${CONFIG_SERVICOS[key].nome}</option>`;
                 }
-            };
+            }
 
-            // Armazenar no localStorage
-            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const novoAtendimento = {
+            const hoje = new Date().toISOString().split('T')[0];
+            div.innerHTML = `
+                ${container.children.length > 0 ? '<button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: #d63031; cursor: pointer; font-weight: bold;">Remover</button>' : ''}
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 15px;">
+                    <select class="s-tipo" required onchange="aplicarPreDefinidos(this)" style="padding: 15px; border-radius: 12px; border: 1px solid #ddd; background: white;">
+                        ${optionsHTML}
+                    </select>
+                    <input type="date" class="s-data" value="${hoje}" required style="padding: 15px; border-radius: 12px; border: 1px solid #ddd;">
+                </div>
+                <textarea class="s-desc" placeholder="Descrição..." rows="3" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; margin-bottom: 15px; resize: none;"></textarea>
+                <input type="number" class="s-valor" placeholder="Valor R$ *" step="0.01" required oninput="calcularTotalGeral()" style="width: 100%; padding: 15px; border-radius: 12px; border: 1px solid #ddd; font-weight: bold; font-size: 1.1rem;">
+            `;
+            container.appendChild(div);
+        }
+
+        function aplicarPreDefinidos(selectElement) {
+            const key = selectElement.value;
+            const item = selectElement.closest('.item-servico');
+            if (CONFIG_SERVICOS[key]) {
+                item.querySelector('.s-valor').value = CONFIG_SERVICOS[key].valor.toFixed(2);
+                item.querySelector('.s-desc').value = CONFIG_SERVICOS[key].desc;
+            }
+            calcularTotalGeral();
+        }
+
+        function calcularTotalGeral() {
+            let total = 0;
+            document.querySelectorAll('.s-valor').forEach(c => total += parseFloat(c.value) || 0);
+            document.getElementById('total-geral-display').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        // --- FUNÇÃO DE SALVAMENTO CORRIGIDA ---
+        document.getElementById('formNovoAtendimento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const blocosVeiculos = document.querySelectorAll('.bloco-veiculo');
+            const frotaCompleta = [];
+            let totalOS = 0;
+
+            blocosVeiculos.forEach(bloco => {
+                const servicosDoVeiculo = [];
+                const blocosServicos = bloco.querySelectorAll('.item-servico');
+                
+                blocosServicos.forEach(bs => {
+                    const valor = parseFloat(bs.querySelector('.s-valor').value) || 0;
+                    totalOS += valor;
+                    servicosDoVeiculo.push({
+                        tipo: bs.querySelector('.s-tipo').value,
+                        data: bs.querySelector('.s-data').value,
+                        descricao: bs.querySelector('.s-desc').value,
+                        valor: valor
+                    });
+                });
+
+                frotaCompleta.push({
+                    dadosVeiculo: {
+                        placa: bloco.querySelector('.v-placa').value,
+                        modelo: bloco.querySelector('.v-modelo').value,
+                        ano: bloco.querySelector('.v-ano').value,
+                        cor: bloco.querySelector('.v-cor').value
+                    },
+                    servicos: servicosDoVeiculo
+                });
+            });
+
+            // Cria o objeto final para o LocalStorage
+            const novaOS = {
                 id: Date.now(),
-                ...dados,
-                status: 'pendente_revisao',
-                dataCriacao: new Date().toLocaleString('pt-BR')
+                cliente: document.getElementById('selecao-empresa').value,
+                frota: frotaCompleta,
+                valorTotalOS: totalOS,
+                dataRegistro: new Date().toLocaleDateString('pt-BR'),
+                status: 'pendente_revisao' // Importante para aparecer na tela de Revisão
             };
-            atendimentos.push(novoAtendimento);
-            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
 
-            alert('✅ Atendimento registrado com sucesso! ID: ' + novoAtendimento.id);
-            document.getElementById('formNovoAtendimento').reset();
-            document.getElementById('servico-data').valueAsDate = new Date();
+            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            atendimentos.push(novaOS);
+            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+            
+            alert('✅ Atendimento registrado e enviado para revisão!');
+            window.location.href = 'revisao.html';
         });
+
+        function limparFormulario() {
+            if(confirm("Deseja realmente limpar todos os dados preenchidos?")) {
+                location.reload();
+            }
+        }
+
+        function popularEmpresas() {
+            const select = document.getElementById('selecao-empresa');
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            empresas.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.nome; opt.dataset.cnpj = emp.cnpj;
+                opt.textContent = emp.nome; select.appendChild(opt);
+            });
+        }
+
+        function preencherDadosEmpresa() {
+            const select = document.getElementById('selecao-empresa');
+            const option = select.options[select.selectedIndex];
+            document.getElementById('display-cnpj').value = option ? (option.dataset.cnpj || '') : '';
+        }
+
+        window.onload = () => {
+            popularEmpresas();
+            adicionarCamposVeiculo();
+        };
     </script>
 </body>
 </html>
-
