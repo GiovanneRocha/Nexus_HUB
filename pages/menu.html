@@ -3,41 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus HUB - Login</title>
+    <title>Painel de Controle - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
         <aside class="barra-lateral">
             <div class="topo-lateral">
-                <div class="logo-erp">Nexus HUB</div>
+                <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
                 <div class="busca-global">
-                    <input type="text" placeholder="Busca Global...">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar...">
                 </div>
             </div>
 
             <nav class="menu-navegacao">
-                <div class="perfil-status">
-                    <div class="avatar-mini">OS</div>
-                    <div>
-                        <p class="nome-empresa">Sistema de OS</p>
-                        <p class="tag-empresa">v1.0</p>
-                    </div>
-                </div>
-
                 <ul>
-                    <li class="item-ativo"><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
-                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li class="item-ativo"><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
                 </ul>
             </nav>
         </aside>
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="alerta-notificacao">🔔</div>
+                <div class="alerta-notificacao">
+                    <i class="bi bi-bell"></i>
+                </div>
                 <div class="perfil-usuario">
                     <div class="info-usuario">
                         <p class="usuario-nome">Julian Vane</p>
@@ -46,12 +44,14 @@
                     <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
                     
                     <div class="menu-opcoes-container">
-                        <button class="botao-menu-trigger" onclick="alternarMenu()">⋮</button>
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
                         <div class="menu-suspenso" id="menuSuspenso">
-                            <a href="#">⚙️ Configurações</a>
-                            <a href="#">🎧 Suporte</a>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
                             <hr>
-                            <a href="../index.html" class="logout">🚪 Logout</a>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
                         </div>
                     </div>
                 </div>
@@ -59,36 +59,36 @@
 
             <section class="sessao-metricas">
                 <div class="titulo-pagina">
-                    <h1>Dashboard - Visão Geral</h1>
+                    <h1><i class="bi bi-speedometer2"></i> Painel de Controle</h1>
                     <p>Acompanhe as métricas e informações do sistema em tempo real.</p>
                 </div>
 
                 <div class="grade-cards">
                     <div class="card-metrica">
-                        <p class="rotulo-metrica">OS ABERTAS</p>
+                        <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
                         <h3>18</h3>
                         <span class="tendencia">Aguardando</span>
                     </div>
                     <div class="card-metrica">
-                        <p class="rotulo-metrica">EM REVISÃO</p>
-                        <h3>7 <small>Atendimentos</small></h3>
-                        <span class="tendencia">Análise</span>
+                        <p class="rotulo-metrica"><i class="bi bi-hourglass-split"></i> Em Análise</p>
+                        <h3>7</h3>
+                        <span class="tendencia">Processando</span>
                     </div>
                     <div class="card-metrica destaque-escuro">
-                        <p class="rotulo-metrica">FINALIZADAS (MÊS)</p>
+                        <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
                         <h3>42</h3>
-                        <span class="tendencia">Conclusão</span>
+                        <span class="tendencia">Concluídas</span>
                     </div>
                     <div class="card-metrica">
-                        <p class="rotulo-metrica">TOTAL DE CLIENTES</p>
+                        <p class="rotulo-metrica"><i class="bi bi-people"></i> Total Clientes</p>
                         <h3>156</h3>
-                        <span class="tendencia positiva">+8</span>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> +8</span>
                     </div>
                 </div>
 
                 <div class="area-graficos">
                     <div class="card-grafico-principal">
-                        <h4>Atendimentos por Mês</h4>
+                        <h4><i class="bi bi-bar-chart"></i> Atendimentos por Mês</h4>
                         <div class="simulador-grafico">
                             <div class="barra" style="height: 40%;"></div>
                             <div class="barra" style="height: 60%;"></div>
@@ -99,8 +99,11 @@
                         </div>
                     </div>
                     <div class="card-atividade">
-                        <h4>Recentes</h4>
-                        <div class="lista-vazia">Aguardando dados...</div>
+                        <h4><i class="bi bi-list-ul"></i> Atividades</h4>
+                        <div class="lista-vazia">
+                            <i class="bi bi-inbox"></i>
+                            <p>Nenhuma atividade recente</p>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -113,9 +116,8 @@
             menu.classList.toggle('visivel');
         }
 
-        // Fechar menu ao clicar fora
         window.onclick = function(event) {
-            if (!event.target.matches('.botao-menu-trigger')) {
+            if (!event.target.matches('.botao-menu-trigger') && !event.target.closest('.botao-menu-trigger')) {
                 const menus = document.getElementsByClassName("menu-suspenso");
                 for (let i = 0; i < menus.length; i++) {
                     if (menus[i].classList.contains('visivel')) {

@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Histórico e Editor Multipáginas - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="../assets/css/style.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -47,14 +48,24 @@
 <body class="corpo-dashboard">
     <div class="layout-erp">
         <aside class="barra-lateral">
-            <div class="topo-lateral"><div class="logo-erp">Nexus HUB</div></div>
+            <div class="topo-lateral">
+                <div class="logo-erp">
+                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                    Nexus HUB
+                </div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
             <nav class="menu-navegacao">
                 <ul>
-                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
-                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
-                    <li class="item-ativo"><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li class="item-ativo"><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
                 </ul>
             </nav>
         </aside>
@@ -66,7 +77,7 @@
             </header>
 
             <section class="titulo-pagina">
-                <h1>Histórico de OS</h1>
+                <h1><i class="bi bi-clock-history"></i> Histórico de OS</h1>
                 <p>Visualize e edite as páginas do relatório antes de exportar.</p>
             </section>
 
@@ -94,8 +105,8 @@
                     <span style="font-size: 0.8rem; color: #2ecc71;">● Modo Visualização Ativo</span>
                 </div>
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="salvarEGerarPDF()" class="botao-acao" style="background: #2ecc71; padding: 10px 25px;">📥 Baixar PDF Final</button>
-                    <button onclick="fecharEditor()" class="botao-secundario" style="background: #444; color: white; border: none; padding: 10px 20px;">Sair</button>
+                    <button onclick="salvarEGerarPDF()" class="botao-acao" style="background: #2ecc71; padding: 10px 25px;"><i class="bi bi-download"></i> Baixar PDF Final</button>
+                    <button onclick="fecharEditor()" class="botao-secundario" style="background: #444; color: white; border: none; padding: 10px 20px;"><i class="bi bi-x"></i> Sair</button>
                 </div>
             </div>
 

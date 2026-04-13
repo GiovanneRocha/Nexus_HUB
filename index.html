@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus HUB - Login</title>
+    <title>Nexus HUB - Sistema de Gestão de Ordens</title>
+    <link rel="icon" type="image/png" href="assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
 </head>
 <body>
     <div class="container-principal">
         <div class="secao-apresentacao fundo-login">
             <div class="conteudo-apresentacao">
-                <div class="logotipo">Nexus HUB</div>
-                <p class="subtitulo-topo">Gestão Eficiente de Serviços</p>
+                <div class="logotipo"><img src="assets/images/icon-sistem.png" alt="Nexus HUB" class="logo-icon"> Nexus HUB</div>
+                <p class="subtitulo-topo">Gestão Inteligente</p>
                 <h1>Sistema de <span>Ordens de Serviço</span></h1>
-                <p class="descricao-texto">Plataforma completa para gerenciamento de atendimentos, acompanhamento e histórico de trabalhos realizados.</p>
+                <p class="descricao-texto">Plataforma completa para gerenciamento de atendimentos, acompanhamento de serviços e histórico de trabalhos realizados.</p>
                 <div class="citacao-rodape">
-                    "Qualidade, eficiência e rastreabilidade em cada serviço."
+                    <i class="bi bi-quote"></i> Qualidade, eficiência e rastreabilidade em cada serviço.
                 </div>
             </div>
         </div>
 
         <div class="secao-formulario">
             <div class="caixa-formulario">
-                <h2>Acesso</h2>
-                <p class="subtitulo-formulario">Entre com suas credenciais.</p>
+                <h2><i class="bi bi-unlock-fill"></i> Acesso</h2>
+                <p class="subtitulo-formulario">Entre com suas credenciais para acessar o sistema.</p>
                 
                 <form id="formLogin">
                     <div class="bloco-campo">
-                        <label for="email">E-mail Corporativo</label>
+                        <label for="email"><i class="bi bi-envelope"></i> E-mail Corporativo</label>
                         <input type="email" id="email" placeholder="nome@empresa.com.br" required>
                     </div>
                     
                     <div class="bloco-campo">
                         <div class="alinhamento-etiqueta">
-                            <label for="senha">Senha de Acesso</label>
-                            <a href="pages/recuperar.html" class="link-esquecimento">ESQUECEU?</a>
+                            <label for="senha"><i class="bi bi-key"></i> Senha de Acesso</label>
+                            <a href="pages/recuperar.html" class="link-esquecimento">Esqueceu?</a>
                         </div>
                         <input type="password" id="senha" placeholder="••••••••" required>
                     </div>
@@ -44,18 +46,13 @@
                         <label for="permanecer-logado">Manter sessão ativa</label>
                     </div>
 
-                    <button type="submit" class="botao-acao">Acessar Sistema &rarr;</button>
+                    <button type="submit" class="botao-acao"><i class="bi bi-box-arrow-in-right"></i> Acessar Sistema</button>
                 </form>
 
-                <div class="alerta-info">
-                    <p>⚠️ O acesso ao Sistema de OS é restrito a usuários autorizados.</p>
-                </div>
-
                 <div class="rodape-tela">
-                    <span>SISTEMA OS</span>
                     <div class="links-institucionais">
-                        <a href="#">Sobre</a>
-                        <a href="#">Contato</a>
+                        <a href="#"><i class="bi bi-question-circle"></i> Suporte</a>
+                        <a href="#"><i class="bi bi-info-circle"></i> Sobre</a>
                     </div>
                 </div>
             </div>
@@ -64,17 +61,12 @@
 
     <script>
         document.getElementById('formLogin').addEventListener('submit', function(evento) {
-            // Evita que a página recarregue ao enviar o formulário
             evento.preventDefault();
-
-            // Captura os valores dos campos
             const campoEmail = document.getElementById('email').value;
             const campoSenha = document.getElementById('senha').value;
 
-            // Validação simples: Se os campos não estiverem vazios
             if (campoEmail.trim() !== "" && campoSenha.trim() !== "") {
-                // Redireciona para a tela de menu (dashboard)
-                window.location.href = "pages/menu.html";
+                window.location.href = "pages/home.html";
             } else {
                 alert("Por favor, preencha todos os campos para acessar o sistema.");
             }

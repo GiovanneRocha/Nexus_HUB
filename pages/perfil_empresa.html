@@ -4,35 +4,37 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Visualizar Empresa - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
         <aside class="barra-lateral">
             <div class="topo-lateral">
-                <div class="logo-erp">Nexus HUB</div>
+                <div class="logo-erp">
+                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                    Nexus HUB
+                </div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Busca Global...">
+                </div>
             </div>
             <nav class="menu-navegacao">
-                <div class="perfil-status">
-                    <div class="avatar-mini">OS</div>
-                    <div>
-                        <p class="nome-empresa">Sistema de OS</p>
-                        <p class="tag-empresa">v1.0</p>
-                    </div>
-                </div>
                 <ul>
-                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
-                    <li class="item-ativo"><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Novo Atendimento</a></li>
+                    <li class="item-ativo"><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
                 </ul>
             </nav>
         </aside>
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="alerta-notificacao">🔔</div>
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
                 <div class="perfil-usuario">
                     <div class="info-usuario">
                         <p class="usuario-nome">Julian Vane</p>

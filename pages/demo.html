@@ -4,40 +4,38 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dados de Demonstração - Sistema OS</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="../assets/css/style.css">
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
         <aside class="barra-lateral">
             <div class="topo-lateral">
-                <div class="logo-erp">Nexus HUB</div>
+                <div class="logo-erp">
+                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                    Nexus HUB
+                </div>
                 <div class="busca-global">
+                    <i class="bi bi-search"></i>
                     <input type="text" placeholder="Busca Global...">
                 </div>
             </div>
 
             <nav class="menu-navegacao">
-                <div class="perfil-status">
-                    <div class="avatar-mini">OS</div>
-                    <div>
-                        <p class="nome-empresa">Sistema de OS</p>
-                        <p class="tag-empresa">v1.0</p>
-                    </div>
-                </div>
-
                 <ul>
-                    <li><a href="menu.html" class="link-menu">📊 Dashboard</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu">📝 Novo Atendimento</a></li>
-                    <li><a href="clientes.html" class="link-menu">👥 Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu">✅ Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu">📋 Histórico</a></li>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Novo Atendimento</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
                 </ul>
             </nav>
         </aside>
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="alerta-notificacao">🔔</div>
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
                 <div class="perfil-usuario">
                     <div class="info-usuario">
                         <p class="usuario-nome">Julian Vane</p>
@@ -55,17 +53,17 @@
 
                 <div class="container-demo" style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 600px; margin-top: 30px;">
                     <div style="margin-bottom: 30px;">
-                        <h3 style="color: #0f1221; margin-bottom: 15px;">🎯 Dados Disponíveis</h3>
+                        <h3 style="color: #0f1221; margin-bottom: 15px;"><i class="bi bi-bullseye"></i> Dados Disponíveis</h3>
                         <ul style="line-height: 2; color: #666; font-size: 0.95rem;">
-                            <li>✅ 5 clientes variados com múltiplos veículos</li>
-                            <li>✅ 15 atendimentos com diferentes status</li>
-                            <li>✅ Serviços de diversos tipos</li>
-                            <li>✅ Dados realistas para teste completo</li>
+                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 5 clientes variados com múltiplos veículos</li>
+                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 15 atendimentos com diferentes status</li>
+                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Serviços de diversos tipos</li>
+                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Dados realistas para teste completo</li>
                         </ul>
                     </div>
 
                     <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-                        <strong style="color: #856404;">⚠️ Atenção:</strong>
+                        <strong style="color: #856404;"><i class="bi bi-exclamation-triangle" style="margin-right: 5px;"></i> Atenção:</strong>
                         <p style="margin: 5px 0 0 0; color: #856404; font-size: 0.9rem;">
                             Isso irá <strong>substituir</strong> todos os dados existentes no localStorage. 
                             Certifique-se de exportar qualquer dado importante primeiro!
@@ -74,10 +72,10 @@
 
                     <div style="display: flex; gap: 10px;">
                         <button id="btn-carregar-demo" class="botao-acao" style="flex: 1; padding: 15px;">
-                            📥 Carregar Dados de Demonstração
+                            <i class="bi bi-download"></i> Carregar Dados de Demonstração
                         </button>
                         <button id="btn-limpar" class="botao-cancelar" style="flex: 1; padding: 15px;">
-                            🗑️ Limpar Todos os Dados
+                            <i class="bi bi-trash"></i> Limpar Todos os Dados
                         </button>
                     </div>
 
