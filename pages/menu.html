@@ -48,6 +48,7 @@
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
                             <a href="#"><i class="bi bi-gear"></i> Configurações</a>
                             <a href="#"><i class="bi bi-headset"></i> Suporte</a>
                             <hr>
@@ -115,6 +116,33 @@
             const menu = document.getElementById('menuSuspenso');
             menu.classList.toggle('visivel');
         }
+
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle('light-mode');
+            localStorage.setItem('nexus-theme', isLight ? 'light' : 'dark');
+            updateThemeButtonText();
+        }
+
+        function updateThemeButtonText() {
+            const button = document.getElementById('themeToggleButton');
+            if (!button) return;
+            if (document.documentElement.classList.contains('light-mode')) {
+                button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro';
+            } else {
+                button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro';
+            }
+        }
+
+        function initTheme() {
+            if (localStorage.getItem('nexus-theme') === 'light') {
+                document.documentElement.classList.add('light-mode');
+            } else {
+                document.documentElement.classList.remove('light-mode');
+            }
+            updateThemeButtonText();
+        }
+
+        window.addEventListener('DOMContentLoaded', initTheme);
 
         window.onclick = function(event) {
             if (!event.target.matches('.botao-menu-trigger') && !event.target.closest('.botao-menu-trigger')) {

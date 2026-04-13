@@ -72,8 +72,26 @@
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="info-usuario"><p class="usuario-nome">Julian Vane</p></div>
-                <img src="../assets/images/manoel.jpeg" class="foto-perfil">
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-sun-fill"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
             </header>
 
             <section class="titulo-pagina">
@@ -81,14 +99,14 @@
                 <p>Visualize e edite as páginas do relatório antes de exportar.</p>
             </section>
 
-            <div class="card-os" style="background: white; border-radius: 25px; margin-top: 30px;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead style="background: #f8f9fd;">
+            <div class="card-tabela">
+                <table class="tabela-dados">
+                    <thead>
                         <tr>
-                            <th style="padding: 25px;">DATA</th>
-                            <th style="padding: 25px;">CLIENTE</th>
-                            <th style="padding: 25px;">FROTA</th>
-                            <th style="padding: 25px; text-align: center;">AÇÃO</th>
+                            <th>DATA</th>
+                            <th>CLIENTE</th>
+                            <th>FROTA</th>
+                            <th>AÇÃO</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-historico-corpo"></tbody>
@@ -124,12 +142,12 @@
             const corpo = document.getElementById('tabela-historico-corpo');
             
             corpo.innerHTML = finalizadas.reverse().map(os => `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 20px;">${os.dataRegistro || '---'}</td>
-                    <td style="padding: 20px; font-weight: bold;">${os.cliente}</td>
-                    <td style="padding: 20px;">${os.frota ? os.frota.length : 1} veículo(s)</td>
-                    <td style="padding: 20px; text-align: center;">
-                        <button onclick="abrirEditor(${os.id})" class="botao-acao" style="background: var(--azul-escuro); font-size: 0.8rem;">Visualizar Relatório</button>
+                <tr>
+                    <td>${os.dataRegistro || '---'}</td>
+                    <td><strong>${os.cliente}</strong></td>
+                    <td>${os.frota ? os.frota.length : 1} veículo(s)</td>
+                    <td>
+                        <button onclick="abrirEditor(${os.id})" class="botao-pequeno btn-pequeno-acoes">Visualizar Relatório</button>
                     </td>
                 </tr>
             `).join('');
@@ -251,5 +269,6 @@
         function fecharEditor() { document.getElementById('modalEditor').style.display = 'none'; }
         window.onload = renderizarTabela;
     </script>
+    <script src="../assets/js/common.js"></script>
 </body>
 </html>

@@ -43,32 +43,44 @@
                         <p class="usuario-cargo">Administrador</p>
                     </div>
                     <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-sun-fill"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
                 </div>
             </header>
 
-            <section class="titulo-pagina" style="display: flex; justify-content: space-between; align-items: center;">
+            <section class="titulo-pagina">
                 <div>
                     <h1><i class="bi bi-people"></i> Gestão de Clientes</h1>
                     <p>Visualize e gerencie as empresas parceiras da AutoDiagnose.</p>
                 </div>
-                <button onclick="window.location.href='cadastrar_empresa.html'" class="botao-acao" style="width: auto; padding: 12px 25px; background: var(--azul-escuro); border-radius: 12px; color: white; border: none; cursor: pointer; font-weight: bold;">
+                <button onclick="window.location.href='cadastrar_empresa.html'" class="botao-acao">
                     <i class="bi bi-plus"></i> Nova Empresa
                 </button>
             </section>
 
-            <div class="card-os" style="background: white; border-radius: 20px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 20px; width: 100%;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead style="background: #f8f9fd; border-bottom: 2px solid #eee;">
+            <div class="card-tabela">
+                <table class="tabela-dados">
+                    <thead>
                         <tr>
-                            <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800;">EMPRESA</th>
-                            <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800;">CNPJ</th>
-                            <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800;">CONTATO PRINCIPAL</th>
-                            <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800;">TELEFONE</th>
-                            <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800;">E-MAIL</th> <th style="padding: 20px; font-size: 0.8rem; color: #777; font-weight: 800; text-align: center;">AÇÕES</th>
+                            <th>EMPRESA</th>
+                            <th>CNPJ</th>
+                            <th>CONTATO PRINCIPAL</th>
+                            <th>TELEFONE</th>
+                            <th>E-MAIL</th>
+                            <th>AÇÕES</th>
                         </tr>
                     </thead>
-                    <tbody id="tabela-clientes-corpo">
-                        </tbody>
+                    <tbody id="tabela-clientes-corpo"></tbody>
                 </table>
             </div>
         </main>
@@ -80,24 +92,25 @@
             const corpo = document.getElementById('tabela-clientes-corpo');
             
             if (empresas.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="6" style="padding: 40px; text-align: center; color: #999;">Nenhuma empresa cadastrada.</td></tr>`;
+                corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma empresa cadastrada.</td></tr>`;
                 return;
             }
 
             corpo.innerHTML = empresas.map(emp => {
                 return `
-                    <tr style="border-bottom: 1px solid #eee; transition: 0.3s;" onmouseover="this.style.background='#fbfcfe'" onmouseout="this.style.background='white'">
-                        <td style="padding: 15px 20px;">
-                            <div style="display: flex; align-items: center; gap: 12px;">
-                                <div style="width: 35px; height: 35px; border-radius: 8px; background: #f0f2f5; display: flex; align-items: center; justify-content: center; font-size: 1.2rem;"><i class="bi bi-building"></i></div>
-                                <strong style="color: var(--azul-escuro);">${emp.nome}</strong>
+                    <tr>
+                        <td>
+                            <div class="tabela-empresa">
+                                <div class="tabela-icone"><i class="bi bi-building"></i></div>
+                                <strong>${emp.nome}</strong>
                             </div>
                         </td>
-                        <td style="padding: 20px; font-size: 0.9rem; color: #555;">${emp.cnpj}</td>
-                        <td style="padding: 20px; font-size: 0.9rem; color: #555;">${emp.contato || '---'}</td>
-                        <td style="padding: 20px; font-size: 0.9rem; color: #555;">${emp.telefone}</td>
-                        <td style="padding: 20px; font-size: 0.9rem; color: #555;">${emp.email || '---'}</td> <td style="padding: 20px; text-align: center;">
-                            <button onclick="verPerfil(${emp.id})" style="background: #eef2ff; color: #4f46e5; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 0.8rem;">
+                        <td>${emp.cnpj}</td>
+                        <td>${emp.contato || '---'}</td>
+                        <td>${emp.telefone}</td>
+                        <td>${emp.email || '---'}</td>
+                        <td>
+                            <button onclick="verPerfil(${emp.id})" class="botao-pequeno btn-pequeno-acoes">
                                 Visualizar Perfil
                             </button>
                         </td>
@@ -113,5 +126,6 @@
 
         window.onload = renderizarClientes;
     </script>
+    <script src="../assets/js/common.js"></script>
 </body>
 </html>

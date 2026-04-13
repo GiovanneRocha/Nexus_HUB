@@ -48,6 +48,7 @@
                             <i class="bi bi-three-dots-vertical"></i>
                         </button>
                         <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
                             <a href="#"><i class="bi bi-gear"></i> Configurações</a>
                             <a href="#"><i class="bi bi-headset"></i> Suporte</a>
                             <hr>
@@ -369,21 +370,7 @@
     </style>
 
     <script>
-        function alternarMenu() {
-            const menu = document.getElementById('menuSuspenso');
-            menu.classList.toggle('visivel');
-        }
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.botao-menu-trigger') && !event.target.closest('.botao-menu-trigger')) {
-                const menus = document.getElementsByClassName("menu-suspenso");
-                for (let i = 0; i < menus.length; i++) {
-                    if (menus[i].classList.contains('visivel')) {
-                        menus[i].classList.remove('visivel');
-                    }
-                }
-            }
-        }
+        // menu toggle and theme behavior handled by common.js
 
         function abrirMenu() {
             window.location.href = 'menu.html';

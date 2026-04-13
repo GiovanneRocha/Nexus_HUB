@@ -73,11 +73,26 @@
 
         <main class="conteudo-principal">
             <header class="cabecalho-topo">
-                <div class="info-usuario">
-                    <p class="usuario-nome">Julian Vane</p>
-                    <p class="usuario-cargo">Administrador</p>
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-sun-fill"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
                 </div>
-                <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
             </header>
 
             <section class="titulo-pagina">
@@ -85,15 +100,15 @@
                 <p>Clique em "Ver Detalhes" para conferir os itens de cada veículo antes de aprovar.</p>
             </section>
 
-            <div class="card-os" style="background: white; border-radius: 25px; padding: 0; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.05); margin-top: 30px; width: 100%;">
-                <table style="width: 100%; border-collapse: collapse; text-align: left;">
-                    <thead style="background: #f8f9fd; border-bottom: 2px solid #eee;">
+            <div class="card-tabela">
+                <table class="tabela-dados">
+                    <thead>
                         <tr>
-                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">DATA</th>
-                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">CLIENTE</th>
-                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">FROTA</th>
-                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800;">TOTAL</th>
-                            <th style="padding: 25px; font-size: 0.8rem; color: #777; font-weight: 800; text-align: center;">AÇÕES</th>
+                            <th>DATA</th>
+                            <th>CLIENTE</th>
+                            <th>FROTA</th>
+                            <th>TOTAL</th>
+                            <th>AÇÕES</th>
                         </tr>
                     </thead>
                     <tbody id="tabela-revisao-corpo"></tbody>
@@ -126,18 +141,18 @@
             const corpo = document.getElementById('tabela-revisao-corpo');
 
             if (emRevisao.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="5" style="padding: 60px; text-align: center; color: #999;">Nenhuma OS pendente.</td></tr>`;
+                corpo.innerHTML = `<tr><td colspan="5" class="sem-dados">Nenhuma OS pendente.</td></tr>`;
                 return;
             }
 
             corpo.innerHTML = emRevisao.map(os => `
-                <tr style="border-bottom: 1px solid #eee;">
-                    <td style="padding: 20px 25px;">${os.dataRegistro || 'Recém criada'}</td>
-                    <td style="padding: 20px 25px;"><strong style="color: var(--azul-escuro);">${os.cliente}</strong></td>
-                    <td style="padding: 20px 25px;">${os.frota ? os.frota.length : 1} Veículo(s)</td>
-                    <td style="padding: 20px 25px;"><strong style="color: var(--verde-agua);">R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</strong></td>
-                    <td style="padding: 20px 25px; text-align: center;">
-                        <button onclick="abrirVerificacao(${os.id})" style="background: #f0f4ff; color: #4f46e5; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold;"><i class="bi bi-search"></i> Ver Detalhes</button>
+                <tr>
+                    <td>${os.dataRegistro || 'Recém criada'}</td>
+                    <td><strong>${os.cliente}</strong></td>
+                    <td>${os.frota ? os.frota.length : 1} Veículo(s)</td>
+                    <td><strong style="color: var(--verde-agua);">R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</strong></td>
+                    <td>
+                        <button onclick="abrirVerificacao(${os.id})" class="botao-pequeno btn-pequeno-acoes"><i class="bi bi-search"></i> Ver Detalhes</button>
                     </td>
                 </tr>
             `).join('');
@@ -197,5 +212,6 @@
 
         window.onload = renderizarRevisao;
     </script>
+    <script src="../assets/js/common.js"></script>
 </body>
 </html>
