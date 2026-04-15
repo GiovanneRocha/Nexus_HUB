@@ -1,103 +1,146 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Clientes - Nexus HUB</title>
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
-    <link rel="stylesheet" href="../assets/css/style.css">
-</head>
-<body class="corpo-dashboard">
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+  </head>
+  <body class="corpo-dashboard">
     <div class="layout-erp">
-        <aside class="barra-lateral">
-            <div class="topo-lateral">
-                <div class="logo-erp">
-                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
-                    Nexus HUB
-                </div>
-                <div class="busca-global">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Busca Global...">
-                </div>
+      <aside class="barra-lateral">
+        <div class="topo-lateral">
+          <div class="logo-erp">
+            <img
+              src="../assets/images/icon-sistem.png"
+              alt="Nexus"
+              class="logo-icon-small"
+            />
+            Nexus HUB
+          </div>
+          <div class="busca-global">
+            <i class="bi bi-search"></i>
+            <input type="text" placeholder="Busca Global..." />
+          </div>
+        </div>
+        <nav class="menu-navegacao">
+          <ul>
+            <li>
+              <a href="home.html" class="link-menu"
+                ><i class="bi bi-house-door"></i> Início</a
+              >
+            </li>
+            <li>
+              <a href="menu.html" class="link-menu"
+                ><i class="bi bi-speedometer2"></i> Painel</a
+              >
+            </li>
+            <li>
+              <a href="novo_atendimento.html" class="link-menu"
+                ><i class="bi bi-plus-circle"></i> Novo Atendimento</a
+              >
+            </li>
+            <li class="item-ativo">
+              <a href="clientes.html" class="link-menu"
+                ><i class="bi bi-people"></i> Clientes</a
+              >
+            </li>
+            <li>
+              <a href="revisao.html" class="link-menu"
+                ><i class="bi bi-check-square"></i> Revisão de OS</a
+              >
+            </li>
+            <li>
+              <a href="historico.html" class="link-menu"
+                ><i class="bi bi-clock-history"></i> Histórico</a
+              >
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <main class="conteudo-principal">
+        <header class="cabecalho-topo">
+          <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
+          <div class="perfil-usuario">
+            <div class="info-usuario">
+              <p class="usuario-nome">Julian Vane</p>
+              <p class="usuario-cargo">Administrador</p>
             </div>
-            <nav class="menu-navegacao">
-                <ul>
-                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
-                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Novo Atendimento</a></li>
-                    <li class="item-ativo"><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
-                </ul>
-
-                
-            </nav>
-        </aside>
-
-        <main class="conteudo-principal">
-            <header class="cabecalho-topo">
-                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
-                <div class="perfil-usuario">
-                    <div class="info-usuario">
-                        <p class="usuario-nome">Julian Vane</p>
-                        <p class="usuario-cargo">Administrador</p>
-                    </div>
-                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
-                    <div class="menu-opcoes-container">
-                        <button class="botao-menu-trigger" onclick="alternarMenu()">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <div class="menu-suspenso" id="menuSuspenso">
-                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-sun-fill"></i> Modo Claro</button>
-                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
-                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
-                            <hr>
-                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
-
-            <section class="titulo-pagina">
-                <div>
-                    <h1><i class="bi bi-people"></i> Gestão de Clientes</h1>
-                    <p>Visualize e gerencie as empresas parceiras da AutoDiagnose.</p>
-                </div>
-                <button onclick="window.location.href='cadastrar_empresa.html'" class="botao-acao">
-                    <i class="bi bi-plus"></i> Nova Empresa
+            <img
+              src="../assets/images/manoel.jpeg"
+              alt="Perfil"
+              class="foto-perfil"
+            />
+            <div class="menu-opcoes-container">
+              <button class="botao-menu-trigger" onclick="alternarMenu()">
+                <i class="bi bi-three-dots-vertical"></i>
+              </button>
+              <div class="menu-suspenso" id="menuSuspenso">
+                <button
+                  id="themeToggleButton"
+                  type="button"
+                  onclick="toggleTheme()"
+                >
+                  <i class="bi bi-sun-fill"></i> Modo Claro
                 </button>
-            </section>
-
-            <div class="card-tabela">
-                <table class="tabela-dados">
-                    <thead>
-                        <tr>
-                            <th>EMPRESA</th>
-                            <th>CNPJ</th>
-                            <th>CONTATO PRINCIPAL</th>
-                            <th>TELEFONE</th>
-                            <th>E-MAIL</th>
-                            <th>AÇÕES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabela-clientes-corpo"></tbody>
-                </table>
+                <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                <hr />
+                <a href="#" onclick="logout()" class="logout"
+                  ><i class="bi bi-box-arrow-right"></i> Logout</a
+                >
+              </div>
             </div>
-        </main>
+          </div>
+        </header>
+
+        <section class="titulo-pagina">
+          <div>
+            <h1><i class="bi bi-people"></i> Gestão de Clientes</h1>
+            <p>Visualize e gerencie as empresas parceiras da AutoDiagnose.</p>
+          </div>
+          <button
+            onclick="window.location.href = 'cadastrar_empresa.html'"
+            class="botao-acao"
+          >
+            <i class="bi bi-plus"></i> Nova Empresa
+          </button>
+        </section>
+
+        <div class="card-tabela">
+          <table class="tabela-dados">
+            <thead>
+              <tr>
+                <th>EMPRESA</th>
+                <th>CNPJ</th>
+                <th>CONTATO PRINCIPAL</th>
+                <th>TELEFONE</th>
+                <th>E-MAIL</th>
+                <th>AÇÕES</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-clientes-corpo"></tbody>
+          </table>
+        </div>
+      </main>
     </div>
 
     <script>
-        function renderizarClientes() {
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            const corpo = document.getElementById('tabela-clientes-corpo');
-            
-            if (empresas.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma empresa cadastrada.</td></tr>`;
-                return;
-            }
+      function renderizarClientes() {
+        const empresas =
+          JSON.parse(localStorage.getItem("nexus_empresas")) || []
+        const corpo = document.getElementById("tabela-clientes-corpo")
 
-            corpo.innerHTML = empresas.map(emp => {
-                return `
+        if (empresas.length === 0) {
+          corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma empresa cadastrada.</td></tr>`
+          return
+        }
+
+        corpo.innerHTML = empresas
+          .map((emp) => {
+            return `
                     <tr>
                         <td>
                             <div class="tabela-empresa">
@@ -106,26 +149,48 @@
                             </div>
                         </td>
                         <td>${emp.cnpj}</td>
-                        <td>${emp.contato || '---'}</td>
+                        <td>${emp.contato || "---"}</td>
                         <td>${emp.telefone}</td>
-                        <td>${emp.email || '---'}</td>
+                        <td>${emp.email || "---"}</td>
                         <td>
                             <button onclick="verPerfil(${emp.id})" class="botao-pequeno btn-pequeno-acoes">
                                 Visualizar Perfil
                             </button>
                         </td>
                     </tr>
-                `;  
-            }).join('');
-        }
+                `
+          })
+          .join("")
+      }
 
-        function verPerfil(id) {
-            localStorage.setItem('empresa_selecionada', id);
-            window.location.href = 'perfil_empresa.html';
-        }
+      function verPerfil(id) {
+        localStorage.setItem("empresa_selecionada", id)
+        window.location.href = "perfil_empresa.html"
+      }
 
-        window.onload = renderizarClientes;
+      window.onload = renderizarClientes
+    </script>
+    <script>
+      const token = localStorage.getItem("token")
+      if (!token) {
+        window.location.href = "../login.html" // Redireciona se não logado
+      } else {
+        // Opcional: Verificar token no backend
+        fetch("http://localhost:3000/protected", {
+          headers: { Authorization: `Bearer ${token}` },
+        }).then((res) => {
+          if (!res.ok) {
+            localStorage.removeItem("token")
+            window.location.href = "../login.html"
+          }
+        })
+      }
+
+      function logout() {
+        localStorage.removeItem("token")
+        window.location.href = "../login.html"
+      }
     </script>
     <script src="../assets/js/common.js"></script>
-</body>
+  </body>
 </html>

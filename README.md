@@ -6,14 +6,33 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 
 ---
 
+## 🚀 Como Executar
+
+### Pré-requisitos
+
+- Node.js instalado (baixe em nodejs.org)
+- MySQL rodando (via XAMPP ou similar)
+- Banco de dados 'nexus_hub' com tabela 'usuarios' (username, password hasheada com bcrypt)
+
+### Instalação
+
+1. Instale dependências: `npm install`
+2. Configure o banco no `server.js` (host, user, password, database)
+3. Rode o servidor: `npm start` ou `node server.js`
+4. Abra `http://localhost:3000/login.html` no navegador
+
+---
+
 ## ✨ Funcionalidades Implementadas
 
 ### 1. **Autenticação e Login** (Página Principal)
+
 - Acesso seguro ao sistema com validação de e-mail e senha
 - Recuperação de senha com redirecionamento
 - Link para cadastro de novos usuários
 
 ### 2. **Dashboard Principal** (`menu.html`)
+
 - **Métricas em tempo real:**
   - OS Abertas (aguardando revisão)
   - Atendimentos em Análise
@@ -23,6 +42,7 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 - **Menu de navegação** para todas as funcionalidades
 
 ### 3. **Registro de Atendimento** (`novo_atendimento.html`) - RF01, RF02
+
 - **Informações do Cliente:** Nome, telefone, e-mail, endereço
 - **Informações do Veículo:** Placa, modelo, ano, cor
 - **Serviço Realizado:**
@@ -34,6 +54,7 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 - **Status automático** como "Pendente Revisão"
 
 ### 4. **Painel de Revisão Administrativa** (`revisao.html`) - RF05, RF06, RF07
+
 - **Lista de atendimentos** para revisão
 - **Filtro por status:** Pendente, Em Análise, Aprovado, Rejeitado
 - **Modal de edição** para correção de dados
@@ -42,6 +63,7 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 - **Validação** antes de aprovação final
 
 ### 5. **Arquivo de Histórico** (`historico.html`) - RF10
+
 - **Listagem de todas as OSs finalizadas** e aprovadas
 - **Busca** por cliente ou placa de veículo
 - **Visualização de detalhes** completos de cada OS
@@ -49,6 +71,7 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 - **Geração de relatório geral** com todas as OSs e valores
 
 ### 6. **Base de Clientes** (`clientes.html`)
+
 - **Visualização de todos os clientes** cadastrados no sistema
 - **Informações resumidas:** E-mail, telefone, endereço
 - **Veículos associados** ao cliente com placa e modelo
@@ -57,6 +80,7 @@ Sistema web completo para gerenciamento de atendimentos e ordens de serviço par
 - **Busca por nome**
 
 ### 7. **Exportação em PDF** - RF08, RF09
+
 - **PDF individual:** Cada OS pode ser exportada em PDF formatado
 - **Relatório geral:** Exporta todas as OSs aprovadas com totalizações
 - **Layout profissional** com dados completos do cliente, veículo e serviço
@@ -113,6 +137,7 @@ Nexus_HUB-main/
 O sistema utiliza **localStorage** do navegador para armazenar:
 
 ### Estrutura de Atendimento:
+
 ```json
 {
   "id": 1234567890,
@@ -131,7 +156,7 @@ O sistema utiliza **localStorage** do navegador para armazenar:
   "servico": {
     "tipo": "Manutenção Preventiva",
     "descricao": "Descrição do serviço...",
-    "valor": 150.00,
+    "valor": 150.0,
     "data": "2026-04-06",
     "observacoes": "Anotações..."
   },
@@ -161,17 +186,20 @@ O sistema utiliza **localStorage** do navegador para armazenar:
 ## 🚀 Como Usar
 
 ### 1. **Login**
+
 - Abra `index.html` no navegador
 - Preencha qualquer email e senha (validação simples)
 - Clique em "Acessar Sistema"
 
 ### 2. **Registrar um Novo Atendimento**
+
 - Acesse "Novo Atendimento" no menu
 - Preencha os dados do cliente, veículo e serviço
 - Clique em "Registrar Atendimento"
 - A OS será criada com status "Pendente Revisão"
 
 ### 3. **Revisar Atendimentos**
+
 - Acesse "Revisão de OS" no menu
 - Visualize os atendimentos pendentes
 - Clique em "Revisar" para editar
@@ -179,11 +207,13 @@ O sistema utiliza **localStorage** do navegador para armazenar:
 - Salve as alterações
 
 ### 4. **Consultar Histórico**
+
 - Acesse "Histórico" no menu
 - Busque por cliente ou placa
 - Exporte individual ou geral em PDF
 
 ### 5. **Gerenciar Clientes**
+
 - Acesse "Clientes" no menu
 - Visualize todos os clientes cadastrados
 - Veja o histórico de cada um
@@ -192,18 +222,18 @@ O sistema utiliza **localStorage** do navegador para armazenar:
 
 ## 📱 Requisitos Atendidos
 
-| Requisito | Funcionalidade | Status |
-|-----------|---------------|--------|
-| RF01 | Registro de informações do serviço | ✅ Implementado |
-| RF02 | Envio de dados para o sistema | ✅ Implementado |
-| RF03 | Recepção do apontamento | ✅ Implementado |
-| RF04 | Vinculação automática à OS e cliente | ✅ Implementado |
-| RF05 | Interface para leitura de dados | ✅ Implementado |
-| RF06 | Correção de erros | ✅ Implementado |
-| RF07 | Organização antes de aprovação | ✅ Implementado |
-| RF08 | Fechamento de OS | ✅ Implementado |
-| RF09 | Exportação em PDF formatado | ✅ Implementado |
-| RF10 | Arquivo de histórico de OSs | ✅ Implementado |
+| Requisito | Funcionalidade                       | Status          |
+| --------- | ------------------------------------ | --------------- |
+| RF01      | Registro de informações do serviço   | ✅ Implementado |
+| RF02      | Envio de dados para o sistema        | ✅ Implementado |
+| RF03      | Recepção do apontamento              | ✅ Implementado |
+| RF04      | Vinculação automática à OS e cliente | ✅ Implementado |
+| RF05      | Interface para leitura de dados      | ✅ Implementado |
+| RF06      | Correção de erros                    | ✅ Implementado |
+| RF07      | Organização antes de aprovação       | ✅ Implementado |
+| RF08      | Fechamento de OS                     | ✅ Implementado |
+| RF09      | Exportação em PDF formatado          | ✅ Implementado |
+| RF10      | Arquivo de histórico de OSs          | ✅ Implementado |
 
 ---
 
@@ -213,7 +243,7 @@ O sistema utiliza **localStorage** do navegador para armazenar:
 - ✅ Confirmação antes de deletar
 - ✅ Status de controle de fluxo
 - ✅ IDs únicos por timestamp
-- ⚠️ *Nota:* Login atualmente é apenas front-end. Para produção, implementar backend com autenticação real.
+- ⚠️ _Nota:_ Login atualmente é apenas front-end. Para produção, implementar backend com autenticação real.
 
 ---
 
