@@ -7,8 +7,8 @@
     --verde-esmeralda: #10b981;
     --verde-esmeralda-claro: #34d399;
     --verde-escuro: #059669;
-    --texto-principal: #e5e7eb;
-    --texto-secundario: #9ca3af;
+    --texto-principal: #ffffff;
+    --texto-secundario: #65686d;
     --texto-suave: #6b7280;
     --destaque: #10b981;
     --branco: #ffffff;
@@ -216,7 +216,7 @@ textarea {
     border: 1px solid var(--bordar);
     border-radius: 14px;
     outline: none;
-    color: var(--texto-principal);
+    color: var(--texto-secundario);
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
 }
 
@@ -502,7 +502,7 @@ textarea {
     width: 100%;
     padding: 14px 18px;
     text-decoration: none;
-    color: var(--texto-principal);
+    color: var(--texto-secundario);
     font-size: 0.95rem;
     text-align: left;
     background: none;

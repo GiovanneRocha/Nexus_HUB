@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Peças - Nexus HUB</title>
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        body.contraste-alto, body.contraste-alto * {
+            background: #000 !important;
+            color: #fff !important;
+            border-color: #fff !important;
+        }
+        .skip-link {
+            position: absolute;
+            left: -999px;
+            top: 10px;
+            background: #222;
+            color: #fff;
+            padding: 8px 16px;
+            z-index: 1000;
+        }
+        .skip-link:focus {
+            left: 10px;
+        }
+        .log-historico {
+            background: #f4f4f4;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 20px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+    <script src="../assets/js/log.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+</head>
+<body>
+    <div class="container-principal">
+    <a href="#main-content" class="skip-link" tabindex="1">Pular para o conteúdo principal</a>
+    <button id="btn-contraste" style="position:fixed;top:10px;right:10px;z-index:1001;" aria-label="Ativar/desativar alto contraste" accesskey="c">Contraste</button>
+    <div class="container" id="main-content" tabindex="0">
+        <div class="secao-formulario">
+            <div class="caixa-formulario">
+                <h2><i class="bi bi-nut"></i> Cadastro de Peças</h2>
+                <form id="formPeca">
+                    <div class="bloco-campo">
+                        <label for="nomePeca"><i class="bi bi-box"></i> Nome da Peça</label>
+                        <input type="text" id="nomePeca" placeholder="Ex: Filtro de óleo" required>
+                    </div>
+                    <div class="bloco-campo">
+                        <label for="codigoPeca"><i class="bi bi-upc"></i> Código</label>
+                        <input type="text" id="codigoPeca" placeholder="Código da peça" required>
+                    </div>
+                    <div class="bloco-campo">
+                        <label for="estoquePeca"><i class="bi bi-archive"></i> Estoque</label>
+                        <input type="number" id="estoquePeca" placeholder="Quantidade em estoque" min="0" required>
+                    </div>
+                    <div class="bloco-campo">
+                        <label for="precoPeca"><i class="bi bi-currency-dollar"></i> Preço</label>
+                        <input type="number" id="precoPeca" placeholder="Preço da peça" min="0" step="0.01" required>
+                    </div>
+                    <button type="submit" class="botao-acao"><i class="bi bi-plus-circle"></i> Cadastrar Peça</button>
+                </form>
+                <div id="mensagem" class="mensagem-sucesso" style="display:none;"></div>
+                <hr>
+                <h3>Peças Cadastradas</h3>
+                <input type="text" id="buscaPeca" placeholder="Buscar por nome ou código..." style="width:100%;margin-bottom:10px;">
+                <ul id="listaPecas" class="lista-pecas"></ul>
+            </div>
+        </div>
+    </div>
+    <script>
+    // Contraste e atalhos
+    document.getElementById('btn-contraste').onclick = function() {
+        document.body.classList.toggle('contraste-alto');
+        localStorage.setItem('contrasteAtivo', document.body.classList.contains('contraste-alto'));
+    };
+    if(localStorage.getItem('contrasteAtivo') === 'true') {
+        document.body.classList.add('contraste-alto');
+    }
+    document.addEventListener('keydown', function(e) {
+        if (e.altKey && e.key.toLowerCase() === 'c') {
+            document.getElementById('btn-contraste').click();
+        }
+        if (e.altKey && e.key.toLowerCase() === 's') {
+            document.querySelector('.skip-link').focus();
+        }
+    });
+
+    // Exemplo: salvar log ao cadastrar peça
+    document.getElementById('formPeca')?.addEventListener('submit', function(e) {
+        const codigo = document.getElementById('codigoPeca')?.value || '';
+        salvarLog('peca', codigo, 'Cadastro', 'Peça cadastrada');
+    });
+
+    // Exibir histórico
+    function mostrarHistorico() {
+        const codigo = document.getElementById('codigoPeca')?.value || '';
+        const logs = obterLog('peca', codigo);
+        const div = document.getElementById('historico-log');
+        if (!div) return;
+        div.innerHTML = logs.length ? logs.map(l => `<div><b>${l.data}</b>: ${l.acao} - ${l.detalhes}</div>`).join('') : '<i>Nenhum histórico.</i>';
+    }
+    document.getElementById('codigoPeca')?.addEventListener('blur', mostrarHistorico);
+    window.onload = mostrarHistorico;
+        function carregarPecas(filtro = "") {
+            const lista = document.getElementById('listaPecas');
+            lista.innerHTML = '';
+            const pecas = JSON.parse(localStorage.getItem('pecas')) || [];
+            const filtroLower = filtro.trim().toLowerCase();
+            pecas.filter(peca => {
+                if (!filtroLower) return true;
+                return (
+                    peca.nome.toLowerCase().includes(filtroLower) ||
+                    peca.codigo.toLowerCase().includes(filtroLower)
+                );
+            }).forEach((peca, idx) => {
+                const li = document.createElement('li');
+                li.innerHTML = `
+                    <span class="nome-peca">${peca.nome} (Cód: ${peca.codigo}) - Estoque: ${peca.estoque} - R$ ${parseFloat(peca.preco).toFixed(2)}</span>
+                    <button onclick="editarPeca(${idx})" title="Editar"><i class="bi bi-pencil"></i></button>
+                    <button onclick="excluirPeca(${idx})" title="Excluir"><i class="bi bi-trash"></i></button>
+                `;
+                lista.appendChild(li);
+            });
+        }
+        // Filtro de busca
+        document.addEventListener('DOMContentLoaded', function() {
+            const busca = document.getElementById('buscaPeca');
+            if (busca) {
+                busca.addEventListener('input', function() {
+                    carregarPecas(this.value);
+                });
+            }
+            carregarPecas();
+        });
+
+        function mostrarMensagem(msg, tipo) {
+            const el = document.getElementById('mensagem');
+            el.textContent = msg;
+            el.className = tipo === 'erro' ? 'mensagem-erro' : 'mensagem-sucesso';
+            el.style.display = 'block';
+            setTimeout(() => { el.style.display = 'none'; }, 3500);
+        }
+
+        document.getElementById('formPeca').addEventListener('submit', function(evento) {
+            evento.preventDefault();
+            const nomeInput = document.getElementById('nomePeca');
+            const codigoInput = document.getElementById('codigoPeca');
+            const estoqueInput = document.getElementById('estoquePeca');
+            const precoInput = document.getElementById('precoPeca');
+
+            const nome = nomeInput.value.trim();
+            const codigo = codigoInput.value.trim();
+            const estoque = estoqueInput.value;
+            const preco = precoInput.value;
+
+            // Reset estilos
+            [nomeInput, codigoInput, estoqueInput, precoInput].forEach(i => i.classList.remove('erro-campo'));
+
+            if (!nome || !codigo || estoque === '' || preco === '') {
+                mostrarMensagem('Preencha todos os campos!', 'erro');
+                [nomeInput, codigoInput, estoqueInput, precoInput].forEach(i => { if (!i.value) i.classList.add('erro-campo'); });
+                return;
+            }
+            if (isNaN(estoque) || parseInt(estoque) < 0) {
+                mostrarMensagem('Estoque inválido!', 'erro');
+                estoqueInput.classList.add('erro-campo');
+                return;
+            }
+            if (isNaN(preco) || parseFloat(preco) < 0) {
+                mostrarMensagem('Preço inválido!', 'erro');
+                precoInput.classList.add('erro-campo');
+                return;
+            }
+            let pecas = JSON.parse(localStorage.getItem('pecas')) || [];
+            if (window.idxEdicaoPeca !== undefined) {
+                pecas[window.idxEdicaoPeca] = { nome, codigo, estoque, preco };
+                window.idxEdicaoPeca = undefined;
+                mostrarMensagem('Peça editada com sucesso!', 'sucesso');
+            } else {
+                pecas.push({ nome, codigo, estoque, preco });
+                mostrarMensagem('Peça cadastrada com sucesso!', 'sucesso');
+            }
+            localStorage.setItem('pecas', JSON.stringify(pecas));
+            document.getElementById('formPeca').reset();
+            carregarPecas();
+        });
+
+        window.editarPeca = function(idx) {
+            const pecas = JSON.parse(localStorage.getItem('pecas')) || [];
+            document.getElementById('nomePeca').value = pecas[idx].nome;
+            document.getElementById('codigoPeca').value = pecas[idx].codigo;
+            document.getElementById('estoquePeca').value = pecas[idx].estoque;
+            document.getElementById('precoPeca').value = pecas[idx].preco;
+            window.idxEdicaoPeca = idx;
+        };
+
+        window.excluirPeca = function(idx) {
+            if (!confirm('Deseja realmente excluir esta peça?')) return;
+            let pecas = JSON.parse(localStorage.getItem('pecas')) || [];
+            pecas.splice(idx, 1);
+            localStorage.setItem('pecas', JSON.stringify(pecas));
+            carregarPecas();
+        };
+
+        carregarPecas();
+
+        // Estilo para campos com erro
+        const style = document.createElement('style');
+        style.innerHTML = `
+        .erro-campo { border: 2px solid #e74c3c !important; background: #fff0f0 !important; }
+        .mensagem-erro { color: #fff; background: #e74c3c; padding: 8px; border-radius: 4px; margin-top: 10px; text-align: center; }
+        .mensagem-sucesso { color: #fff; background: #10b981; padding: 8px; border-radius: 4px; margin-top: 10px; text-align: center; }
+        .lista-pecas { list-style: none; padding: 0; }
+        .lista-pecas li { background: #1f2937; color: #fff; margin-bottom: 6px; padding: 8px 12px; border-radius: 4px; font-size: 1rem; }
+        @media (max-width: 600px) {
+            .caixa-formulario, .secao-formulario { padding: 8px !important; }
+            .lista-pecas li { font-size: 0.95rem; padding: 6px 6px; }
+        }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
