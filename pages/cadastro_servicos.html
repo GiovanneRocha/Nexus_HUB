@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro de Serviços - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar...">
+                </div>
+            </div>
+            <nav class="menu-navegacao">
+                <ul>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
+                    <li class="item-ativo"><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
+                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
+                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">
+                    <i class="bi bi-bell"></i>
+                </div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="titulo-pagina">
+                <h1><i class="bi bi-tools"></i> Gestão de Serviços</h1>
+                <p>Cadastre novos tipos de serviços para serem utilizados nas Ordens de Serviço.</p>
+            </section>
+
+            <div class="container-formulario-novo-atendimento">
+                <form id="formCadastroServico">
+                    <div class="secao-formulario-novo">
+                        <h3><i class="bi bi-plus-lg"></i> Novo Serviço</h3>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label>Nome do Serviço</label>
+                                <input type="text" id="nome-servico" placeholder="Ex: Manutenção de Motor" required>
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label>Valor Padrão (R$)</label>
+                                <input type="number" id="valor-servico" step="0.01" placeholder="0.00" required>
+                            </div>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label>Descrição Padrão</label>
+                            <textarea id="desc-servico" rows="2" placeholder="Breve descrição técnica..."></textarea>
+                        </div>
+                        <button type="submit" class="botao-acao" style="margin-top: 20px;">
+                            <i class="bi bi-save"></i> Salvar no Banco de Dados
+                        </button>
+                    </div>
+                </form>
+
+                <div class="secao-formulario-novo">
+                    <h3><i class="bi bi-list-ul"></i> Serviços Cadastrados</h3>
+                    <div id="lista-servicos-cadastrados">
+                        </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const form = document.getElementById('formCadastroServico');
+
+        function renderizarServicos() {
+            const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
+            const container = document.getElementById('lista-servicos-cadastrados');
+            
+            if (servicos.length === 0) {
+                container.innerHTML = '<p style="color: var(--texto-secundario);">Nenhum serviço personalizado cadastrado.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="tabela-custom" style="width: 100%; color: var(--texto-principal);">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--bordar);">
+                            <th>Serviço</th>
+                            <th>Valor</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${servicos.map((s, index) => `
+                            <tr>
+                                <td>${s.nome}</td>
+                                <td>R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                                <td><button onclick="removerServico(${index})" class="botao-cancelar" style="padding: 5px 10px;"><i class="bi bi-trash"></i></button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const novo = {
+                nome: document.getElementById('nome-servico').value,
+                valor: document.getElementById('valor-servico').value,
+                desc: document.getElementById('desc-servico').value
+            };
+            const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
+            servicos.push(novo);
+            localStorage.setItem('nexus_servicos_custom', JSON.stringify(servicos));
+            form.reset();
+            renderizarServicos();
+        });
+
+        function removerServico(index) {
+            if(confirm("Deseja excluir este serviço?")) {
+                const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom'));
+                servicos.splice(index, 1);
+                localStorage.setItem('nexus_servicos_custom', JSON.stringify(servicos));
+                renderizarServicos();
+            }
+        }
+
+        window.onload = renderizarServicos;
+    </script>
+</body>
+</html>
