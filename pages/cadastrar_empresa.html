@@ -71,7 +71,7 @@
                         </div>
                         <div class="bloco-campo-novo">
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">CNPJ *</label>
-                            <input type="text" id="cnpj-empresa" placeholder="00.000.000/0000-00" required maxlength="18" style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+                            <input type="text" id="cnpj-empresa" placeholder="00.000.000/0000-00" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
                         </div>
                     </div>
 
@@ -102,7 +102,7 @@
                         <textarea id="obs-empresa" placeholder="Informações relevantes sobre o contrato ou frota..." rows="4" style="width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #f0f2f5; resize: none;"></textarea>
                     </div>
 
-                    <button type="submit" id="btnSalvar" class="botao-acao" style="width: 100%; padding: 22px; background: var(--azul-escuro); font-size: 1.1rem; border-radius: 15px;">Salvar Empresa</button>
+                    <button type="submit" class="botao-acao" style="width: 100%; padding: 22px; background: var(--azul-escuro); font-size: 1.1rem; border-radius: 15px;">Salvar Empresa</button>
                 </div>
             </form>
         </main>
@@ -112,12 +112,8 @@
         document.getElementById('formNovaEmpresa').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const btnSalvar = document.getElementById('btnSalvar');
-            btnSalvar.innerText = "Salvando...";
-            btnSalvar.disabled = true;
-
-            // Coleta os dados exatos como estavam antes
             const novaEmpresa = {
+                id: Date.now(),
                 nome: document.getElementById('nome-empresa').value,
                 cnpj: document.getElementById('cnpj-empresa').value,
                 site: document.getElementById('site-empresa').value,
@@ -128,35 +124,17 @@
                 historico_atividades: [{
                     tipo: "registro",
                     mensagem: "Empresa cadastrada no sistema Nexus HUB.",
+                    data: new Date().toLocaleString('pt-BR'),
                     usuario: "Julian Vane"
                 }]
             };
 
-            // Envia para o arquivo PHP processar a inserção no banco
-            fetch('../php/salvar_empresa.php', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(novaEmpresa)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.sucesso) {
-                    alert('✅ Empresa salva com sucesso no banco de dados!');
-                    window.location.href = 'clientes.html';
-                } else {
-                    alert('❌ Erro ao salvar: ' + data.erro);
-                    btnSalvar.innerText = "Salvar Empresa";
-                    btnSalvar.disabled = false;
-                }
-            })
-            .catch(error => {
-                console.error('Erro:', error);
-                alert('❌ Erro de comunicação com o servidor.');
-                btnSalvar.innerText = "Salvar Empresa";
-                btnSalvar.disabled = false;
-            });
+            let empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            empresas.push(novaEmpresa);
+            localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
+
+            alert('✅ Empresa salva com sucesso!');
+            window.location.href = 'clientes.html';
         });
     </script>
 </body>

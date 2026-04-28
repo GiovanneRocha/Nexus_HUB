@@ -90,65 +90,44 @@
     </div>
 
     <script>
-        // Função assíncrona para buscar os dados no banco
-        async function carregarClientes() {
+        function renderizarClientes() {
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
             const corpo = document.getElementById('tabela-clientes-corpo');
             
-            // Estado de carregamento visual
-            corpo.innerHTML = `<tr><td colspan="6" style="text-align:center; padding: 20px;">Carregando empresas... <i class="bi bi-hourglass-split"></i></td></tr>`;
-
-            try {
-                // Faz a requisição para o nosso novo endpoint PHP
-                const response = await fetch('../php/listar_empresas.php');
-                const data = await response.json();
-
-                if (data.sucesso) {
-                    const empresas = data.empresas;
-
-                    if (empresas.length === 0) {
-                        corpo.innerHTML = `<tr><td colspan="6" class="sem-dados" style="text-align:center; padding: 20px; color: #6b7280;">Nenhuma empresa cadastrada no banco de dados.</td></tr>`;
-                        return;
-                    }
-
-                    // Mapeia os dados do banco para as linhas da tabela
-                    corpo.innerHTML = empresas.map(emp => {
-                        return `
-                            <tr>
-                                <td>
-                                    <div class="tabela-empresa" style="display: flex; align-items: center; gap: 10px;">
-                                        <div class="tabela-icone" style="background: #eef2ff; color: #4f46e5; padding: 8px 12px; border-radius: 8px;"><i class="bi bi-building"></i></div>
-                                        <strong>${emp.nome}</strong>
-                                    </div>
-                                </td>
-                                <td>${emp.cnpj}</td>
-                                <td>${emp.contato || '---'}</td>
-                                <td>${emp.telefone || '---'}</td>
-                                <td>${emp.email || '---'}</td>
-                                <td>
-                                    <button onclick="verPerfil(${emp.id})" class="botao-pequeno btn-pequeno-acoes">
-                                        Visualizar Perfil
-                                    </button>
-                                </td>
-                            </tr>
-                        `;  
-                    }).join('');
-                } else {
-                    corpo.innerHTML = `<tr><td colspan="6" style="text-align:center; color: red;">Erro ao carregar dados: ${data.erro}</td></tr>`;
-                }
-            } catch (error) {
-                console.error("Erro na requisição:", error);
-                corpo.innerHTML = `<tr><td colspan="6" style="text-align:center; color: red;">Erro de conexão com o servidor.</td></tr>`;
+            if (empresas.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma empresa cadastrada.</td></tr>`;
+                return;
             }
+
+            corpo.innerHTML = empresas.map(emp => {
+                return `
+                    <tr>
+                        <td>
+                            <div class="tabela-empresa">
+                                <div class="tabela-icone"><i class="bi bi-building"></i></div>
+                                <strong>${emp.nome}</strong>
+                            </div>
+                        </td>
+                        <td>${emp.cnpj}</td>
+                        <td>${emp.contato || '---'}</td>
+                        <td>${emp.telefone}</td>
+                        <td>${emp.email || '---'}</td>
+                        <td>
+                            <button onclick="verPerfil(${emp.id})" class="botao-pequeno btn-pequeno-acoes">
+                                Visualizar Perfil
+                            </button>
+                        </td>
+                    </tr>
+                `;  
+            }).join('');
         }
 
-        // Continua usando o localStorage apenas para passar o ID para a próxima tela
         function verPerfil(id) {
             localStorage.setItem('empresa_selecionada', id);
             window.location.href = 'perfil_empresa.html';
         }
 
-        // Executa a função assim que a página carrega
-        window.onload = carregarClientes;
+        window.onload = renderizarClientes;
     </script>
     <script src="../assets/js/common.js"></script>
 </body>
