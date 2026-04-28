@@ -286,16 +286,31 @@
             }
         }
 
-        function popularEmpresas() {
+        // Substitua esta função no seu script
+        async function popularEmpresas() {
             const select = document.getElementById('selecao-empresa');
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            empresas.forEach(emp => {
-                const opt = document.createElement('option');
-                opt.value = emp.nome;
-                opt.dataset.cnpj = emp.cnpj;
-                opt.textContent = emp.nome;
-                select.appendChild(opt);
-            });
+            
+            try {
+                // Reaproveita o mesmo endpoint que criamos para a tabela de clientes!
+                const response = await fetch('../php/listar_empresas.php');
+                const data = await response.json();
+
+                if (data.sucesso && data.empresas.length > 0) {
+                    data.empresas.forEach(emp => {
+                        const opt = document.createElement('option');
+                        // É essencial guardar o ID real da empresa no 'value' agora, em vez do nome
+                        opt.value = emp.id; 
+                        opt.dataset.cnpj = emp.cnpj;
+                        opt.textContent = emp.nome;
+                        select.appendChild(opt);
+                    });
+                } else {
+                    select.innerHTML = '<option value="">Nenhuma empresa cadastrada no sistema...</option>';
+                }
+            } catch (error) {
+                console.error("Erro ao carregar empresas:", error);
+                select.innerHTML = '<option value="">Erro ao conectar com o banco de dados...</option>';
+            }
         }
 
         function preencherDadosEmpresa() {
