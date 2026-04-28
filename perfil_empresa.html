@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visualizar Empresa - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">
+                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                    Nexus HUB
+                </div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+            <nav class="menu-navegacao">
+                <ul>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
+                    <li class="item-ativo"><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
+                    <li><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
+                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
+                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                </div>
+            </header>
+
+            <section class="titulo-pagina" style="display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h1>Visualizar Empresa</h1>
+                    <p>Detalhes cadastrais e histórico de serviços da frota.</p>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="salvarAlteracoes()" class="botao-acao" style="background: var(--azul-escuro); padding: 12px 25px; width: auto; border-radius: 12px;">Salvar Alterações</button>
+                    <button onclick="window.location.href='clientes.html'" class="botao-secundario" style="background: white; padding: 12px 25px; border-radius: 12px; border: 1px solid #ddd;">Voltar</button>
+                </div>
+            </section>
+
+            <div style="display: grid; grid-template-columns: 1fr 1.2fr 1fr; gap: 25px; margin-top: 20px;">
+                
+                <section class="card-os" style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05);">
+                    <div style="text-align: center; margin-bottom: 25px;">
+                        <h3 id="display-nome-titulo" style="color: var(--azul-escuro); font-weight: 800; font-size: 1.5rem;">---</h3>
+                    </div>
+
+                    <div class="bloco-campo-novo" style="margin-bottom: 15px;">
+                        <label style="font-weight: 800; font-size: 0.7rem; color: var(--azul-escuro);">LINK DO SITE</label>
+                        <input type="text" id="edit-site" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #f0f2f5; background: #fbfcfe;">
+                    </div>
+
+                    <div class="bloco-campo-novo" style="margin-bottom: 15px;">
+                        <label style="font-weight: 800; font-size: 0.7rem; color: var(--azul-escuro);">CNPJ</label>
+                        <input type="text" id="edit-cnpj" readonly style="width: 100%; padding: 12px; border-radius: 8px; border: none; background: #f8f9fd; color: #777;">
+                    </div>
+
+                    <div class="bloco-campo-novo" style="margin-bottom: 15px;">
+                        <label style="font-weight: 800; font-size: 0.7rem; color: var(--azul-escuro);">CONTATO PRINCIPAL</label>
+                        <input type="text" id="edit-contato" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #f0f2f5; background: #fbfcfe;">
+                    </div>
+
+                    <div class="bloco-campo-novo" style="margin-bottom: 15px;">
+                        <label style="font-weight: 800; font-size: 0.7rem; color: var(--azul-escuro);">TELEFONE / WHATSAPP</label>
+                        <input type="text" id="edit-telefone" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #f0f2f5; background: #fbfcfe;">
+                    </div>
+
+                    <div class="bloco-campo-novo">
+                        <label style="font-weight: 800; font-size: 0.7rem; color: var(--azul-escuro);">E-MAIL CORPORATIVO</label>
+                        <input type="email" id="edit-email" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #f0f2f5; background: #fbfcfe;">
+                    </div>
+                </section>
+
+                <section class="card-os" style="background: white; padding: 15px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.1rem; color: var(--azul-escuro);">Log de Atividades</h3>
+                    <div id="log-lista" style="flex: 1; overflow-y: auto; max-height: 400px; margin-bottom: 20px; padding-right: 10px;"></div>
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="nova-nota" placeholder="Adicionar nota manual..." style="flex: 1; padding: 12px; border-radius: 10px; border: 1px solid #eee;">
+                        <button onclick="adicionarNota()" class="botao-acao" style="width: auto; padding: 0 20px; border-radius: 10px;">Postar</button>
+                    </div>
+                </section>
+
+                <div style="display: flex; flex-direction: column; gap: 25px;">
+    
+                <section class="card-os" style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); flex: 1; overflow-y: auto;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.1rem; color: var(--azul-escuro);">Relatórios de OS</h3>
+                    <div id="relatorios-vinculados"></div>
+                </section>
+
+                <section class="card-os" style="background: white; padding: 30px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); flex: 1; overflow-y: auto;">
+                    <h3 style="margin-bottom: 20px; font-size: 1.1rem; color: var(--azul-escuro);">Veículos Cadastrados</h3>
+                    <div id="frota-lista" style="display: flex; flex-direction: column; gap: 10px;"></div>
+                </section>
+
+</div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        let empresaAtual = null;
+
+        function inicializar() {
+            const idSelecionado = localStorage.getItem('empresa_selecionada');
+            const empresasNoBanco = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            empresaAtual = empresasNoBanco.find(e => e.id == idSelecionado);
+
+            if (empresaAtual) {
+                // Preenchimento dos dados com as chaves corretas
+                document.getElementById('display-nome-titulo').innerText = empresaAtual.nome || "Empresa sem nome";
+                document.getElementById('edit-site').value = empresaAtual.site || "";
+                document.getElementById('edit-contato').value = empresaAtual.contato || "";
+                document.getElementById('edit-telefone').value = empresaAtual.telefone || "";
+                document.getElementById('edit-cnpj').value = empresaAtual.cnpj || "";
+                document.getElementById('edit-email').value = empresaAtual.email || "";
+
+                renderLog();
+                renderRelatorios();
+            } else {
+                alert("Empresa não encontrada.");
+                window.location.href = 'clientes.html';
+            }
+        }
+
+        function renderLog() {
+            const container = document.getElementById('log-lista');
+            if (empresaAtual.historico_atividades) {
+                container.innerHTML = empresaAtual.historico_atividades.slice().reverse().map(item => `
+                    <div style="background: #fbfcfe; padding: 12px; border-radius: 12px; border-left: 4px solid #4a90e2; margin-bottom: 12px;">
+                        <p style="font-size: 0.85rem; margin-bottom: 4px;">${item.mensagem}</p>
+                        <small style="color: #999;">${item.data}</small>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function renderRelatorios() {
+            const container = document.getElementById('relatorios-vinculados');
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            // Filtra atendimentos vinculados a este cliente
+            const filtrados = atendimentos.filter(a => a.cliente === empresaAtual.nome);
+
+            if (filtrados.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; font-size: 0.9rem; margin-top: 20px;">Nenhuma OS finalizada para esta empresa.</p>';
+                return;
+            }
+
+            container.innerHTML = filtrados.map(os => `
+                <div style="padding: 15px; border-radius: 12px; background: #f8f9fd; margin-bottom: 10px; border: 1px solid #eee;">
+                    <div style="display: flex; justify-content: space-between;">
+                        <strong style="font-size: 0.85rem; color: var(--azul-escuro);">OS #${os.id.toString().slice(-6)}</strong>
+                        <span style="font-size: 0.7rem; color: #2ecc71; font-weight: bold;">${os.status.toUpperCase()}</span>
+                    </div>
+                    <p style="font-size: 0.8rem; color: #666; margin-top: 8px;">Total: R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</p>
+                </div>
+            `).join('');
+        }
+
+        function salvarAlteracoes() {
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            const idx = empresas.findIndex(e => e.id == empresaAtual.id);
+
+            if (idx !== -1) {
+                // Atualiza o objeto no banco de dados
+                empresas[idx].site = document.getElementById('edit-site').value;
+                empresas[idx].contato = document.getElementById('edit-contato').value;
+                empresas[idx].telefone = document.getElementById('edit-telefone').value;
+                empresas[idx].email = document.getElementById('edit-email').value;
+
+                localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
+                alert("✅ Dados da empresa atualizados!");
+                location.reload();
+            }
+        }
+
+        function adicionarNota() {
+            const nota = document.getElementById('nova-nota').value;
+            if (!nota) return;
+
+            if (!empresaAtual.historico_atividades) empresaAtual.historico_atividades = [];
+            
+            empresaAtual.historico_atividades.push({
+                tipo: "manual",
+                mensagem: nota,
+                data: new Date().toLocaleString('pt-BR'),
+                usuario: "Julian Vane"
+            });
+
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            const idx = empresas.findIndex(e => e.id == empresaAtual.id);
+            empresas[idx] = empresaAtual;
+            localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
+
+            document.getElementById('nova-nota').value = '';
+            renderLog();
+        }
+
+        window.onload = inicializar;
+    </script>
+</body>
+</html>

@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nova OS - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Buscar...">
+                </div>
+            </div>
+            <nav class="menu-navegacao">
+                <ul>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li class="item-ativo"><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
+                    <li><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
+                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
+                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao">
+                    <i class="bi bi-bell"></i>
+                </div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="titulo-pagina">
+                <h1><i class="bi bi-plus-circle"></i> Registrar Nova OS</h1>
+                <p>Preencha os dados do cliente e serviços. O sistema valida duplicatas automaticamente.</p>
+            </section>
+
+            <form id="formNovoAtendimento">
+                <div class="container-formulario-novo-atendimento">
+                    <div class="secao-formulario-novo">
+                        <h3><i class="bi bi-building"></i> Informações da Empresa</h3>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-shop"></i> Selecionar Empresa</label>
+                                <select id="selecao-empresa" required onchange="preencherDadosEmpresa()">
+                                    <option value="">Escolha uma empresa cadastrada...</option>
+                                </select>
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-card-text"></i> CNPJ</label>
+                                <input type="text" id="display-cnpj" readonly>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="container-veiculos"></div>
+
+                    <div class="secao-formulario-novo">
+                        <button type="button" onclick="adicionarCamposVeiculo()" style="width: 100%; padding: 16px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 2px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            <i class="bi bi-plus-lg"></i> Adicionar Veículo
+                        </button>
+                    </div>
+
+                    <div class="secao-formulario-novo">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding-bottom: 16px; border-bottom: 1px solid var(--bordar);">
+                            <h3 style="margin: 0;"><i class="bi bi-calculator"></i> Total da OS</h3>
+                            <h2 id="total-geral-display" style="color: var(--verde-esmeralda); font-size: 2rem; margin: 0;">R$ 0,00</h2>
+                        </div>
+                        
+                        <div class="area-botoes" style="margin-top: 24px;">
+                            <button type="submit" class="botao-acao" style="flex: 1; background: linear-gradient(135deg, var(--verde-esmeralda) 0%, var(--verde-escuro) 100%); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="bi bi-check-circle"></i> Registrar Atendimento
+                            </button>
+                            <button type="button" onclick="limparFormulario()" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="bi bi-trash"></i> Limpar
+                            </button>
+                            <button type="button" onclick="window.location.href='menu.html'" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                                <i class="bi bi-arrow-left"></i> Voltar
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </main>
+    </div>
+
+    <script>
+        const CONFIG_SERVICOS = {
+            "Manutencao_Preventiva": { nome: "Manutenção Preventiva", valor: 450.00, desc: "Revisão geral de itens de segurança e fluidos." },
+            "Troca_Oleo": { nome: "Troca de Óleo", valor: 850.00, desc: "Troca de óleo do motor e substituição de filtros." },
+            "Suspensao": { nome: "Suspensão", valor: 1200.00, desc: "Manutenção de batentes, buchas e amortecedores." },
+            "Freios": { nome: "Freios", valor: 600.00, desc: "Substituição de pastilhas e retífica de discos/tambores." },
+            "Eletrica": { nome: "Elétrica", valor: 300.00, desc: "Diagnóstico elétrico e troca de lâmpadas/fusíveis." }
+        };
+
+        let contagemVeiculos = 0;
+
+        function adicionarCamposVeiculo() {
+            contagemVeiculos++;
+            const container = document.getElementById('container-veiculos');
+            const div = document.createElement('div');
+            div.className = 'bloco-veiculo';
+            div.style = 'margin-bottom: 24px;';
+            
+            div.innerHTML = `
+                <div class="secao-formulario-novo" style="position: relative;">
+                    <h3><i class="bi bi-car-front"></i> Veículo ${contagemVeiculos}</h3>
+                    ${contagemVeiculos > 1 ? '<button type="button" onclick="this.closest(\'.secao-formulario-novo\').parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 20px; right: 20px; background: rgba(239, 68, 68, 0.1); color: var(--erro); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="bi bi-trash"></i> Remover</button>' : ''}
+                    <div class="linha-campos">
+                        <div class="bloco-campo-novo">
+                            <label><i class="bi bi-tag"></i> Placa</label>
+                            <input type="text" class="v-placa" placeholder="ABC-1234" required>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label><i class="bi bi-type"></i> Modelo</label>
+                            <input type="text" class="v-modelo" placeholder="Modelo do veículo" required>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label><i class="bi bi-calendar-event"></i> Ano</label>
+                            <input type="number" class="v-ano" placeholder="2024" required>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label><i class="bi bi-palette"></i> Cor</label>
+                            <input type="text" class="v-cor" placeholder="Branco" required>
+                        </div>
+                    </div>
+                    
+                    <div class="container-servicos-veiculo" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--bordar);"></div>
+                    
+                    <button type="button" onclick="adicionarServicoAoVeiculo(this)" style="width: 100%; margin-top: 16px; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <i class="bi bi-plus"></i> Adicionar Serviço
+                    </button>
+                </div>
+            `;
+            container.appendChild(div);
+            adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+        }
+
+        function adicionarServicoAoVeiculo(botao) {
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            const container = blocoVeiculo.querySelector('.container-servicos-veiculo');
+            const servicosJaUsados = Array.from(container.querySelectorAll('.s-tipo')).map(s => s.value);
+            
+            if (servicosJaUsados.length >= Object.keys(CONFIG_SERVICOS).length) {
+                alert("Todos os serviços disponíveis já foram adicionados para este veículo.");
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'item-servico';
+            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); boundary-radius: 8px; border-left: 4px solid var(--verde-esmeralda);';
+            
+            let optionsHTML = '<option value="">Selecione um serviço...</option>';
+            for (const key in CONFIG_SERVICOS) {
+                if (!servicosJaUsados.includes(key)) {
+                    optionsHTML += `<option value="${key}">${CONFIG_SERVICOS[key].nome}</option>`;
+                }
+            }
+
+            const hoje = new Date().toISOString().split('T')[0];
+            div.innerHTML = `
+                ${container.children.length > 0 ? '<button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--erro); cursor: pointer; font-weight: 600;"><i class="bi bi-x-circle"></i></button>' : ''}
+                <div class="linha-campos">
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-tools"></i> Tipo de Serviço</label>
+                        <select class="s-tipo" required onchange="aplicarPreDefinidos(this)">
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-calendar2-date"></i> Data</label>
+                        <input type="date" class="s-data" value="${hoje}" required>
+                    </div>
+                </div>
+                <div class="bloco-campo-novo">
+                    <label><i class="bi bi-chat-left-text"></i> Descrição</label>
+                    <textarea class="s-desc" placeholder="Descreva o serviço realizado..." rows="2" style="width: 100%;"></textarea>
+                </div>
+                <div class="bloco-campo-novo">
+                    <label><i class="bi bi-currency-dollar"></i> Valor (R$)</label>
+                    <input type="number" class="s-valor" placeholder="0,00" step="0.01" required oninput="calcularTotalGeral()">
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        function aplicarPreDefinidos(selectElement) {
+            const key = selectElement.value;
+            const item = selectElement.closest('.item-servico');
+            if (CONFIG_SERVICOS[key]) {
+                item.querySelector('.s-valor').value = CONFIG_SERVICOS[key].valor.toFixed(2);
+                item.querySelector('.s-desc').value = CONFIG_SERVICOS[key].desc;
+            }
+            calcularTotalGeral();
+        }
+
+        function calcularTotalGeral() {
+            let total = 0;
+            document.querySelectorAll('.s-valor').forEach(c => total += parseFloat(c.value) || 0);
+            document.getElementById('total-geral-display').innerText = `R$ ${total.toFixed(2)}`;
+        }
+
+        document.getElementById('formNovoAtendimento').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const blocosVeiculos = document.querySelectorAll('.bloco-veiculo');
+            const frotaCompleta = [];
+            let totalOS = 0;
+            
+            blocosVeiculos.forEach(bloco => {
+                const servicosDoVeiculo = [];
+                const blocosServicos = bloco.querySelectorAll('.item-servico');
+                
+                blocosServicos.forEach(bs => {
+                    const valor = parseFloat(bs.querySelector('.s-valor').value) || 0;
+                    totalOS += valor;
+                    servicosDoVeiculo.push({
+                        tipo: bs.querySelector('.s-tipo').value,
+                        data: bs.querySelector('.s-data').value,
+                        descricao: bs.querySelector('.s-desc').value,
+                        valor: valor
+                    });
+                });
+
+                frotaCompleta.push({
+                    dadosVeiculo: {
+                        placa: bloco.querySelector('.v-placa').value,
+                        modelo: bloco.querySelector('.v-modelo').value,
+                        ano: bloco.querySelector('.v-ano').value,
+                        cor: bloco.querySelector('.v-cor').value
+                    },
+                    servicos: servicosDoVeiculo
+                });
+            });
+
+            const novaOS = {
+                id: Date.now(),
+                cliente: document.getElementById('selecao-empresa').value,
+                frota: frotaCompleta,
+                valorTotalOS: totalOS,
+                dataRegistro: new Date().toLocaleDateString('pt-BR'),
+                status: 'pendente_revisao'
+            };
+
+            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            atendimentos.push(novaOS);
+            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+            
+            alert('✅ Atendimento registrado com sucesso! Enviado para revisão.');
+            window.location.href = 'revisao.html';
+        });
+
+        function limparFormulario() {
+            if(confirm("Deseja realmente limpar todos os dados?")) {
+                location.reload();
+            }
+        }
+
+        function popularEmpresas() {
+            const select = document.getElementById('selecao-empresa');
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            empresas.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp.nome;
+                opt.dataset.cnpj = emp.cnpj;
+                opt.textContent = emp.nome;
+                select.appendChild(opt);
+            });
+        }
+
+        function preencherDadosEmpresa() {
+            const select = document.getElementById('selecao-empresa');
+            const option = select.options[select.selectedIndex];
+            document.getElementById('display-cnpj').value = option ? (option.dataset.cnpj || '') : '';
+        }
+
+        function alternarMenu() {
+            const menu = document.getElementById('menuSuspenso');
+            menu.classList.toggle('visivel');
+        }
+
+        function toggleTheme() {
+            const isLight = document.documentElement.classList.toggle('light-mode');
+            localStorage.setItem('nexus-theme', isLight ? 'light' : 'dark');
+            updateThemeButtonText();
+        }
+
+        function updateThemeButtonText() {
+            const button = document.getElementById('themeToggleButton');
+            if (!button) return;
+            if (document.documentElement.classList.contains('light-mode')) {
+                button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro';
+            } else {
+                button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro';
+            }
+        }
+
+        function initTheme() {
+            if (localStorage.getItem('nexus-theme') === 'light') {
+                document.documentElement.classList.add('light-mode');
+            } else {
+                document.documentElement.classList.remove('light-mode');
+            }
+            updateThemeButtonText();
+        }
+
+        window.addEventListener('DOMContentLoaded', initTheme);
+
+        window.onclick = function(event) {
+            if (!event.target.matches('.botao-menu-trigger') && !event.target.closest('.botao-menu-trigger')) {
+                const menus = document.getElementsByClassName("menu-suspenso");
+                for (let i = 0; i < menus.length; i++) {
+                    menus[i].classList.remove('visivel');
+                }
+            }
+        }
+
+        window.onload = () => {
+            popularEmpresas();
+            adicionarCamposVeiculo();
+        };
+    </script>
+</body>
+</html>

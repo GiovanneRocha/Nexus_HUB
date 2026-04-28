@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Histórico e Editor Multipáginas - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <style>
+        /* Estilos do Editor Multipáginas */
+        .modal-editor {
+            display: none;
+            position: fixed;
+            z-index: 2000;
+            left: 0; top: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            overflow-y: auto;
+            padding: 40px 0;
+        }
+        .painel-editor {
+            width: 850px; margin: auto; display: flex; flex-direction: column; gap: 30px;
+        }
+        .controles-superiores {
+            background: #1a1a1a; padding: 20px; border-radius: 15px;
+            color: white; position: sticky; top: 0; z-index: 2001;
+            display: flex; justify-content: space-between; align-items: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        .folha-pdf {
+            background: white; width: 794px; min-height: 1123px; padding: 60px;
+            margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            color: #333; position: relative; box-sizing: border-box;
+        }
+        [contenteditable="true"] {
+            border: 1px dashed transparent; transition: 0.3s; padding: 2px;
+        }
+        [contenteditable="true"]:hover {
+            border: 1px dashed #4f46e5; background: #f0f4ff;
+        }
+        .tabela-pdf { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .tabela-pdf th { background: #f2f2f2; padding: 12px; border: 1px solid #ddd; text-align: left; font-size: 12px; }
+        .tabela-pdf td { padding: 12px; border: 1px solid #ddd; font-size: 14px; }
+        .rodape-pdf { position: absolute; bottom: 60px; left: 60px; width: calc(100% - 120px); border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #777; }
+    </style>
+</head>
+<body class="corpo-dashboard">
+    <div class="layout-erp">
+        <aside class="barra-lateral">
+            <div class="topo-lateral">
+                <div class="logo-erp">
+                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                    Nexus HUB
+                </div>
+                <div class="busca-global">
+                    <i class="bi bi-search"></i>
+                    <input type="text" placeholder="Busca Global...">
+                </div>
+            </div>
+            <nav class="menu-navegacao">
+                <ul>
+                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
+                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
+                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
+                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
+                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
+                    <li class="item-ativo"><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
+                    <li><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
+                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
+                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="conteudo-principal">
+            <header class="cabecalho-topo">
+                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
+                <div class="perfil-usuario">
+                    <div class="info-usuario">
+                        <p class="usuario-nome">Julian Vane</p>
+                        <p class="usuario-cargo">Administrador</p>
+                    </div>
+                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
+                    <div class="menu-opcoes-container">
+                        <button class="botao-menu-trigger" onclick="alternarMenu()">
+                            <i class="bi bi-three-dots-vertical"></i>
+                        </button>
+                        <div class="menu-suspenso" id="menuSuspenso">
+                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-sun-fill"></i> Modo Claro</button>
+                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
+                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                            <hr>
+                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <section class="titulo-pagina">
+                <h1><i class="bi bi-clock-history"></i> Histórico de OS</h1>
+                <p>Visualize e edite as páginas do relatório antes de exportar.</p>
+            </section>
+
+            <div class="card-tabela">
+                <table class="tabela-dados">
+                    <thead>
+                        <tr>
+                            <th>DATA</th>
+                            <th>CLIENTE</th>
+                            <th>FROTA</th>
+                            <th>AÇÃO</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-historico-corpo"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <div id="modalEditor" class="modal-editor">
+        <div class="painel-editor">
+            <div class="controles-superiores">
+                <div>
+                    <h3 style="margin: 0;">Editor de Relatório</h3>
+                    <span style="font-size: 0.8rem; color: #2ecc71;">● Modo Visualização Ativo</span>
+                </div>
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="salvarEGerarPDF()" class="botao-acao" style="background: #2ecc71; padding: 10px 25px;"><i class="bi bi-download"></i> Baixar PDF Final</button>
+                    <button onclick="fecharEditor()" class="botao-secundario" style="background: #444; color: white; border: none; padding: 10px 20px;"><i class="bi bi-x"></i> Sair</button>
+                </div>
+            </div>
+
+            <div id="paginas-container">
+                </div>
+        </div>
+    </div>
+
+    <script>
+        let osSelecionada = null;
+
+        function renderizarTabela() {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const finalizadas = atendimentos.filter(a => a.status === 'finalizada');
+            const corpo = document.getElementById('tabela-historico-corpo');
+            
+            corpo.innerHTML = finalizadas.reverse().map(os => `
+                <tr>
+                    <td>${os.dataRegistro || '---'}</td>
+                    <td><strong>${os.cliente}</strong></td>
+                    <td>${os.frota ? os.frota.length : 1} veículo(s)</td>
+                    <td>
+                        <button onclick="abrirEditor(${os.id})" class="botao-pequeno btn-pequeno-acoes">Visualizar Relatório</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function abrirEditor(id) {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            osSelecionada = atendimentos.find(a => a.id == id);
+            const cliente = empresas.find(e => e.nome === osSelecionada.cliente) || {};
+            
+            const container = document.getElementById('paginas-container');
+            container.innerHTML = ''; // Limpa anterior
+
+            // --- CRIAÇÃO DA PÁGINA 1: CAPA/RESUMO ---
+            const capa = document.createElement('div');
+            capa.className = 'folha-pdf';
+            capa.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #4f46e5; padding-bottom: 20px;">
+                    <h2 style="margin: 0; color: #1a1a1a;">AutoDiagnose</h2>
+                    <div style="text-align: right;">
+                        <p style="font-weight: bold; margin: 0;">Relatório OS #${osSelecionada.id.toString().slice(-6)}</p>
+                        <p style="margin: 0; font-size: 0.9rem;">Data: ${osSelecionada.dataRegistro}</p>
+                    </div>
+                </div>
+                <h1 style="font-size: 32px; margin: 40px 0 10px 0;" contenteditable="true">Relatório de Serviços Corporativos</h1>
+                <div style="margin-bottom: 30px;">
+                    <p><strong>Cliente:</strong> ${osSelecionada.cliente}</p>
+                    <p><strong>Contato:</strong> <span contenteditable="true">${cliente.contato || '---'}</span></p>
+                    <p><strong>Email:</strong> <span contenteditable="true">${cliente.email || '---'}</span></p>
+                </div>
+                <div style="margin-bottom: 40px;">
+                    <h3 style="color: #4f46e5; border-bottom: 1px solid #eee; padding-bottom: 10px;">Introdução</h3>
+                    <p contenteditable="true" style="text-align: justify; line-height: 1.6; color: #555;">
+                        Apresentamos o detalhamento técnico dos serviços realizados na frota da empresa ${osSelecionada.cliente}. Este documento consolida todas as intervenções de manutenção executadas pela nossa equipe técnica.
+                    </p>
+                </div>
+                <table class="tabela-pdf">
+                    <thead><tr><th>Caminhão / Veículo</th><th style="text-align: right;">Subtotal</th></tr></thead>
+                    <tbody>
+                        ${osSelecionada.frota.map(v => {
+                            const totalV = v.servicos.reduce((acc, s) => acc + parseFloat(s.valor), 0);
+                            return `<tr><td>${v.dadosVeiculo.modelo} - ${v.dadosVeiculo.placa}</td><td style="text-align: right; font-weight: bold;">R$ ${totalV.toFixed(2)}</td></tr>`;
+                        }).join('')}
+                        <tr style="background: #f9f9f9; font-size: 18px;">
+                            <td><strong>Total Consolidado</strong></td>
+                            <td style="text-align: right; color: #4f46e5;"><strong>R$ ${parseFloat(osSelecionada.valorTotalOS).toFixed(2)}</strong></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="rodape-pdf">Gerado por Nexus HUB | Julian Vane - Administrador</div>
+            `;
+            container.appendChild(capa);
+
+            // --- CRIAÇÃO DAS PÁGINAS DE CADA VEÍCULO ---
+            osSelecionada.frota.forEach(veiculo => {
+                const pagV = document.createElement('div');
+                pagV.className = 'folha-pdf';
+                const totalV = veiculo.servicos.reduce((acc, s) => acc + parseFloat(s.valor), 0);
+                
+                pagV.innerHTML = `
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">
+                        <h3 style="margin: 0; color: #444;">AutoDiagnose</h3>
+                        <span style="font-size: 0.9rem; color: #888;">Detalhamento por Unidade</span>
+                    </div>
+                    <div style="margin: 30px 0; background: #f8f9fd; padding: 20px; border-radius: 10px;">
+                        <h2 style="margin: 0;">${veiculo.dadosVeiculo.modelo}</h2>
+                        <p style="margin: 5px 0; color: #4f46e5; font-weight: bold;">PLACA: ${veiculo.dadosVeiculo.placa} | COR: ${veiculo.dadosVeiculo.cor}</p>
+                    </div>
+                    <table class="tabela-pdf">
+                        <thead><tr><th>Serviço Executado</th><th>Descrição Detalhada</th><th style="text-align: right;">Valor</th></tr></thead>
+                        <tbody>
+                            ${veiculo.servicos.map(s => `
+                                <tr>
+                                    <td><strong>${s.tipo.replace('_', ' ')}</strong></td>
+                                    <td contenteditable="true" style="color: #666; font-size: 12px;">${s.descricao}</td>
+                                    <td style="text-align: right;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                                </tr>
+                            `).join('')}
+                            <tr>
+                                <td colspan="2" style="text-align: right;"><strong>Subtotal do Veículo</strong></td>
+                                <td style="text-align: right; font-weight: bold; background: #fcfcfc;">R$ ${totalV.toFixed(2)}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div style="margin-top: 30px;">
+                        <h4 style="margin-bottom: 10px;">Comentários Técnicos / Observações:</h4>
+                        <div contenteditable="true" style="min-height: 80px; border: 1px solid #eee; padding: 10px; border-radius: 5px; font-size: 13px; color: #666;">
+                            Veículo liberado para operação. Sem pendências críticas detectadas nesta revisão.
+                        </div>
+                    </div>
+                    <div class="rodape-pdf">Página Detalhada | OS #${osSelecionada.id.toString().slice(-6)}</div>
+                `;
+                container.appendChild(pagV);
+            });
+
+            document.getElementById('modalEditor').style.display = 'block';
+        }
+
+        async function salvarEGerarPDF() {
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF('p', 'pt', 'a4');
+            const folhas = document.querySelectorAll('.folha-pdf');
+            
+            // Oculta as bordas de edição para a captura
+            document.querySelectorAll('[contenteditable="true"]').forEach(el => el.style.border = 'none');
+
+            for (let i = 0; i < folhas.length; i++) {
+                const canvas = await html2canvas(folhas[i], { scale: 2 });
+                const imgData = canvas.toDataURL('image/png');
+                if (i > 0) pdf.addPage();
+                pdf.addImage(imgData, 'PNG', 0, 0, 595.28, 841.89);
+            }
+
+            pdf.save(`Relatorio_Nexus_${osSelecionada.cliente}.pdf`);
+            fecharEditor();
+        }
+
+        function fecharEditor() { document.getElementById('modalEditor').style.display = 'none'; }
+        window.onload = renderizarTabela;
+    </script>
+    <script src="../assets/js/common.js"></script>
+</body>
+</html>
