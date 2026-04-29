@@ -6,46 +6,14 @@
     <title>Visualizar Empresa - Nexus HUB</title>
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/common.js"></script>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
-        <aside class="barra-lateral">
-            <div class="topo-lateral">
-                <div class="logo-erp">
-                    <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
-                    Nexus HUB
-                </div>
-                <div class="busca-global">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Busca Global...">
-                </div>
-            </div>
-            <nav class="menu-navegacao">
-                <ul>
-                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
-                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
-                    <li><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
-                    <li class="item-ativo"><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
-                    <li><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
-                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
-                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
-                </ul>
-            </nav>
-        </aside>
+        <!-- Sidebar and Header will be inserted here via JavaScript -->
 
         <main class="conteudo-principal">
-            <header class="cabecalho-topo">
-                <div class="alerta-notificacao"><i class="bi bi-bell"></i></div>
-                <div class="perfil-usuario">
-                    <div class="info-usuario">
-                        <p class="usuario-nome">Julian Vane</p>
-                        <p class="usuario-cargo">Administrador</p>
-                    </div>
-                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
-                </div>
-            </header>
+            <!-- Header will be inserted here via JavaScript -->
 
             <section class="titulo-pagina" style="display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -136,6 +104,7 @@
 
                 renderLog();
                 renderRelatorios();
+                renderFrota();
             } else {
                 alert("Empresa não encontrada.");
                 window.location.href = 'clientes.html';
@@ -172,6 +141,32 @@
                         <span style="font-size: 0.7rem; color: #2ecc71; font-weight: bold;">${os.status.toUpperCase()}</span>
                     </div>
                     <p style="font-size: 0.8rem; color: #666; margin-top: 8px;">Total: R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderFrota() {
+            const container = document.getElementById('frota-lista');
+            const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
+            // Filtra veículos vinculados a esta empresa
+            const filtrados = veiculos.filter(v => v.empresa === empresaAtual.nome);
+
+            if (filtrados.length === 0) {
+                container.innerHTML = '<p style="color: #999; text-align: center; font-size: 0.9rem; margin-top: 20px;">Nenhum veículo cadastrado para esta empresa.</p>';
+                return;
+            }
+
+            container.innerHTML = filtrados.map(veiculo => `
+                <div style="padding: 15px; border-radius: 12px; background: #f8f9fd; margin-bottom: 10px; border: 1px solid #eee;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div>
+                            <strong style="font-size: 0.9rem; color: var(--azul-escuro);">${veiculo.placa}</strong>
+                            <p style="font-size: 0.8rem; color: #666; margin: 4px 0 0 0;">${veiculo.modelo} - ${veiculo.ano}</p>
+                        </div>
+                        <div style="text-align: right;">
+                            <span style="font-size: 0.7rem; color: #999;">Cor: ${veiculo.cor}</span>
+                        </div>
+                    </div>
                 </div>
             `).join('');
         }
@@ -216,6 +211,13 @@
         }
 
         window.onload = inicializar;
+    </script>
+    <script>
+        // Insert sidebar and header from common.js
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('clientes'));
+            document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML());
+        });
     </script>
 </body>
 </html>

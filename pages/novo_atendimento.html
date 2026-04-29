@@ -7,58 +7,14 @@
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+    <script src="../assets/js/common.js"></script>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
-        <aside class="barra-lateral">
-            <div class="topo-lateral">
-                <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
-                <div class="busca-global">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Buscar...">
-                </div>
-            </div>
-            <nav class="menu-navegacao">
-                <ul>
-                    <li><a href="home.html" class="link-menu"><i class="bi bi-house-door"></i> Início</a></li>
-                    <li><a href="menu.html" class="link-menu"><i class="bi bi-speedometer2"></i> Painel</a></li>
-                    <li class="item-ativo"><a href="novo_atendimento.html" class="link-menu"><i class="bi bi-plus-circle"></i> Nova OS</a></li>
-                    <li><a href="clientes.html" class="link-menu"><i class="bi bi-people"></i> Clientes</a></li>
-                    <li><a href="revisao.html" class="link-menu"><i class="bi bi-check-square"></i> Revisão de OS</a></li>
-                    <li><a href="historico.html" class="link-menu"><i class="bi bi-clock-history"></i> Histórico</a></li>
-                    <li><a href="cadastro_servicos.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Serviços</a></li>
-                    <li><a href="cadastro_pecas.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Peças</a></li>
-                    <li><a href="cadastro_veiculo.html" class="link-menu"><i class="bi bi-plus-circle"></i> Cadastro de Veículos</a></li>
-                </ul>
-            </nav>
-        </aside>
+        <!-- Sidebar and Header will be inserted here via JavaScript -->
 
         <main class="conteudo-principal">
-            <header class="cabecalho-topo">
-                <div class="alerta-notificacao">
-                    <i class="bi bi-bell"></i>
-                </div>
-                <div class="perfil-usuario">
-                    <div class="info-usuario">
-                        <p class="usuario-nome">Julian Vane</p>
-                        <p class="usuario-cargo">Administrador</p>
-                    </div>
-                    <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
-
-                    <div class="menu-opcoes-container">
-                        <button class="botao-menu-trigger" onclick="alternarMenu()">
-                            <i class="bi bi-three-dots-vertical"></i>
-                        </button>
-                        <div class="menu-suspenso" id="menuSuspenso">
-                            <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
-                            <a href="#"><i class="bi bi-gear"></i> Configurações</a>
-                            <a href="#"><i class="bi bi-headset"></i> Suporte</a>
-                            <hr>
-                            <a href="../index.html" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
-                        </div>
-                    </div>
-                </div>
-            </header>
+            <!-- Header will be inserted here via JavaScript -->
 
             <section class="titulo-pagina">
                 <h1><i class="bi bi-plus-circle"></i> Registrar Nova OS</h1>
@@ -134,8 +90,11 @@
             
             div.innerHTML = `
                 <div class="secao-formulario-novo" style="position: relative;">
-                    <h3><i class="bi bi-car-front"></i> Veículo ${contagemVeiculos}</h3>
-                    ${contagemVeiculos > 1 ? '<button type="button" onclick="this.closest(\'.secao-formulario-novo\').parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 20px; right: 20px; background: rgba(239, 68, 68, 0.1); color: var(--erro); border: none; padding: 8px 14px; border-radius: 6px; cursor: pointer; font-weight: 600; display: flex; align-items: center; gap: 6px;"><i class="bi bi-trash"></i> Remover</button>' : ''}
+                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                        <h3 style="margin: 0;"><i class="bi bi-car-front"></i> Veículo ${contagemVeiculos}</h3>
+                        <button type="button" class="botao-secundario" onclick="mostrarVeiculosCadastrados(this)" style="padding: 10px 16px; font-size: 0.95rem; white-space: nowrap;">Buscar veículo cadastrado</button>
+                    </div>
+                    <div class="painel-veiculos-existentes" style="display: none; margin-top: 16px;"></div>
                     <div class="linha-campos">
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-tag"></i> Placa</label>
@@ -164,6 +123,71 @@
             `;
             container.appendChild(div);
             adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+        }
+
+        function mostrarVeiculosCadastrados(botao) {
+            const empresaSelecionada = document.getElementById('selecao-empresa').value;
+            if (!empresaSelecionada) {
+                alert('Selecione primeiro uma empresa para buscar veículos cadastrados.');
+                return;
+            }
+
+            const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
+            const veiculosDaEmpresa = veiculos.filter(v => v.empresa === empresaSelecionada);
+            if (veiculosDaEmpresa.length === 0) {
+                alert('Nenhum veículo cadastrado encontrado para esta empresa.');
+                return;
+            }
+
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            const painel = blocoVeiculo.querySelector('.painel-veiculos-existentes');
+            if (!painel) return;
+
+            if (painel.style.display === 'block') {
+                painel.style.display = 'none';
+                painel.innerHTML = '';
+                return;
+            }
+
+            painel.style.display = 'block';
+            painel.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                    <strong style="font-size: 0.95rem;">Veículos já cadastrados</strong>
+                    <button type="button" onclick="this.closest('.painel-veiculos-existentes').style.display='none'" style="background:none; border:none; color: var(--texto-secundario); cursor:pointer; font-size: 1rem;"><i class="bi bi-x-lg"></i></button>
+                </div>
+                <select class="selecao-veiculo-existente" style="width:100%; padding: 10px; border: 1px solid var(--bordar); border-radius: 8px; margin-bottom: 12px;">
+                    <option value="">Selecione um veículo...</option>
+                    ${veiculosDaEmpresa.map(v => `<option value="${encodeURIComponent(JSON.stringify(v))}">${v.placa} — ${v.modelo} (${v.ano})</option>`).join('')}
+                </select>
+                <button type="button" onclick="preencherVeiculoExistente(this)" style="width: 100%; padding: 12px; background: var(--azul-escuro); color: #fff; border:none; border-radius: 8px; cursor:pointer;">Preencher dados</button>
+            `;
+        }
+
+        function preencherVeiculoExistente(botao) {
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            const select = blocoVeiculo.querySelector('.selecao-veiculo-existente');
+            const opcaoSelecionada = select ? select.selectedOptions[0] : null;
+            if (!opcaoSelecionada || !opcaoSelecionada.value) {
+                alert('Selecione um veículo antes de preencher os dados.');
+                return;
+            }
+
+            let veiculo = null;
+            try {
+                veiculo = JSON.parse(decodeURIComponent(opcaoSelecionada.value));
+            } catch (err) {
+                console.error('Erro ao ler veículo selecionado:', err);
+            }
+
+            if (!veiculo) {
+                alert('Veículo não encontrado.');
+                return;
+            }
+
+            blocoVeiculo.querySelector('.v-placa').value = veiculo.placa || '';
+            blocoVeiculo.querySelector('.v-modelo').value = veiculo.modelo || '';
+            blocoVeiculo.querySelector('.v-ano').value = veiculo.ano || '';
+            blocoVeiculo.querySelector('.v-cor').value = veiculo.cor || '';
         }
 
         function adicionarServicoAoVeiculo(botao) {
@@ -349,6 +373,16 @@
             popularEmpresas();
             adicionarCamposVeiculo();
         };
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Insert sidebar with active page 'novo_atendimento'
+            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('novo_atendimento'));
+            
+            // Insert header
+            document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
+        });
     </script>
 </body>
 </html>

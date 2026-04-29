@@ -336,6 +336,12 @@ textarea {
     padding: 32px 24px;
     border-right: 1px solid #e8edf6;
     box-shadow: 0 0 0 1px rgba(255,255,255,0.35);
+    
+    /* CÓDIGO PARA FIXAR */
+    position: sticky;
+    top: 0;
+    height: 100vh; /* Faz a barra ocupar a altura total da tela */
+    overflow-y: auto; /* Permite rolar o menu se ele for maior que a tela */
 }
 
 .topo-lateral {
