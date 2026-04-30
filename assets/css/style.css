@@ -617,6 +617,25 @@ textarea {
     opacity: 0.85;
 }
 
+.card-atividade .lista-atividades {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 220px;
+    overflow-y: auto;
+}
+
+.card-atividade .atividade-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--bordar);
+    font-size: 0.9rem;
+    color: var(--texto-principal);
+}
+
+.card-atividade .atividade-item:last-child {
+    border-bottom: none;
+}
+
 .container-formulario-novo-atendimento {
     background: var(--surface-strong);
     border-radius: 22px;

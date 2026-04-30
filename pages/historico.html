@@ -99,16 +99,28 @@
             const finalizadas = atendimentos.filter(a => a.status === 'finalizada');
             const corpo = document.getElementById('tabela-historico-corpo');
             
-            corpo.innerHTML = finalizadas.reverse().map(os => `
+            corpo.innerHTML = finalizadas.reverse().map(os => {
+                let dataExibicao = '---';
+                if (os.dataRegistro) {
+                    dataExibicao = os.dataRegistro;
+                } else if (os.data) {
+                    try {
+                        dataExibicao = new Date(os.data).toLocaleDateString('pt-BR');
+                    } catch (e) {
+                        dataExibicao = '---';
+                    }
+                }
+                return `
                 <tr>
-                    <td>${os.dataRegistro || '---'}</td>
+                    <td>${dataExibicao}</td>
                     <td><strong>${os.cliente}</strong></td>
                     <td>${os.frota ? os.frota.length : 1} veículo(s)</td>
                     <td>
                         <button onclick="abrirEditor(${os.id})" class="botao-pequeno btn-pequeno-acoes">Visualizar Relatório</button>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
 
         function abrirEditor(id) {

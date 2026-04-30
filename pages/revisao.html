@@ -93,6 +93,49 @@
     </div>
 
     <script>
+        // Check for success message
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === '1') {
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                color: #155724;
+                padding: 15px 20px;
+                border: 1px solid #c3e6cb;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                animation: slideIn 0.3s ease-out;
+            `;
+            successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> Atendimento registrado com sucesso! Enviado para revisão.';
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(successDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                successDiv.style.animation = 'slideIn 0.3s ease-in reverse';
+                setTimeout(() => successDiv.remove(), 300);
+            }, 5000);
+            
+            // Clean URL
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+
         function renderizarRevisao() {
             const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
             const emRevisao = atendimentos.filter(a => a.status === 'pendente_revisao');
@@ -103,9 +146,18 @@
                 return;
             }
 
-            corpo.innerHTML = emRevisao.map(os => `
+            corpo.innerHTML = emRevisao.map(os => {
+                let dataFormatada = 'Data não registrada';
+                if (os.data) {
+                    try {
+                        dataFormatada = new Date(os.data).toLocaleDateString('pt-BR');
+                    } catch (e) {
+                        console.error('Erro ao formatar data:', e);
+                    }
+                }
+                return `
                 <tr>
-                    <td>${os.dataRegistro || 'Recém criada'}</td>
+                    <td>${dataFormatada}</td>
                     <td><strong>${os.cliente}</strong></td>
                     <td>${os.frota ? os.frota.length : 1} Veículo(s)</td>
                     <td><strong style="color: var(--verde-agua);">R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</strong></td>
@@ -113,15 +165,50 @@
                         <button onclick="abrirVerificacao(${os.id})" class="botao-pequeno btn-pequeno-acoes"><i class="bi bi-search"></i> Ver Detalhes</button>
                     </td>
                 </tr>
-            `).join('');
+            `;
+            }).join('');
         }
+
+        // Definir serviços predefinidos para referência
+        const CONFIG_SERVICOS = {
+            "Manutencao_Preventiva": { nome: "Manutenção Preventiva", valor: 450.00, desc: "Revisão geral de itens de segurança e fluidos." },
+            "Troca_Oleo": { nome: "Troca de Óleo", valor: 850.00, desc: "Troca de óleo do motor e substituição de filtros." },
+            "Suspensao": { nome: "Suspensão", valor: 1200.00, desc: "Manutenção de batentes, buchas e amortecedores." },
+            "Freios": { nome: "Freios", valor: 600.00, desc: "Substituição de pastilhas e retífica de discos/tambores." },
+            "Eletrica": { nome: "Elétrica", valor: 300.00, desc: "Diagnóstico elétrico e troca de lâmpadas/fusíveis." }
+        };
 
         function abrirVerificacao(id) {
             const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
             const os = atendimentos.find(a => a.id == id);
             const container = document.getElementById('detalhes-os-modal');
             
-            let htmlVeiculos = os.frota.map((item, index) => `
+            let htmlVeiculos = os.frota.map((item, index) => {
+                const servicosHTML = item.servicos.map(s => {
+                    let nomServico = s.tipo;
+                    // Extrair nome do serviço de predefinido_ ou customizado_
+                    if (s.tipo.startsWith('predefinido_')) {
+                        const key = s.tipo.replace('predefinido_', '');
+                        if (CONFIG_SERVICOS && CONFIG_SERVICOS[key]) {
+                            nomServico = CONFIG_SERVICOS[key].nome;
+                        }
+                    } else if (s.tipo.startsWith('customizado_')) {
+                        const index = parseInt(s.tipo.replace('customizado_', ''));
+                        const servicosCustomizados = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
+                        if (servicosCustomizados[index]) {
+                            nomServico = servicosCustomizados[index].nome;
+                        }
+                    }
+                    return `
+                        <tr>
+                            <td>${nomServico}</td>
+                            <td style="color: #666;">${s.descricao || '-'}</td>
+                            <td style="font-weight: bold;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                return `
                 <div class="bloco-detalhe-veiculo">
                     <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                         <strong>Veículo ${index + 1}: ${item.dadosVeiculo.modelo}</strong>
@@ -132,17 +219,12 @@
                             <tr><th>Serviço</th><th>Descrição</th><th>Valor</th></tr>
                         </thead>
                         <tbody>
-                            ${item.servicos.map(s => `
-                                <tr>
-                                    <td>${s.tipo.replace('_', ' ')}</td>
-                                    <td style="color: #666;">${s.descricao}</td>
-                                    <td style="font-weight: bold;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
-                                </tr>
-                            `).join('')}
+                            ${servicosHTML}
                         </tbody>
                     </table>
                 </div>
-            `).join('');
+            `;
+            }).join('');
 
             container.innerHTML = `
                 <div style="margin-bottom: 20px;">
@@ -162,7 +244,23 @@
             let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
             const idx = atendimentos.findIndex(a => a.id == id);
             atendimentos[idx].status = 'finalizada';
+            atendimentos[idx].dataRegistro = new Date().toLocaleDateString('pt-BR');
+            atendimentos[idx].dataAprovacao = new Date().toISOString();
             localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+            
+            // Add activity to company
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            const empresa = empresas.find(e => e.nome === atendimentos[idx].cliente);
+            if (empresa) {
+                if (!empresa.historico_atividades) empresa.historico_atividades = [];
+                empresa.historico_atividades.push({
+                    descricao: `OS finalizada - ${atendimentos[idx].frota.length} veículo(s)`,
+                    data: new Date().toLocaleString('pt-BR'),
+                    usuario: "Sistema"
+                });
+                localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
+            }
+            
             alert("OS Aprovada e enviada para o Histórico!");
             fecharModal();
             renderizarRevisao();

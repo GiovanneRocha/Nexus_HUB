@@ -25,22 +25,22 @@
                 <div class="grade-cards">
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
-                        <h3>18</h3>
+                        <h3 id="os-abertas">18</h3>
                         <span class="tendencia">Aguardando</span>
                     </div>
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-hourglass-split"></i> Em Análise</p>
-                        <h3>7</h3>
+                        <h3 id="os-analise">7</h3>
                         <span class="tendencia">Processando</span>
                     </div>
                     <div class="card-metrica destaque-escuro">
                         <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
-                        <h3>42</h3>
+                        <h3 id="os-finalizadas">42</h3>
                         <span class="tendencia">Concluídas</span>
                     </div>
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-people"></i> Total Clientes</p>
-                        <h3>156</h3>
+                        <h3 id="total-clientes">156</h3>
                         <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> +8</span>
                     </div>
                 </div>
@@ -59,10 +59,9 @@
                     </div>
                     <div class="card-atividade">
                         <h4><i class="bi bi-list-ul"></i> Atividades</h4>
-                        <div class="lista-vazia">
-                            <i class="bi bi-inbox"></i>
-                            <p>Nenhuma atividade recente</p>
-                        </div>
+                        <ul id="lista-atividades" class="lista-atividades">
+                            <li class="atividade-item">Carregando atividades...</li>
+                        </ul>
                     </div>
                 </div>
             </section>
@@ -121,7 +120,79 @@
             
             // Insert header
             document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
+
+            // Load metrics on page load
+            loadMetrics();
+
+            // Update metrics every 30 seconds
+            setInterval(loadMetrics, 30000);
         });
+
+        async function loadMetrics() {
+            try {
+                // Load data from localStorage and compute metrics
+                const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+                const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+
+                // Compute metrics
+                const currentMonth = new Date().getMonth();
+                const currentYear = new Date().getFullYear();
+
+                const os_abertas = atendimentos.filter(a => a.status === 'pendente_revisao').length;
+                const os_analise = atendimentos.filter(a => a.status === 'em_analise').length; // if exists
+                const os_finalizadas_mes = atendimentos.filter(a => {
+                    if (a.status !== 'aprovada') return false;
+                    const date = new Date(a.data);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                }).length;
+                const clientes = empresas.length;
+                const atendimentos_mes = atendimentos.filter(a => {
+                    const date = new Date(a.data);
+                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                }).length;
+
+                // Collect activities from all companies
+                let allActivities = [];
+                empresas.forEach(empresa => {
+                    if (empresa.historico_atividades) {
+                        empresa.historico_atividades.forEach(activity => {
+                            allActivities.push({
+                                descricao: activity.descricao || activity.texto,
+                                data: activity.data
+                            });
+                        });
+                    }
+                });
+
+                // Sort by date desc and take last 10
+                allActivities.sort((a, b) => new Date(b.data) - new Date(a.data));
+                const atividades = allActivities.slice(0, 10);
+
+                // Update metrics
+                document.getElementById('os-abertas').textContent = os_abertas;
+                document.getElementById('os-analise').textContent = os_analise;
+                document.getElementById('os-finalizadas').textContent = os_finalizadas_mes;
+                document.getElementById('total-clientes').textContent = clientes;
+
+                // Update activities
+                const lista = document.getElementById('lista-atividades');
+                lista.innerHTML = '';
+
+                if (atividades.length === 0) {
+                    lista.innerHTML = '<li class="atividade-item">Nenhuma atividade recente</li>';
+                } else {
+                    atividades.forEach(atividade => {
+                        const li = document.createElement('li');
+                        li.className = 'atividade-item';
+                        li.textContent = `${atividade.descricao} - ${new Date(atividade.data).toLocaleString()}`;
+                        lista.appendChild(li);
+                    });
+                }
+            } catch (error) {
+                console.error('Erro ao carregar métricas:', error);
+            }
+        }
+    </script>
     </script>
 </body>
 </html>
