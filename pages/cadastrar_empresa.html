@@ -100,6 +100,7 @@
             empresas.push(novaEmpresa);
             localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
 
+            registrarAtividade('empresa_cadastrada', `Nova empresa cadastrada: ${novaEmpresa.nome}`, `CNPJ: ${novaEmpresa.cnpj}`);
             alert('✅ Empresa salva com sucesso!');
             window.location.href = 'clientes.html';
         });

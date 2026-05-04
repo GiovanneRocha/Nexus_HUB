@@ -25,23 +25,23 @@
                 <div class="grade-cards">
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
-                        <h3 id="os-abertas">18</h3>
+                        <h3 id="os-abertas">0</h3>
                         <span class="tendencia">Aguardando</span>
                     </div>
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-hourglass-split"></i> Em Análise</p>
-                        <h3 id="os-analise">7</h3>
+                        <h3 id="os-analise">0</h3>
                         <span class="tendencia">Processando</span>
                     </div>
                     <div class="card-metrica destaque-escuro">
                         <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
-                        <h3 id="os-finalizadas">42</h3>
+                        <h3 id="os-finalizadas">0</h3>
                         <span class="tendencia">Concluídas</span>
                     </div>
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-people"></i> Total Clientes</p>
-                        <h3 id="total-clientes">156</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> +8</span>
+                        <h3 id="total-clientes">0</h3>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> +0</span>
                     </div>
                 </div>
 
@@ -151,22 +151,12 @@
                     return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
                 }).length;
 
-                // Collect activities from all companies
-                let allActivities = [];
-                empresas.forEach(empresa => {
-                    if (empresa.historico_atividades) {
-                        empresa.historico_atividades.forEach(activity => {
-                            allActivities.push({
-                                descricao: activity.descricao || activity.texto,
-                                data: activity.data
-                            });
-                        });
-                    }
-                });
-
-                // Sort by date desc and take last 10
-                allActivities.sort((a, b) => new Date(b.data) - new Date(a.data));
-                const atividades = allActivities.slice(0, 10);
+                // Collect activities from nexus_atividades
+                const atividades_lista = JSON.parse(localStorage.getItem('nexus_atividades')) || [];
+                
+                // Sort by date desc and show all
+                const atividades = atividades_lista
+                    .sort((a, b) => new Date(b.data) - new Date(a.data));
 
                 // Update metrics
                 document.getElementById('os-abertas').textContent = os_abertas;
@@ -192,7 +182,6 @@
                 console.error('Erro ao carregar métricas:', error);
             }
         }
-    </script>
     </script>
 </body>
 </html>

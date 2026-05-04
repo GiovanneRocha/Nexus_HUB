@@ -23,26 +23,83 @@
             width: 850px; margin: auto; display: flex; flex-direction: column; gap: 30px;
         }
         .controles-superiores {
-            background: #1a1a1a; padding: 20px; border-radius: 15px;
-            color: white; position: sticky; top: 0; z-index: 2001;
-            display: flex; justify-content: space-between; align-items: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background: linear-gradient(135deg, #1a1a1a 0%, #2a2a3a 100%); 
+            padding: 20px; 
+            border-radius: 15px;
+            color: white; 
+            position: sticky; 
+            top: 0; 
+            z-index: 2001;
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(79, 70, 229, 0.3);
+            border-left: 4px solid #4f46e5;
         }
         .folha-pdf {
-            background: white; width: 794px; min-height: 1123px; padding: 60px;
-            margin: auto; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            color: #333; position: relative; box-sizing: border-box;
+            background: white; 
+            width: 794px; 
+            min-height: 1123px; 
+            padding: 60px;
+            margin: auto; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+            color: #333; 
+            position: relative; 
+            box-sizing: border-box;
+            border-left: 8px solid #4f46e5;
+        }
+        .folha-pdf::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, #4f46e5 0%, transparent 100%);
+            border-radius: 0 0 0 100%;
         }
         [contenteditable="true"] {
-            border: 1px dashed transparent; transition: 0.3s; padding: 2px;
+            border: 1px dashed transparent; 
+            transition: 0.3s; 
+            padding: 2px;
         }
         [contenteditable="true"]:hover {
-            border: 1px dashed #4f46e5; background: #f0f4ff;
+            border: 1px dashed #4f46e5; 
+            background: #f0f4ff;
         }
-        .tabela-pdf { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        .tabela-pdf th { background: #f2f2f2; padding: 12px; border: 1px solid #ddd; text-align: left; font-size: 12px; }
-        .tabela-pdf td { padding: 12px; border: 1px solid #ddd; font-size: 14px; }
-        .rodape-pdf { position: absolute; bottom: 60px; left: 60px; width: calc(100% - 120px); border-top: 1px solid #eee; padding-top: 20px; font-size: 12px; color: #777; }
+        .tabela-pdf { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px;
+        }
+        .tabela-pdf th { 
+            background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%); 
+            color: white;
+            padding: 12px; 
+            border: 1px solid #4f46e5; 
+            text-align: left; 
+            font-size: 12px; 
+            font-weight: 600;
+        }
+        .tabela-pdf td { 
+            padding: 12px; 
+            border: 1px solid #e0e0e0; 
+            font-size: 14px; 
+        }
+        .tabela-pdf tbody tr:nth-child(odd) {
+            background-color: #f9f9fd;
+        }
+        .rodape-pdf { 
+            position: absolute; 
+            bottom: 60px; 
+            left: 60px; 
+            width: calc(100% - 120px); 
+            border-top: 2px solid #4f46e5; 
+            padding-top: 20px; 
+            font-size: 12px; 
+            color: #4f46e5;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="corpo-dashboard">
@@ -136,39 +193,50 @@
             const capa = document.createElement('div');
             capa.className = 'folha-pdf';
             capa.innerHTML = `
-                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #4f46e5; padding-bottom: 20px;">
-                    <h2 style="margin: 0; color: #1a1a1a;">AutoDiagnose</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 4px solid #4f46e5; padding-bottom: 20px; margin-bottom: 30px;">
+                    <div>
+                        <h2 style="margin: 0; color: #4f46e5; font-size: 28px;">Nexus HUB</h2>
+                        <p style="margin: 5px 0 0 0; color: #888; font-size: 12px;">Sistema de Gestão de Ordens de Serviço</p>
+                    </div>
                     <div style="text-align: right;">
-                        <p style="font-weight: bold; margin: 0;">Relatório OS #${osSelecionada.id.toString().slice(-6)}</p>
-                        <p style="margin: 0; font-size: 0.9rem;">Data: ${osSelecionada.dataRegistro}</p>
+                        <p style="font-weight: 600; margin: 0; color: #4f46e5;">OS #${osSelecionada.id.toString().slice(-6)}</p>
+                        <p style="margin: 5px 0 0 0; font-size: 0.9rem; color: #666;">Data: ${osSelecionada.dataRegistro}</p>
                     </div>
                 </div>
-                <h1 style="font-size: 32px; margin: 40px 0 10px 0;" contenteditable="true">Relatório de Serviços Corporativos</h1>
-                <div style="margin-bottom: 30px;">
-                    <p><strong>Cliente:</strong> ${osSelecionada.cliente}</p>
-                    <p><strong>Contato:</strong> <span contenteditable="true">${cliente.contato || '---'}</span></p>
-                    <p><strong>Email:</strong> <span contenteditable="true">${cliente.email || '---'}</span></p>
+                <div style="background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%); padding: 30px; border-radius: 10px; border-left: 4px solid #4f46e5; margin: 30px 0;">
+                    <h1 style="font-size: 32px; margin: 0 0 15px 0; color: #1a1a1a;" contenteditable="true">Relatório de Serviços Corporativos</h1>
+                    <p style="margin: 0; color: #4f46e5; font-weight: 600;">Detalhamento Técnico e Financeiro</p>
                 </div>
-                <div style="margin-bottom: 40px;">
-                    <h3 style="color: #4f46e5; border-bottom: 1px solid #eee; padding-bottom: 10px;">Introdução</h3>
-                    <p contenteditable="true" style="text-align: justify; line-height: 1.6; color: #555;">
-                        Apresentamos o detalhamento técnico dos serviços realizados na frota da empresa ${osSelecionada.cliente}. Este documento consolida todas as intervenções de manutenção executadas pela nossa equipe técnica.
+                <div style="margin: 30px 0;">
+                    <h3 style="color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 15px;">Informações do Cliente</h3>
+                    <p style="margin: 8px 0;"><strong>Empresa:</strong> ${osSelecionada.cliente}</p>
+                    <p style="margin: 8px 0;"><strong>Contato:</strong> <span contenteditable="true">${cliente.contato || '---'}</span></p>
+                    <p style="margin: 8px 0;"><strong>Email:</strong> <span contenteditable="true">${cliente.email || '---'}</span></p>
+                    <p style="margin: 8px 0;"><strong>Telefone:</strong> <span contenteditable="true">${cliente.telefone || '---'}</span></p>
+                </div>
+                <div style="margin: 40px 0;">
+                    <h3 style="color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 15px;">Resumo Executivo</h3>
+                    <p contenteditable="true" style="text-align: justify; line-height: 1.8; color: #555; margin: 0;">
+                        Apresentamos o detalhamento técnico completo dos serviços realizados na frota corporativa de ${osSelecionada.cliente}. Este documento consolida todas as intervenções de manutenção executadas pela equipe técnica especializada da Nexus HUB, incluindo diagnósticos, substituições de componentes e análises de desempenho.
                     </p>
                 </div>
-                <table class="tabela-pdf">
-                    <thead><tr><th>Caminhão / Veículo</th><th style="text-align: right;">Subtotal</th></tr></thead>
-                    <tbody>
-                        ${osSelecionada.frota.map(v => {
-                            const totalV = v.servicos.reduce((acc, s) => acc + parseFloat(s.valor), 0);
-                            return `<tr><td>${v.dadosVeiculo.modelo} - ${v.dadosVeiculo.placa}</td><td style="text-align: right; font-weight: bold;">R$ ${totalV.toFixed(2)}</td></tr>`;
-                        }).join('')}
-                        <tr style="background: #f9f9f9; font-size: 18px;">
-                            <td><strong>Total Consolidado</strong></td>
-                            <td style="text-align: right; color: #4f46e5;"><strong>R$ ${parseFloat(osSelecionada.valorTotalOS).toFixed(2)}</strong></td>
-                        </tr>
-                    </tbody>
-                </table>
-                <div class="rodape-pdf">Gerado por Nexus HUB | Julian Vane - Administrador</div>
+                <div style="margin: 40px 0; background: #f9f9fd; padding: 20px; border-radius: 8px; border-left: 4px solid #4f46e5;">
+                    <h4 style="margin: 0 0 15px 0; color: #4f46e5;">Resumo Financeiro</h4>
+                    <table class="tabela-pdf">
+                        <thead><tr><th>Caminhão / Veículo</th><th style="text-align: center;">Placa</th><th style="text-align: right;">Subtotal</th></tr></thead>
+                        <tbody>
+                            ${osSelecionada.frota.map(v => {
+                                const totalV = v.servicos.reduce((acc, s) => acc + parseFloat(s.valor), 0);
+                                return `<tr><td>${v.dadosVeiculo.modelo}</td><td style="text-align: center;">${v.dadosVeiculo.placa}</td><td style="text-align: right; font-weight: bold;">R$ ${totalV.toFixed(2)}</td></tr>`;
+                            }).join('')}
+                            <tr style="background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%); font-size: 16px;">
+                                <td colspan="2"><strong>Total Consolidado</strong></td>
+                                <td style="text-align: right; color: #4f46e5;"><strong>R$ ${parseFloat(osSelecionada.valorTotalOS).toFixed(2)}</strong></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="rodape-pdf">Relatório Gerado por Nexus HUB | Julian Vane - Administrador | ${new Date().toLocaleDateString('pt-BR')}</div>
             `;
             container.appendChild(capa);
 
@@ -179,37 +247,42 @@
                 const totalV = veiculo.servicos.reduce((acc, s) => acc + parseFloat(s.valor), 0);
                 
                 pagV.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #eee; padding-bottom: 15px;">
-                        <h3 style="margin: 0; color: #444;">AutoDiagnose</h3>
-                        <span style="font-size: 0.9rem; color: #888;">Detalhamento por Unidade</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #4f46e5; padding-bottom: 15px; margin-bottom: 25px;">
+                        <h3 style="margin: 0; color: #4f46e5; font-size: 18px;">Nexus HUB - Detalhamento por Unidade</h3>
+                        <span style="font-size: 0.85rem; color: #888; background: #f0f4ff; padding: 5px 12px; border-radius: 20px; border: 1px solid #4f46e5;">Veículo Específico</span>
                     </div>
-                    <div style="margin: 30px 0; background: #f8f9fd; padding: 20px; border-radius: 10px;">
-                        <h2 style="margin: 0;">${veiculo.dadosVeiculo.modelo}</h2>
-                        <p style="margin: 5px 0; color: #4f46e5; font-weight: bold;">PLACA: ${veiculo.dadosVeiculo.placa} | COR: ${veiculo.dadosVeiculo.cor}</p>
+                    <div style="margin: 30px 0; background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%); padding: 20px; border-radius: 10px; border-left: 4px solid #4f46e5;">
+                        <h2 style="margin: 0; color: #1a1a1a;">${veiculo.dadosVeiculo.modelo}</h2>
+                        <p style="margin: 10px 0 0 0; color: #4f46e5; font-weight: 600; font-size: 14px;">
+                            PLACA: <strong>${veiculo.dadosVeiculo.placa}</strong> | COR: <strong>${veiculo.dadosVeiculo.cor}</strong> | ANO: <strong>${veiculo.dadosVeiculo.ano}</strong>
+                        </p>
                     </div>
-                    <table class="tabela-pdf">
-                        <thead><tr><th>Serviço Executado</th><th>Descrição Detalhada</th><th style="text-align: right;">Valor</th></tr></thead>
-                        <tbody>
-                            ${veiculo.servicos.map(s => `
-                                <tr>
-                                    <td><strong>${s.tipo.replace('_', ' ')}</strong></td>
-                                    <td contenteditable="true" style="color: #666; font-size: 12px;">${s.descricao}</td>
-                                    <td style="text-align: right;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                    <div style="margin: 30px 0;">
+                        <h3 style="color: #4f46e5; border-bottom: 2px solid #4f46e5; padding-bottom: 10px; margin-bottom: 15px;">Serviços Executados</h3>
+                        <table class="tabela-pdf">
+                            <thead><tr><th>Serviço</th><th>Descrição Técnica</th><th style="text-align: right;">Valor</th></tr></thead>
+                            <tbody>
+                                ${veiculo.servicos.map(s => `
+                                    <tr>
+                                        <td><strong>${s.tipo.replace(/_/g, ' ')}</strong></td>
+                                        <td contenteditable="true" style="color: #666; font-size: 13px;">${s.descricao}</td>
+                                        <td style="text-align: right; font-weight: 600;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                                <tr style="background: linear-gradient(135deg, #f0f4ff 0%, #e8edff 100%); font-size: 14px;">
+                                    <td colspan="2" style="text-align: right;"><strong>Subtotal do Veículo</strong></td>
+                                    <td style="text-align: right; font-weight: bold; color: #4f46e5;">R$ ${totalV.toFixed(2)}</td>
                                 </tr>
-                            `).join('')}
-                            <tr>
-                                <td colspan="2" style="text-align: right;"><strong>Subtotal do Veículo</strong></td>
-                                <td style="text-align: right; font-weight: bold; background: #fcfcfc;">R$ ${totalV.toFixed(2)}</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                    <div style="margin-top: 30px;">
-                        <h4 style="margin-bottom: 10px;">Comentários Técnicos / Observações:</h4>
-                        <div contenteditable="true" style="min-height: 80px; border: 1px solid #eee; padding: 10px; border-radius: 5px; font-size: 13px; color: #666;">
-                            Veículo liberado para operação. Sem pendências críticas detectadas nesta revisão.
+                            </tbody>
+                        </table>
+                    </div>
+                    <div style="margin-top: 30px; padding: 20px; background: #f9f9fd; border-radius: 8px; border-left: 4px solid #4f46e5;">
+                        <h4 style="margin: 0 0 10px 0; color: #4f46e5;">Observações Técnicas</h4>
+                        <div contenteditable="true" style="min-height: 100px; border: none; padding: 0; font-size: 13px; color: #666; line-height: 1.6;">
+                            Veículo foi submetido a inspeção completa. Todas as manutenções preventivas foram executadas conforme cronograma. Sistema em perfeitas condições de operação. Recomenda-se próxima revisão em 90 dias.
                         </div>
                     </div>
-                    <div class="rodape-pdf">Página Detalhada | OS #${osSelecionada.id.toString().slice(-6)}</div>
+                    <div class="rodape-pdf">OS #${osSelecionada.id.toString().slice(-6)} | Veículo: ${veiculo.dadosVeiculo.placa} | ${new Date().toLocaleDateString('pt-BR')}</div>
                 `;
                 container.appendChild(pagV);
             });

@@ -418,6 +418,94 @@ textarea {
     transform: translateX(1px);
 }
 
+.menu-navegacao .menu-grupo {
+    padding: 0;
+    margin-bottom: 16px;
+}
+
+.menu-navegacao .menu-grupo-titulo {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    border-radius: 16px;
+    color: var(--texto-secundario);
+    font-weight: 700;
+}
+
+.menu-navegacao .menu-grupo-titulo i {
+    font-size: 1rem;
+}
+
+.menu-navegacao .submenu {
+    list-style: none;
+    margin-top: 8px;
+    padding-left: 16px;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 0.25s ease, opacity 0.25s ease, visibility 0.25s ease;
+}
+
+.menu-navegacao .menu-grupo:hover .submenu,
+.menu-navegacao .menu-grupo.item-ativo .submenu {
+    max-height: 500px;
+    opacity: 1;
+    visibility: visible;
+}
+
+.menu-navegacao .submenu li {
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    border-radius: 14px;
+    color: var(--texto-secundario);
+    transition: background 0.25s ease, color 0.25s ease, transform 0.25s ease;
+}
+
+.menu-navegacao .submenu li:hover {
+    background: #f5f8ff;
+    color: var(--destaque);
+    transform: translateX(1px);
+}
+
+.menu-navegacao .submenu li.item-ativo {
+    background: #ffffff;
+    color: var(--destaque);
+    font-weight: 700;
+    box-shadow: 0 10px 30px rgba(15,18,33,0.08);
+}
+
+.menu-navegacao .menu-grupo:hover > .menu-grupo-titulo,
+.menu-navegacao .menu-grupo.item-ativo > .menu-grupo-titulo {
+    background: #f5f8ff;
+    color: var(--destaque);
+}
+
+.menu-navegacao .menu-grupo-titulo {
+    cursor: pointer;
+}
+
+.menu-navegacao li.item-ativo > .menu-grupo-titulo,
+.menu-navegacao li.item-ativo > .link-menu {
+    color: var(--destaque);
+}
+
+.menu-navegacao li.item-ativo > .menu-grupo-titulo {
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(15,18,33,0.08);
+}
+
+.menu-navegacao li.item-ativo > .link-menu {
+    display: inline-block;
+    width: 100%;
+}
+
+.menu-navegacao li.item-ativo > .link-menu i,
+.menu-navegacao .submenu li.item-ativo > .link-menu i {
+    margin-right: 8px;
+}
+
 .menu-navegacao li.item-ativo {
     background: #ffffff;
     color: var(--destaque);

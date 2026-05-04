@@ -109,6 +109,7 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const novo = {
+                id: Date.now(),
                 empresa: document.getElementById('selecao-empresa-veiculo').value,
                 placa: document.getElementById('placa-veiculo').value,
                 modelo: document.getElementById('modelo-veiculo').value,
@@ -118,6 +119,7 @@
             const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
             veiculos.push(novo);
             localStorage.setItem('nexus_veiculos', JSON.stringify(veiculos));
+            registrarAtividade('veiculo_cadastrado', `Novo veículo cadastrado: ${novo.placa}`, `${novo.modelo} (${novo.ano}) - ${novo.cor}`);
             form.reset();
             renderizarVeiculos();
         });

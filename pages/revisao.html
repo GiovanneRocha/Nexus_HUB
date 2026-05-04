@@ -261,6 +261,8 @@
                 localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
             }
             
+            registrarAtividade('os_aprovada', `OS aprovada - Cliente: ${atendimentos[idx].cliente}`, `Total: R$ ${parseFloat(atendimentos[idx].valorTotalOS).toFixed(2)} | ${atendimentos[idx].frota.length} veículo(s)`);
+            
             alert("OS Aprovada e enviada para o Histórico!");
             fecharModal();
             renderizarRevisao();

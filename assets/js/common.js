@@ -44,18 +44,50 @@ function getSidebarHTML(activePage = 'home') {
     const menuItems = [
         { href: 'home.html', icon: 'bi-house-door', text: 'início', key: 'home' },
         { href: 'menu.html', icon: 'bi-speedometer2', text: 'Painel', key: 'menu' },
-        { href: 'novo_atendimento.html', icon: 'bi-plus-circle', text: 'Nova OS', key: 'novo_atendimento' },
         { href: 'clientes.html', icon: 'bi-people', text: 'Clientes', key: 'clientes' },
-        { href: 'revisao.html', icon: 'bi-check-square', text: 'Revisão de OS', key: 'revisao' },
-        { href: 'historico.html', icon: 'bi-clock-history', text: 'Histórico', key: 'historico' },
-        { href: 'cadastro_servicos.html', icon: 'bi-plus-circle', text: 'Cadastro de Serviços', key: 'cadastro_servicos' },
-        { href: 'cadastro_pecas.html', icon: 'bi-plus-circle', text: 'Cadastro de Peças', key: 'cadastro_pecas' },
-        { href: 'cadastro_veiculo.html', icon: 'bi-plus-circle', text: 'Cadastro de Veículos', key: 'cadastro_veiculo' }
+        {
+            icon: 'bi-wrench',
+            text: 'Ordem de Serviço',
+            key: 'ordem_servico',
+            children: [
+                { href: 'novo_atendimento.html', icon: 'bi-plus-circle', text: 'Nova OS', key: 'novo_atendimento' },
+                { href: 'revisao.html', icon: 'bi-check-square', text: 'Revisão de OS', key: 'revisao' }
+            ]
+        },
+        {
+            icon: 'bi-journal-plus',
+            text: 'Cadastro',
+            key: 'cadastro',
+            children: [
+                { href: 'cadastro_servicos.html', icon: 'bi-gear', text: 'Cadastro de Serviço', key: 'cadastro_servicos' },
+                { href: 'cadastro_pecas.html', icon: 'bi-box-seam', text: 'Cadastro de Peças', key: 'cadastro_pecas' },
+                { href: 'cadastro_veiculo.html', icon: 'bi-truck', text: 'Cadastro de Veículos', key: 'cadastro_veiculo' }
+            ]
+        },
+        { href: 'historico.html', icon: 'bi-clock-history', text: 'Histórico', key: 'historico' }
     ];
 
     const menuHTML = menuItems.map(item => {
-        const isActive = item.key === activePage ? ' class="item-ativo"' : '';
-        return `<li${isActive}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> ${item.text}</a></li>`;
+        const isGroupActive = item.key === activePage || (item.children && item.children.some(child => child.key === activePage));
+        const groupClass = item.children ? ' menu-grupo' : '';
+        const activeClass = isGroupActive ? ' class="item-ativo"' : '';
+
+        if (item.children) {
+            const submenuHTML = item.children.map(child => {
+                const isChildActive = child.key === activePage ? ' class="item-ativo"' : '';
+                return `<li${isChildActive}><a href="${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> ${child.text}</a></li>`;
+            }).join('\n                        ');
+
+            return `
+                <li class="menu-grupo${isGroupActive ? ' item-ativo' : ''}">
+                    <div class="menu-grupo-titulo"><i class="bi ${item.icon}"></i> ${item.text}</div>
+                    <ul class="submenu">
+                        ${submenuHTML}
+                    </ul>
+                </li>`;
+        }
+
+        return `<li${activeClass}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> ${item.text}</a></li>`;
     }).join('\n                    ');
 
     return `
@@ -105,6 +137,31 @@ function getHeaderHTML() {
             </div>
         </header>
     `;
+}
+
+// ==========================================
+// FUNÇÃO PARA REGISTRAR ATIVIDADES
+// ==========================================
+function registrarAtividade(tipo, descricao, detalhes = '') {
+    /**
+     * Registra uma atividade no localStorage em nexus_atividades
+     * @param {string} tipo - Tipo da atividade (ex: 'empresa_criada', 'os_aprovada', 'veiculo_cadastrado')
+     * @param {string} descricao - Descrição breve da atividade
+     * @param {string} detalhes - Detalhes adicionais (opcional)
+     */
+    const atividades = JSON.parse(localStorage.getItem('nexus_atividades')) || [];
+    
+    const novaAtividade = {
+        id: Date.now(),
+        tipo: tipo,
+        descricao: descricao,
+        detalhes: detalhes,
+        usuario: "Julian Vane", // Pode ser obtido de sessão futura
+        data: new Date().toLocaleString('pt-BR')
+    };
+    
+    atividades.push(novaAtividade);
+    localStorage.setItem('nexus_atividades', JSON.stringify(atividades));
 }
 
 window.addEventListener('DOMContentLoaded', initTheme);

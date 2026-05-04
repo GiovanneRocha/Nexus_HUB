@@ -91,6 +91,7 @@
         form.addEventListener('submit', (e) => {
             e.preventDefault();
             const novo = {
+                id: Date.now(),
                 nome: document.getElementById('nome-servico').value,
                 valor: document.getElementById('valor-servico').value,
                 desc: document.getElementById('desc-servico').value
@@ -98,6 +99,7 @@
             const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
             servicos.push(novo);
             localStorage.setItem('nexus_servicos_custom', JSON.stringify(servicos));
+            registrarAtividade('servico_cadastrado', `Novo serviço cadastrado: ${novo.nome}`, `Valor: R$ ${parseFloat(novo.valor).toFixed(2)}`);
             form.reset();
             renderizarServicos();
         });
