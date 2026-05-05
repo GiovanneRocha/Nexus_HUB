@@ -56,12 +56,12 @@ function getSidebarHTML(activePage = 'home') {
         },
         {
             icon: 'bi-journal-plus',
-            text: 'Cadastro',
+            text: 'Gestão',
             key: 'cadastro',
             children: [
-                { href: 'cadastro_servicos.html', icon: 'bi-gear', text: 'Cadastro de Serviço', key: 'cadastro_servicos' },
-                { href: 'cadastro_pecas.html', icon: 'bi-box-seam', text: 'Cadastro de Peças', key: 'cadastro_pecas' },
-                { href: 'cadastro_veiculo.html', icon: 'bi-truck', text: 'Cadastro de Veículos', key: 'cadastro_veiculo' }
+                { href: 'cadastro_servicos.html', icon: 'bi-gear', text: 'Gestão de Serviços', key: 'cadastro_servicos' },
+                { href: 'cadastro_pecas.html', icon: 'bi-box-seam', text: 'Gestão de Peças', key: 'cadastro_pecas' },
+                { href: 'cadastro_veiculo.html', icon: 'bi-truck', text: 'Gestão de Veículos', key: 'cadastro_veiculo' }
             ]
         },
         { href: 'historico.html', icon: 'bi-clock-history', text: 'Histórico', key: 'historico' }

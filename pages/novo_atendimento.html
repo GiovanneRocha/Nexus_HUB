@@ -127,13 +127,18 @@
                     
                     <div class="container-servicos-veiculo" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--bordar);"></div>
                     
-                    <button type="button" onclick="adicionarServicoAoVeiculo(this)" style="width: 100%; margin-top: 16px; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
-                        <i class="bi bi-plus"></i> Adicionar Serviço
-                    </button>
+                    <div style="display: grid; gap: 12px; margin-top: 16px;">
+                        <button type="button" onclick="adicionarServicoAoVeiculo(this)" style="width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            <i class="bi bi-plus"></i> Adicionar Serviço
+                        </button>
+                        <button type="button" onclick="adicionarPecaAoVeiculo(this)" style="width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px dashed var(--azul-escuro); color: var(--azul-escuro); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                            <i class="bi bi-box-seam"></i> Adicionar Peça
+                        </button>
+                    </div>
                 </div>
             `;
             container.appendChild(div);
-            adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+            adicionarServicoAoVeiculo(div.querySelector('button[onclick*=\"adicionarServicoAoVeiculo\"]'));
         }
 
         function mostrarVeiculosCadastrados(botao) {
@@ -217,7 +222,7 @@
 
             const div = document.createElement('div');
             div.className = 'item-servico';
-            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); boundary-radius: 8px; border-left: 4px solid var(--verde-esmeralda);';
+            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); border-radius: 8px; border-left: 4px solid var(--verde-esmeralda);';
             
             let optionsHTML = '<option value="">Selecione um serviço...</option>';
             
@@ -262,6 +267,70 @@
             `;
             container.appendChild(div);
         }
+        
+        function adicionarPecaAoVeiculo(botao) {
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            const container = blocoVeiculo.querySelector('.container-pecas-veiculo');
+            const pecasCadastradas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+
+            if (pecasCadastradas.length === 0) {
+                alert('Cadastre peças antes de adicioná-las à OS. Acesse Gestão de Peças.');
+                return;
+            }
+
+            const div = document.createElement('div');
+            div.className = 'item-peca';
+            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); border-radius: 8px;';
+
+            const optionsHTML = pecasCadastradas.map((peca, index) => `
+                <option value="peca_${index}">${peca.nome} — R$ ${parseFloat(peca.valor).toFixed(2)}</option>
+            `).join('');
+
+            div.innerHTML = `
+                ${container.children.length > 0 ? '<button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--erro); cursor: pointer; font-weight: 600;"><i class="bi bi-x-circle"></i></button>' : ''}
+                <div class="linha-campos">
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-box-seam"></i> Peça</label>
+                        <select class="p-peca" required onchange="aplicarPecaSelecionada(this)">
+                            <option value="">Selecione uma peça...</option>
+                            ${optionsHTML}
+                        </select>
+                    </div>
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-sort-numeric-up"></i> Quantidade</label>
+                        <input type="number" class="p-qtde" min="1" value="1" required oninput="calcularTotalGeral()">
+                    </div>
+                </div>
+                <div class="linha-campos">
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
+                        <input type="number" class="p-valor-unitario" placeholder="0,00" step="0.01" required oninput="calcularTotalGeral()">
+                    </div>
+                    <div class="bloco-campo-novo">
+                        <label><i class="bi bi-calculator"></i> Total</label>
+                        <input type="text" class="p-total" value="R$ 0,00" readonly>
+                    </div>
+                </div>
+                <div class="bloco-campo-novo">
+                    <label><i class="bi bi-chat-left-text"></i> Descrição</label>
+                    <textarea class="p-desc" placeholder="Observações sobre a peça..." rows="2" style="width: 100%;"></textarea>
+                    <input type="hidden" class="p-nome">
+                </div>
+            `;
+
+            div.querySelector('.p-qtde').addEventListener('input', atualizarTotalPeca);
+            div.querySelector('.p-valor-unitario').addEventListener('input', atualizarTotalPeca);
+            container.appendChild(div);
+            calcularTotalGeral();
+        }
+
+        function atualizarTotalPeca(event) {
+            const item = event.target.closest('.item-peca');
+            const qtde = parseFloat(item.querySelector('.p-qtde').value) || 0;
+            const valorUnitario = parseFloat(item.querySelector('.p-valor-unitario').value) || 0;
+            item.querySelector('.p-total').value = `R$ ${ (qtde * valorUnitario).toFixed(2) }`;
+            calcularTotalGeral();
+        }
 
         function aplicarPreDefinidos(selectElement) {
             const valor = selectElement.value;
@@ -288,9 +357,29 @@
             calcularTotalGeral();
         }
 
+        function aplicarPecaSelecionada(selectElement) {
+            const valor = selectElement.value;
+            const item = selectElement.closest('.item-peca');
+            const pecasCadastradas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            const index = parseInt(valor.replace('peca_', ''));
+            const peca = pecasCadastradas[index];
+
+            if (peca) {
+                item.querySelector('.p-valor-unitario').value = parseFloat(peca.valor).toFixed(2);
+                item.querySelector('.p-desc').value = peca.desc || `${peca.fornecedor} • ${peca.codigo}`;
+                item.querySelector('.p-nome').value = peca.nome;
+            }
+            calcularTotalGeral();
+        }
+
         function calcularTotalGeral() {
             let total = 0;
             document.querySelectorAll('.s-valor').forEach(c => total += parseFloat(c.value) || 0);
+            document.querySelectorAll('.item-peca').forEach(item => {
+                const qtde = parseFloat(item.querySelector('.p-qtde').value) || 0;
+                const valorUnitario = parseFloat(item.querySelector('.p-valor-unitario').value) || 0;
+                total += qtde * valorUnitario;
+            });
             document.getElementById('total-geral-display').innerText = `R$ ${total.toFixed(2)}`;
         }
 
@@ -304,6 +393,8 @@
             blocosVeiculos.forEach(bloco => {
                 const servicosDoVeiculo = [];
                 const blocosServicos = bloco.querySelectorAll('.item-servico');
+                const blocosPecas = bloco.querySelectorAll('.item-peca');
+                const pecasDoVeiculo = [];
                 
                 blocosServicos.forEach(bs => {
                     const valor = parseFloat(bs.querySelector('.s-valor').value) || 0;
@@ -316,6 +407,20 @@
                     });
                 });
 
+                blocosPecas.forEach(bp => {
+                    const qtde = parseFloat(bp.querySelector('.p-qtde').value) || 0;
+                    const valorUnitario = parseFloat(bp.querySelector('.p-valor-unitario').value) || 0;
+                    const valorTotal = qtde * valorUnitario;
+                    totalOS += valorTotal;
+                    pecasDoVeiculo.push({
+                        nome: bp.querySelector('.p-nome').value || bp.querySelector('.p-peca').selectedOptions[0].text,
+                        quantidade: qtde,
+                        valorUnitario: valorUnitario,
+                        valorTotal: valorTotal,
+                        descricao: bp.querySelector('.p-desc').value
+                    });
+                });
+
                 frotaCompleta.push({
                     dadosVeiculo: {
                         placa: bloco.querySelector('.v-placa').value,
@@ -323,7 +428,8 @@
                         ano: bloco.querySelector('.v-ano').value,
                         cor: bloco.querySelector('.v-cor').value
                     },
-                    servicos: servicosDoVeiculo
+                    servicos: servicosDoVeiculo,
+                    pecas: pecasDoVeiculo
                 });
             });
 

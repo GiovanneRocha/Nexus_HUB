@@ -22,6 +22,30 @@
                     <p>Acompanhe as métricas e informações do sistema em tempo real.</p>
                 </div>
 
+                <div class="painel-filtros card-grafico-principal">
+                    <div class="filtros-dashboard">
+                        <select id="filtro-status" class="filtro-select">
+                            <option value="todos">Todos os Status</option>
+                            <option value="pendente_revisao">Pendente de Revisão</option>
+                            <option value="em_analise">Em Análise</option>
+                            <option value="aprovada">Aprovada</option>
+                            <option value="recusada">Recusada</option>
+                        </select>
+                        <select id="filtro-periodo" class="filtro-select">
+                            <option value="mes_atual">Mês Atual</option>
+                            <option value="30_dias">Últimos 30 dias</option>
+                            <option value="ano_atual">Ano Atual</option>
+                            <option value="todos">Todo Período</option>
+                        </select>
+                        <button type="button" class="botao-acao" style="min-width: 180px;">Aplicar Filtros</button>
+                    </div>
+                    <div class="resumo-filtro" id="resumo-filtro">
+                        <span>Filtrando: <strong id="resumo-status">Todos</strong></span>
+                        <span>Período: <strong id="resumo-periodo">Mês Atual</strong></span>
+                        <span>Última atualização: <strong id="resumo-atualizacao">Agora</strong></span>
+                    </div>
+                </div>
+
                 <div class="grade-cards">
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
@@ -36,32 +60,62 @@
                     <div class="card-metrica destaque-escuro">
                         <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
                         <h3 id="os-finalizadas">0</h3>
-                        <span class="tendencia">Concluídas</span>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Concluídas</span>
                     </div>
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-people"></i> Total Clientes</p>
                         <h3 id="total-clientes">0</h3>
                         <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> +0</span>
                     </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-box-seam"></i> Total Peças</p>
+                        <h3 id="total-pecas">0</h3>
+                        <span class="tendencia">Cadastro de peças</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-truck"></i> Total Veículos</p>
+                        <h3 id="total-veiculos">0</h3>
+                        <span class="tendencia">Frotas ativas</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-currency-dollar"></i> Receita (Mês)</p>
+                        <h3 id="receita-mes">R$ 0,00</h3>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Ticket médio</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-bar-chart-line"></i> Médias</p>
+                        <h3 id="ticket-medio">R$ 0,00</h3>
+                        <span class="tendencia">Por atendimento</span>
+                    </div>
                 </div>
 
                 <div class="area-graficos">
                     <div class="card-grafico-principal">
                         <h4><i class="bi bi-bar-chart"></i> Atendimentos por Mês</h4>
-                        <div class="simulador-grafico">
-                            <div class="barra" style="height: 40%;"></div>
-                            <div class="barra" style="height: 60%;"></div>
-                            <div class="barra" style="height: 45%;"></div>
-                            <div class="barra destaque" style="height: 80%;"></div>
-                            <div class="barra" style="height: 55%;"></div>
-                            <div class="barra" style="height: 70%;"></div>
-                        </div>
+                        <div id="grafico-mensal" class="simulador-grafico"></div>
+                        <div class="legenda-status" id="grafico-legend" style="margin-top: 20px; display:flex; gap: 12px; flex-wrap: wrap;"></div>
                     </div>
                     <div class="card-atividade">
-                        <h4><i class="bi bi-list-ul"></i> Atividades</h4>
-                        <ul id="lista-atividades" class="lista-atividades">
-                            <li class="atividade-item">Carregando atividades...</li>
-                        </ul>
+                        <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+                            <h4><i class="bi bi-list-ul"></i> Últimas OS</h4>
+                            <div class="status-badge" id="os-status-legend"></div>
+                        </div>
+                        <div class="tabela-historico-container" style="margin-top: 18px;">
+                            <table class="tabela-historico">
+                                <thead>
+                                    <tr>
+                                        <th>OS</th>
+                                        <th>Empresa</th>
+                                        <th>Status</th>
+                                        <th>Data</th>
+                                        <th>Total</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="tabela-ultimas-os">
+                                    <tr><td colspan="5" style="padding: 18px; color: var(--texto-secundario);">Carregando histórico...</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -130,58 +184,164 @@
 
         async function loadMetrics() {
             try {
-                // Load data from localStorage and compute metrics
                 const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
                 const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+                const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+                const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
 
-                // Compute metrics
-                const currentMonth = new Date().getMonth();
-                const currentYear = new Date().getFullYear();
+                const filtroStatus = document.getElementById('filtro-status').value;
+                const filtroPeriodo = document.getElementById('filtro-periodo').value;
+                const agora = new Date();
+                const periodo = getPeriodoFiltro(filtroPeriodo, agora);
 
-                const os_abertas = atendimentos.filter(a => a.status === 'pendente_revisao').length;
-                const os_analise = atendimentos.filter(a => a.status === 'em_analise').length; // if exists
-                const os_finalizadas_mes = atendimentos.filter(a => {
-                    if (a.status !== 'aprovada') return false;
-                    const date = new Date(a.data);
-                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-                }).length;
+                const atendimentosFiltrados = atendimentos.filter(a => {
+                    const data = new Date(a.data);
+                    const dentroPeriodo = !periodo || (data >= periodo.inicio && data <= periodo.fim);
+                    const statusValido = filtroStatus === 'todos' || a.status === filtroStatus;
+                    return dentroPeriodo && statusValido;
+                });
+
+                const currentMonth = agora.getMonth();
+                const currentYear = agora.getFullYear();
+
+                const os_abertas = atendimentosFiltrados.filter(a => a.status === 'pendente_revisao').length;
+                const os_analise = atendimentosFiltrados.filter(a => a.status === 'em_analise').length;
+                const os_finalizadas_mes = atendimentos.filter(a => a.status === 'aprovada' && new Date(a.data).getMonth() === currentMonth && new Date(a.data).getFullYear() === currentYear).length;
                 const clientes = empresas.length;
-                const atendimentos_mes = atendimentos.filter(a => {
-                    const date = new Date(a.data);
-                    return date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+                const totalPecas = pecas.length;
+                const totalVeiculos = veiculos.length;
+                const receitaMes = atendimentos.reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
+                const atendimentosMes = atendimentos.filter(a => {
+                    const data = new Date(a.data);
+                    return data.getMonth() === currentMonth && data.getFullYear() === currentYear;
                 }).length;
+                const ticketMedio = atendimentosMes ? receitaMes / atendimentosMes : 0;
 
-                // Collect activities from nexus_atividades
-                const atividades_lista = JSON.parse(localStorage.getItem('nexus_atividades')) || [];
-                
-                // Sort by date desc and show all
-                const atividades = atividades_lista
-                    .sort((a, b) => new Date(b.data) - new Date(a.data));
+                const statusCounts = atendimentos.reduce((acc, item) => {
+                    const status = item.status || 'outros';
+                    acc[status] = (acc[status] || 0) + 1;
+                    return acc;
+                }, {});
 
-                // Update metrics
                 document.getElementById('os-abertas').textContent = os_abertas;
                 document.getElementById('os-analise').textContent = os_analise;
                 document.getElementById('os-finalizadas').textContent = os_finalizadas_mes;
                 document.getElementById('total-clientes').textContent = clientes;
+                document.getElementById('total-pecas').textContent = totalPecas;
+                document.getElementById('total-veiculos').textContent = totalVeiculos;
+                document.getElementById('receita-mes').textContent = `R$ ${receitaMes.toFixed(2)}`;
+                document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toFixed(2)}`;
 
-                // Update activities
-                const lista = document.getElementById('lista-atividades');
-                lista.innerHTML = '';
+                document.getElementById('resumo-status').textContent = filtroStatus === 'todos' ? 'Todos' : document.querySelector(`#filtro-status option[value="${filtroStatus}"]`).textContent;
+                document.getElementById('resumo-periodo').textContent = document.querySelector(`#filtro-periodo option[value="${filtroPeriodo}"]`).textContent;
+                document.getElementById('resumo-atualizacao').textContent = agora.toLocaleTimeString('pt-BR');
 
-                if (atividades.length === 0) {
-                    lista.innerHTML = '<li class="atividade-item">Nenhuma atividade recente</li>';
-                } else {
-                    atividades.forEach(atividade => {
-                        const li = document.createElement('li');
-                        li.className = 'atividade-item';
-                        li.textContent = `${atividade.descricao} - ${new Date(atividade.data).toLocaleString()}`;
-                        lista.appendChild(li);
-                    });
-                }
+                renderGraficoMensal(atendimentos);
+                renderStatusLegend(statusCounts);
+                renderUltimasOS(atendimentosFiltrados);
             } catch (error) {
                 console.error('Erro ao carregar métricas:', error);
             }
         }
+
+        function getPeriodoFiltro(chave, agora) {
+            const fim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 23, 59, 59, 999);
+            switch (chave) {
+                case 'mes_atual':
+                    return { inicio: new Date(agora.getFullYear(), agora.getMonth(), 1), fim };
+                case '30_dias':
+                    return { inicio: new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000), fim };
+                case 'ano_atual':
+                    return { inicio: new Date(agora.getFullYear(), 0, 1), fim };
+                default:
+                    return null;
+            }
+        }
+
+        function renderGraficoMensal(atendimentos) {
+            const agora = new Date();
+            const grafico = document.getElementById('grafico-mensal');
+            grafico.innerHTML = '';
+            const meses = [];
+            const valores = [];
+            for (let i = 5; i >= 0; i--) {
+                const data = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
+                meses.push(data.toLocaleString('pt-BR', { month: 'short' }));
+                const quantidade = atendimentos.filter(a => {
+                    const d = new Date(a.data);
+                    return d.getMonth() === data.getMonth() && d.getFullYear() === data.getFullYear();
+                }).length;
+                valores.push(quantidade);
+            }
+            const maxVal = Math.max(...valores, 1);
+            meses.forEach((mes, index) => {
+                const barra = document.createElement('div');
+                barra.className = `barra${index === meses.length - 1 ? ' destaque' : ''}`;
+                const altura = Math.max(16, (valores[index] / maxVal) * 100);
+                barra.style.height = `${altura}%`;
+                barra.title = `${mes}: ${valores[index]} atendimentos`;
+                const label = document.createElement('span');
+                label.className = 'barra-legenda';
+                label.textContent = mes;
+                barra.appendChild(label);
+                grafico.appendChild(barra);
+            });
+        }
+
+        function renderStatusLegend(counts) {
+            const container = document.getElementById('grafico-legend');
+            container.innerHTML = '';
+            const legendas = [
+                { status: 'pendente_revisao', label: 'Pendente', color: '#f6ad55' },
+                { status: 'em_analise', label: 'Em Análise', color: '#63b3ed' },
+                { status: 'aprovada', label: 'Aprovada', color: '#38a169' },
+                { status: 'recusada', label: 'Recusada', color: '#e53e3e' }
+            ];
+            legendas.forEach(item => {
+                const badge = document.createElement('span');
+                badge.className = 'status-pill';
+                badge.style.background = item.color + '20';
+                badge.style.color = item.color;
+                badge.textContent = `${item.label}: ${counts[item.status] || 0}`;
+                container.appendChild(badge);
+            });
+        }
+
+        function renderUltimasOS(atendimentos) {
+            const tabela = document.getElementById('tabela-ultimas-os');
+            tabela.innerHTML = '';
+            if (atendimentos.length === 0) {
+                tabela.innerHTML = '<tr><td colspan="5" style="padding: 18px; color: var(--texto-secundario);">Nenhuma OS encontrada para o filtro selecionado.</td></tr>';
+                return;
+            }
+            atendimentos
+                .sort((a, b) => new Date(b.data) - new Date(a.data))
+                .slice(0, 6)
+                .forEach((a, index) => {
+                    const tr = document.createElement('tr');
+                    const statusLabel = getStatusLabel(a.status);
+                    tr.innerHTML = `
+                        <td>#${index + 1}</td>
+                        <td>${a.cliente || 'Sem cliente'}</td>
+                        <td><span class="status-pill status-${a.status}">${statusLabel}</span></td>
+                        <td>${new Date(a.data).toLocaleDateString('pt-BR')}</td>
+                        <td>R$ ${(parseFloat(a.valorTotalOS) || 0).toFixed(2)}</td>
+                    `;
+                    tabela.appendChild(tr);
+                });
+        }
+
+        function getStatusLabel(status) {
+            switch (status) {
+                case 'pendente_revisao': return 'Pendente';
+                case 'em_analise': return 'Em análise';
+                case 'aprovada': return 'Aprovada';
+                case 'recusada': return 'Recusada';
+                default: return 'Outro';
+            }
+        }
+
+        document.querySelector('.painel-filtros .botao-acao').addEventListener('click', loadMetrics);
     </script>
 </body>
 </html>

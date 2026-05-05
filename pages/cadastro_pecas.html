@@ -22,10 +22,113 @@
             </section>
 
             <div class="container-formulario-novo-atendimento">
-               Trabalhando...
+                <form id="formCadastroPeca">
+                    <div class="secao-formulario-novo">
+                        <h3><i class="bi bi-plus-lg"></i> Nova Peça</h3>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-box-seam"></i> Nome da Peça</label>
+                                <input type="text" id="nome-peca" placeholder="Ex: Pastilha de Freio" required>
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-truck"></i> Fornecedor</label>
+                                <input type="text" id="fornecedor-peca" placeholder="Ex: Auto Peças Brasil" required>
+                            </div>
+                        </div>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-card-text"></i> Código / Referência</label>
+                                <input type="text" id="codigo-peca" placeholder="Ex: PF-0012" required>
+                            </div>
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
+                                <input type="number" id="valor-peca" placeholder="0.00" step="0.01" required>
+                            </div>
+                        </div>
+                        <div class="bloco-campo-novo">
+                            <label><i class="bi bi-chat-left-text"></i> Descrição</label>
+                            <textarea id="desc-peca" rows="2" placeholder="Descrição ou observações da peça..."></textarea>
+                        </div>
+                        <button type="submit" class="botao-acao" style="margin-top: 20px;">
+                            <i class="bi bi-save"></i> Salvar Peça
+                        </button>
+                    </div>
+                </form>
+
+                <div class="secao-formulario-novo">
+                    <h3><i class="bi bi-list-ul"></i> Peças Cadastradas</h3>
+                    <div id="lista-pecas-cadastradas"></div>
+                </div>
             </div>
         </main>
     </div>
+
+    <script>
+        const formPeca = document.getElementById('formCadastroPeca');
+
+        function renderizarPecas() {
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            const container = document.getElementById('lista-pecas-cadastradas');
+
+            if (pecas.length === 0) {
+                container.innerHTML = '<p style="color: var(--texto-secundario);">Nenhuma peça cadastrada.</p>';
+                return;
+            }
+
+            container.innerHTML = `
+                <table class="tabela-custom" style="width: 100%; color: var(--texto-principal);">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 1px solid var(--bordar);">
+                            <th>Peça</th>
+                            <th>Fornecedor</th>
+                            <th>Código</th>
+                            <th>Valor</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${pecas.map((p, index) => `
+                            <tr>
+                                <td>${p.nome}</td>
+                                <td>${p.fornecedor}</td>
+                                <td>${p.codigo}</td>
+                                <td>R$ ${parseFloat(p.valor).toFixed(2)}</td>
+                                <td><button onclick="removerPeca(${index})" class="botao-cancelar" style="padding: 5px 10px;"><i class="bi bi-trash"></i></button></td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        formPeca.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const novaPeca = {
+                id: Date.now(),
+                nome: document.getElementById('nome-peca').value,
+                fornecedor: document.getElementById('fornecedor-peca').value,
+                codigo: document.getElementById('codigo-peca').value,
+                valor: document.getElementById('valor-peca').value,
+                desc: document.getElementById('desc-peca').value
+            };
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            pecas.push(novaPeca);
+            localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
+            formPeca.reset();
+            renderizarPecas();
+        });
+
+        function removerPeca(index) {
+            if (confirm('Deseja excluir esta peça?')) {
+                const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+                pecas.splice(index, 1);
+                localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
+                renderizarPecas();
+            }
+        }
+
+        window.onload = renderizarPecas;
+    </script>
 
     <script>
         document.addEventListener('DOMContentLoaded', function() {
