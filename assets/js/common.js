@@ -64,7 +64,7 @@ function getSidebarHTML(activePage = 'home') {
                 { href: 'cadastro_veiculo.html', icon: 'bi-truck', text: 'Gestão de Veículos', key: 'cadastro_veiculo' }
             ]
         },
-        { href: 'historico.html', icon: 'bi-clock-history', text: 'Histórico', key: 'historico' }
+        { href: 'historico.html', icon: 'bi-clock-history', text: 'OS Aprovadas', key: 'historico' }
     ];
 
     const menuHTML = menuItems.map(item => {

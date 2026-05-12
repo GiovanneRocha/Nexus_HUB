@@ -3,11 +3,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cadastro de Serviços - Nexus HUB</title>
+    <title>Revisão de OS - Nexus HUB</title>
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <script src="../assets/js/common.js"></script>
+    <style>
+        /* Estilos para o Modal de Verificação */
+        .modal-revisao {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.6);
+            backdrop-filter: blur(5px);
+        }
+        .modal-conteudo {
+            background-color: white;
+            margin: 5% auto;
+            padding: 30px;
+            border-radius: 25px;
+            width: 70%;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
+        }
+        .bloco-detalhe-veiculo {
+            background: #f8f9fd;
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 5px solid #4f46e5;
+        }
+        .tabela-mini-servicos {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            border-collapse: collapse;
+        }
+        .tabela-mini-servicos th { color: #777; padding: 8px; text-align: left; border-bottom: 1px solid #ddd; }
+        .tabela-mini-servicos td { padding: 8px; border-bottom: 1px solid #eee; }
+    </style>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
@@ -17,108 +54,275 @@
             <!-- Header will be inserted here via JavaScript -->
 
             <section class="titulo-pagina">
-                <h1><i class="bi bi-tools"></i> Gestão de Serviços</h1>
-                <p>Cadastre novos tipos de serviços para serem utilizados nas Ordens de Serviço.</p>
+                <h1><i class="bi bi-check-square"></i> Ordens de Serviço em Revisão</h1>
+                <p>Clique em "Ver Detalhes" para conferir os itens de cada veículo antes de aprovar.</p>
             </section>
 
-            <div class="container-formulario-novo-atendimento">
-                <form id="formCadastroServico">
-                    <div class="secao-formulario-novo">
-                        <h3><i class="bi bi-plus-lg"></i> Novo Serviço</h3>
-                        <div class="linha-campos">
-                            <div class="bloco-campo-novo">
-                                <label>Nome do Serviço</label>
-                                <input type="text" id="nome-servico" placeholder="Ex: Manutenção de Motor" required>
-                            </div>
-                            <div class="bloco-campo-novo">
-                                <label>Valor Padrão (R$)</label>
-                                <input type="number" id="valor-servico" step="0.01" placeholder="0.00" required>
-                            </div>
-                        </div>
-                        <div class="bloco-campo-novo">
-                            <label>Descrição Padrão</label>
-                            <textarea id="desc-servico" rows="2" placeholder="Breve descrição técnica..."></textarea>
-                        </div>
-                        <button type="submit" class="botao-acao" style="margin-top: 20px;">
-                            <i class="bi bi-save"></i> Salvar no Banco de Dados
-                        </button>
-                    </div>
-                </form>
-
-                <div class="secao-formulario-novo">
-                    <h3><i class="bi bi-list-ul"></i> Serviços Cadastrados</h3>
-                    <div id="lista-servicos-cadastrados">
-                        </div>
-                </div>
+            <div class="card-tabela">
+                <table class="tabela-dados">
+                    <thead>
+                        <tr>
+                            <th>DATA</th>
+                            <th>CLIENTE</th>
+                            <th>FROTA</th>
+                            <th>TOTAL</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-revisao-corpo"></tbody>
+                </table>
             </div>
         </main>
     </div>
 
-    <script>
-        const form = document.getElementById('formCadastroServico');
-
-        function renderizarServicos() {
-            const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
-            const container = document.getElementById('lista-servicos-cadastrados');
+    <div id="modalVerificacao" class="modal-revisao">
+        <div class="modal-conteudo">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                <h2 style="color: var(--azul-escuro);">Verificação Final da OS</h2>
+                <button onclick="fecharModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
+            </div>
             
-            if (servicos.length === 0) {
-                container.innerHTML = '<p style="color: var(--texto-secundario);">Nenhum serviço personalizado cadastrado.</p>';
+            <div id="detalhes-os-modal">
+                </div>
+
+            <div style="margin-top: 30px; display: flex; gap: 15px;">
+                <button id="btnAprovarModal" class="botao-acao" style="background: #2ecc71; flex: 1; padding: 20px;"><i class="bi bi-check-circle"></i> Aprovar e Finalizar</button>
+                <button onclick="fecharModal()" class="botao-secundario" style="flex: 1; padding: 20px; border: 1px solid #ddd;"><i class="bi bi-arrow-left"></i> Voltar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Check for success message
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('success') === '1') {
+            // Show success message
+            const successDiv = document.createElement('div');
+            successDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: #d4edda;
+                color: #155724;
+                padding: 15px 20px;
+                border: 1px solid #c3e6cb;
+                border-radius: 8px;
+                box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+                z-index: 1000;
+                font-weight: 500;
+                animation: slideIn 0.3s ease-out;
+            `;
+            successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> Atendimento registrado com sucesso! Enviado para revisão.';
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(successDiv);
+            
+            // Remove after 5 seconds
+            setTimeout(() => {
+                successDiv.style.animation = 'slideIn 0.3s ease-in reverse';
+                setTimeout(() => successDiv.remove(), 300);
+            }, 5000);
+            
+            // Clean URL
+            window.history.replaceState(null, null, window.location.pathname);
+        }
+
+        function renderizarRevisao() {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const emRevisao = atendimentos.filter(a => a.status === 'pendente_revisao');
+            const corpo = document.getElementById('tabela-revisao-corpo');
+
+            if (emRevisao.length === 0) {
+                corpo.innerHTML = `<tr><td colspan="5" class="sem-dados">Nenhuma OS pendente.</td></tr>`;
                 return;
             }
 
-            container.innerHTML = `
-                <table class="tabela-custom" style="width: 100%; color: var(--texto-principal);">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid var(--bordar);">
-                            <th>Serviço</th>
-                            <th>Valor</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${servicos.map((s, index) => `
-                            <tr>
-                                <td>${s.nome}</td>
-                                <td>R$ ${parseFloat(s.valor).toFixed(2)}</td>
-                                <td><button onclick="removerServico(${index})" class="botao-cancelar" style="padding: 5px 10px;"><i class="bi bi-trash"></i></button></td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
+            corpo.innerHTML = emRevisao.map(os => {
+                let dataFormatada = 'Data não registrada';
+                if (os.data) {
+                    try {
+                        dataFormatada = new Date(os.data).toLocaleDateString('pt-BR');
+                    } catch (e) {
+                        console.error('Erro ao formatar data:', e);
+                    }
+                }
+                return `
+                <tr>
+                    <td>${dataFormatada}</td>
+                    <td><strong>${os.cliente}</strong></td>
+                    <td>${os.frota ? os.frota.length : 1} Veículo(s)</td>
+                    <td><strong style="color: var(--verde-agua);">R$ ${parseFloat(os.valorTotalOS || 0).toFixed(2)}</strong></td>
+                    <td>
+                        <button onclick="abrirVerificacao(${os.id})" class="botao-pequeno btn-pequeno-acoes"><i class="bi bi-search"></i> Ver Detalhes</button>
+                    </td>
+                </tr>
             `;
+            }).join('');
         }
 
-        form.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const novo = {
-                id: Date.now(),
-                nome: document.getElementById('nome-servico').value,
-                valor: document.getElementById('valor-servico').value,
-                desc: document.getElementById('desc-servico').value
-            };
-            const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
-            servicos.push(novo);
-            localStorage.setItem('nexus_servicos_custom', JSON.stringify(servicos));
-            registrarAtividade('servico_cadastrado', `Novo serviço cadastrado: ${novo.nome}`, `Valor: R$ ${parseFloat(novo.valor).toFixed(2)}`);
-            form.reset();
-            renderizarServicos();
-        });
+        // Definir serviços predefinidos para referência
+        const CONFIG_SERVICOS = {
+            "Manutencao_Preventiva": { nome: "Manutenção Preventiva", valor: 450.00, desc: "Revisão geral de itens de segurança e fluidos." },
+            "Troca_Oleo": { nome: "Troca de Óleo", valor: 850.00, desc: "Troca de óleo do motor e substituição de filtros." },
+            "Suspensao": { nome: "Suspensão", valor: 1200.00, desc: "Manutenção de batentes, buchas e amortecedores." },
+            "Freios": { nome: "Freios", valor: 600.00, desc: "Substituição de pastilhas e retífica de discos/tambores." },
+            "Eletrica": { nome: "Elétrica", valor: 300.00, desc: "Diagnóstico elétrico e troca de lâmpadas/fusíveis." }
+        };
 
-        function removerServico(index) {
-            if(confirm("Deseja excluir este serviço?")) {
-                const servicos = JSON.parse(localStorage.getItem('nexus_servicos_custom'));
-                servicos.splice(index, 1);
-                localStorage.setItem('nexus_servicos_custom', JSON.stringify(servicos));
-                renderizarServicos();
+        function abrirVerificacao(id) {
+            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const os = atendimentos.find(a => a.id == id);
+            const container = document.getElementById('detalhes-os-modal');
+            
+            let htmlVeiculos = os.frota.map((item, index) => {
+                const servicosHTML = item.servicos.map(s => {
+                    let nomServico = s.tipo;
+                    // Extrair nome do serviço de predefinido_ ou customizado_
+                    if (s.tipo.startsWith('predefinido_')) {
+                        const key = s.tipo.replace('predefinido_', '');
+                        if (CONFIG_SERVICOS && CONFIG_SERVICOS[key]) {
+                            nomServico = CONFIG_SERVICOS[key].nome;
+                        }
+                    } else if (s.tipo.startsWith('customizado_')) {
+                        const index = parseInt(s.tipo.replace('customizado_', ''));
+                        const servicosCustomizados = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
+                        if (servicosCustomizados[index]) {
+                            nomServico = servicosCustomizados[index].nome;
+                        }
+                    }
+                    return `
+                        <tr>
+                            <td>${nomServico}</td>
+                            <td style="color: #666;">${s.descricao || '-'}</td>
+                            <td style="font-weight: bold;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
+                        </tr>
+                    `;
+                }).join('');
+
+                // Renderiza peças associadas ao veículo
+                const pecasHTML = (item.pecas && item.pecas.length > 0) ? `
+                    <div style="margin-top: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 700; color: #3b82f6; margin-bottom: 6px;"><i class="bi bi-box-seam"></i> Peças Utilizadas</p>
+                        <table class="tabela-mini-servicos">
+                            <thead>
+                                <tr><th>Peça</th><th>Qtde</th><th>Vlr Unit.</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                ${item.pecas.map(p => `
+                                    <tr>
+                                        <td>${p.nome}</td>
+                                        <td>${p.quantidade}</td>
+                                        <td>R$ ${parseFloat(p.valorUnitario).toFixed(2)}</td>
+                                        <td style="font-weight: bold;">R$ ${parseFloat(p.valorTotal).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : '';
+                
+                return `
+                <div class="bloco-detalhe-veiculo">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                        <strong>Veículo ${index + 1}: ${item.dadosVeiculo.modelo}</strong>
+                        <span style="color: #4f46e5; font-weight: bold;">PLACA: ${item.dadosVeiculo.placa}</span>
+                    </div>
+                    <table class="tabela-mini-servicos">
+                        <thead>
+                            <tr><th>Serviço</th><th>Descrição</th><th>Valor</th></tr>
+                        </thead>
+                        <tbody>
+                            ${servicosHTML}
+                        </tbody>
+                    </table>
+                    ${pecasHTML}
+                </div>
+            `;
+            }).join('');
+
+            container.innerHTML = `
+                <div style="margin-bottom: 20px;">
+                    <p><strong>Cliente:</strong> ${os.cliente}</p>
+                    <p><strong>Total da OS:</strong> <span style="color: var(--verde-agua); font-weight: 800;">R$ ${parseFloat(os.valorTotalOS).toFixed(2)}</span></p>
+                </div>
+                ${htmlVeiculos}
+            `;
+
+            document.getElementById('btnAprovarModal').onclick = () => aprovarOS(id);
+            document.getElementById('modalVerificacao').style.display = 'block';
+        }
+
+        function fecharModal() { document.getElementById('modalVerificacao').style.display = 'none'; }
+
+        function aprovarOS(id) {
+            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
+            const idx = atendimentos.findIndex(a => a.id == id);
+            atendimentos[idx].status = 'finalizada';
+            atendimentos[idx].dataRegistro = new Date().toLocaleDateString('pt-BR');
+            atendimentos[idx].dataAprovacao = new Date().toISOString();
+            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+
+            // ==========================================
+            // DESCONTA ESTOQUE DAS PEÇAS UTILIZADAS
+            // ==========================================
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            let estoqueAtualizado = false;
+
+            (atendimentos[idx].frota || []).forEach(veiculo => {
+                (veiculo.pecas || []).forEach(pecaOS => {
+                    if (pecaOS.indexOriginal !== null && pecaOS.indexOriginal !== undefined && pecas[pecaOS.indexOriginal]) {
+                        const estoqueAtual = parseInt(pecas[pecaOS.indexOriginal].estoque) || 0;
+                        const novoEstoque = Math.max(0, estoqueAtual - pecaOS.quantidade);
+                        pecas[pecaOS.indexOriginal].estoque = novoEstoque;
+                        // Atualiza status se estoque zerou
+                        if (novoEstoque === 0) {
+                            pecas[pecaOS.indexOriginal].status = 'Em falta';
+                        }
+                        estoqueAtualizado = true;
+                    }
+                });
+            });
+
+            if (estoqueAtualizado) {
+                localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
             }
+            
+            // Add activity to company
+            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
+            const empresa = empresas.find(e => e.nome === atendimentos[idx].cliente);
+            if (empresa) {
+                if (!empresa.historico_atividades) empresa.historico_atividades = [];
+                empresa.historico_atividades.push({
+                    descricao: `OS finalizada - ${atendimentos[idx].frota.length} veículo(s)`,
+                    data: new Date().toLocaleString('pt-BR'),
+                    usuario: "Sistema"
+                });
+                localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
+            }
+            
+            registrarAtividade('os_aprovada', `OS aprovada - Cliente: ${atendimentos[idx].cliente}`, `Total: R$ ${parseFloat(atendimentos[idx].valorTotalOS).toFixed(2)} | ${atendimentos[idx].frota.length} veículo(s)`);
+            
+            alert("OS Aprovada e enviada para o Histórico!");
+            fecharModal();
+            renderizarRevisao();
         }
 
-        window.onload = renderizarServicos;
+        window.onload = renderizarRevisao;
     </script>
+    <script src="../assets/js/common.js"></script>
     <script>
         // Insert sidebar and header from common.js
         document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('cadastro_servicos'));
+            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('revisao'));
             document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML());
         });
     </script>

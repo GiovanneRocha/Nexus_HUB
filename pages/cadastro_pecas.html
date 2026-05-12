@@ -4,10 +4,105 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Peças - Nexus HUB</title>
-
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="../assets/css/style.css">
+
+    <style>
+        .abas-gestao {
+            display: flex;
+            gap: 12px;
+            margin: 28px 0 20px;
+            flex-wrap: wrap;
+        }
+
+        .botao-aba {
+            padding: 12px 22px;
+            border-radius: 999px;
+            border: 1px solid transparent;
+            background: var(--surface);
+            color: var(--texto-principal);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .botao-aba:hover {
+            background: var(--surface-strong);
+        }
+
+        .botao-aba-ativo {
+            background: var(--destaque);
+            color: #ffffff;
+            border-color: var(--destaque);
+        }
+
+        .tela-oculta {
+            display: none;
+        }
+
+        #filtro-estoque {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1px solid #dfe4f0;
+            border-radius: 999px;
+            background: var(--surface);
+            color: var(--texto-principal);
+            font-size: 0.95rem;
+        }
+
+        .notificacao-sucesso {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #10b981;
+            color: #ffffff;
+            padding: 16px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
+            z-index: 10000;
+            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s forwards;
+        }
+
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to   { transform: translateX(0);     opacity: 1; }
+        }
+
+        @keyframes slideOut {
+            from { transform: translateX(0);     opacity: 1; }
+            to   { transform: translateX(400px); opacity: 0; }
+        }
+
+        .fundo-estoque {
+            background: #f0f4f8;
+            border-radius: 22px;
+            padding: 28px;
+            box-shadow: 0 18px 45px rgba(15,18,33,0.06);
+        }
+
+        body.light-mode .fundo-estoque {
+            background: #f8fafb;
+        }
+
+        .tabela-estoque-container {
+            overflow-x: auto;
+        }
+
+        .tabela-estoque-container table {
+            min-width: 1200px;
+        }
+
+        .badge-categoria {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            background: rgba(16,185,129,0.15);
+            color: #10b981;
+        }
+    </style>
 
     <script src="../assets/js/common.js"></script>
 </head>
@@ -18,509 +113,362 @@
         <main class="conteudo-principal">
 
             <section class="titulo-pagina">
-                <h1><i class="bi bi-tools"></i> Gestão de Peças</h1>
-                <p>Cadastre novas peças para serem utilizadas nas Ordens de Serviço.</p>
+                <h1><i class="bi bi-box-seam"></i> Gestão de Peças</h1>
+                <p>Cadastre e gerencie as peças utilizadas nas Ordens de Serviço.</p>
             </section>
+
+            <!-- ABAS -->
+            <div class="abas-gestao">
+                <button type="button" id="btn-cadastro" class="botao-aba botao-aba-ativo">
+                    <i class="bi bi-plus-circle"></i> Cadastro
+                </button>
+                <button type="button" id="btn-estoque" class="botao-aba">
+                    <i class="bi bi-box-seam"></i> Estoque
+                </button>
+            </div>
 
             <div class="container-formulario-novo-atendimento">
 
-                <!-- FORMULÁRIO -->
-                <form id="formCadastroPeca">
+                <!-- ======================== TELA CADASTRO ======================== -->
+                <div id="view-cadastro">
+                    <form id="formCadastroPeca">
+                        <div class="secao-formulario-novo">
 
+                            <h3 id="titulo-form-peca"><i class="bi bi-plus-lg"></i> Nova Peça</h3>
+
+                            <!-- LINHA 1 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-box-seam"></i> Nome da Peça</label>
+                                    <input type="text" id="nome-peca" placeholder="Ex: Pastilha de Freio" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-grid"></i> Categoria</label>
+                                    <select id="categoria-peca" required>
+                                        <option value="">Selecione</option>
+                                        <option value="Motor">Motor</option>
+                                        <option value="Freios">Freios</option>
+                                        <option value="Suspensão">Suspensão</option>
+                                        <option value="Elétrica">Elétrica</option>
+                                        <option value="Pneus">Pneus</option>
+                                        <option value="Outros">Outros</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- LINHA 2 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-award"></i> Marca / Fabricante</label>
+                                    <input type="text" id="marca-peca" placeholder="Ex: Bosch" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-truck"></i> Fornecedor</label>
+                                    <input type="text" id="fornecedor-peca" placeholder="Ex: Auto Peças Brasil" required>
+                                </div>
+                            </div>
+
+                            <!-- LINHA 3 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-card-text"></i> Código / Referência</label>
+                                    <input type="text" id="codigo-peca" placeholder="Ex: PF-0012" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-car-front"></i> Compatibilidade</label>
+                                    <input type="text" id="compatibilidade-peca" placeholder="Ex: Honda Civic 2018-2022">
+                                </div>
+                            </div>
+
+                            <!-- LINHA 4 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-boxes"></i> Quantidade em Estoque</label>
+                                    <input type="number" id="estoque-peca" min="0" placeholder="0" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-exclamation-triangle"></i> Estoque Mínimo</label>
+                                    <input type="number" id="estoque-minimo-peca" min="0" placeholder="0">
+                                </div>
+                            </div>
+
+                            <!-- LINHA 5 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-geo-alt"></i> Localização no Estoque</label>
+                                    <input type="text" id="localizacao-peca" placeholder="Ex: Prateleira A3">
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-rulers"></i> Unidade</label>
+                                    <select id="unidade-peca">
+                                        <option value="Unidade">Unidade</option>
+                                        <option value="Kit">Kit</option>
+                                        <option value="Metro">Metro</option>
+                                        <option value="Litro">Litro</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- LINHA 6 -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
+                                    <input type="number" id="valor-peca" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-check-circle"></i> Status</label>
+                                    <select id="status-peca">
+                                        <option value="Ativa">Ativa</option>
+                                        <option value="Em falta">Em falta</option>
+                                        <option value="Descontinuada">Descontinuada</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- LINHA 7 -->
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-image"></i> URL da Imagem</label>
+                                <input type="text" id="imagem-peca" placeholder="https://...">
+                            </div>
+
+                            <!-- DESCRIÇÃO -->
+                            <div class="bloco-campo-novo">
+                                <label><i class="bi bi-chat-left-text"></i> Descrição</label>
+                                <textarea id="desc-peca" rows="2" placeholder="Descrição ou observações da peça..."></textarea>
+                            </div>
+
+                            <!-- BOTÕES -->
+                            <div style="display: flex; gap: 12px; margin-top: 20px;">
+                                <button type="submit" class="botao-acao">
+                                    <i class="bi bi-save"></i> Salvar Peça
+                                </button>
+                                <button type="button" class="botao-secundario" onclick="resetarFormulario()"
+                                    style="padding: 12px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: transparent; cursor: pointer;">
+                                    <i class="bi bi-x-circle"></i> Cancelar
+                                </button>
+                            </div>
+
+                        </div>
+                    </form>
+                </div>
+
+                <!-- ======================== TELA ESTOQUE ======================== -->
+                <div id="view-estoque" class="tela-oculta">
                     <div class="secao-formulario-novo">
+                        <h3><i class="bi bi-box-seam"></i> Estoque de Peças</h3>
 
-                        <h3><i class="bi bi-plus-lg"></i> Nova Peça</h3>
-
-                        <!-- LINHA 1 -->
-                        <div class="linha-campos">
-
+                        <div class="linha-campos" style="grid-template-columns: 1fr; margin-bottom: 20px;">
                             <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-box-seam"></i>
-                                    Nome da Peça
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="nome-peca"
-                                    placeholder="Ex: Pastilha de Freio"
-                                    required
-                                >
+                                <label>Pesquisa feita com o Nome ou Código da peça</label>
+                                <input type="text" id="filtro-estoque" placeholder="Digite nome ou código para filtrar">
                             </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-grid"></i>
-                                    Categoria
-                                </label>
-
-                                <select id="categoria-peca" required>
-                                    <option value="">Selecione</option>
-                                    <option value="Motor">Motor</option>
-                                    <option value="Freios">Freios</option>
-                                    <option value="Suspensão">Suspensão</option>
-                                    <option value="Elétrica">Elétrica</option>
-                                    <option value="Pneus">Pneus</option>
-                                    <option value="Outros">Outros</option>
-                                </select>
-                            </div>
-
                         </div>
 
-                        <!-- LINHA 2 -->
-                        <div class="linha-campos">
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-award"></i>
-                                    Marca / Fabricante
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="marca-peca"
-                                    placeholder="Ex: Bosch"
-                                    required
-                                >
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-truck"></i>
-                                    Fornecedor
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="fornecedor-peca"
-                                    placeholder="Ex: Auto Peças Brasil"
-                                    required
-                                >
-                            </div>
-
+                        <div class="fundo-estoque tabela-estoque-container">
+                            <div id="lista-pecas-cadastradas"></div>
                         </div>
-
-                        <!-- LINHA 3 -->
-                        <div class="linha-campos">
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-card-text"></i>
-                                    Código / Referência
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="codigo-peca"
-                                    placeholder="Ex: PF-0012"
-                                    required
-                                >
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-car-front"></i>
-                                    Compatibilidade
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="compatibilidade-peca"
-                                    placeholder="Ex: Honda Civic 2018-2022"
-                                >
-                            </div>
-
-                        </div>
-
-                        <!-- LINHA 4 -->
-                        <div class="linha-campos">
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-boxes"></i>
-                                    Quantidade em Estoque
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="estoque-peca"
-                                    min="0"
-                                    placeholder="0"
-                                    required
-                                >
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-exclamation-triangle"></i>
-                                    Estoque Mínimo
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="estoque-minimo-peca"
-                                    min="0"
-                                    placeholder="0"
-                                >
-                            </div>
-
-                        </div>
-
-                        <!-- LINHA 5 -->
-                        <div class="linha-campos">
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-geo-alt"></i>
-                                    Localização no Estoque
-                                </label>
-
-                                <input
-                                    type="text"
-                                    id="localizacao-peca"
-                                    placeholder="Ex: Prateleira A3"
-                                >
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-rulers"></i>
-                                    Unidade
-                                </label>
-
-                                <select id="unidade-peca">
-                                    <option value="Unidade">Unidade</option>
-                                    <option value="Kit">Kit</option>
-                                    <option value="Metro">Metro</option>
-                                    <option value="Litro">Litro</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <!-- LINHA 6 -->
-                        <div class="linha-campos">
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-currency-dollar"></i>
-                                    Valor Unitário (R$)
-                                </label>
-
-                                <input
-                                    type="number"
-                                    id="valor-peca"
-                                    placeholder="0.00"
-                                    step="0.01"
-                                    min="0"
-                                    required
-                                >
-                            </div>
-
-                            <div class="bloco-campo-novo">
-                                <label>
-                                    <i class="bi bi-check-circle"></i>
-                                    Status
-                                </label>
-
-                                <select id="status-peca">
-                                    <option value="Ativa">Ativa</option>
-                                    <option value="Em falta">Em falta</option>
-                                    <option value="Descontinuada">Descontinuada</option>
-                                </select>
-                            </div>
-
-                        </div>
-
-                        <!-- LINHA 7 -->
-                        <div class="bloco-campo-novo">
-
-                            <label>
-                                <i class="bi bi-image"></i>
-                                URL da Imagem
-                            </label>
-
-                            <input
-                                type="text"
-                                id="imagem-peca"
-                                placeholder="https://..."
-                            >
-
-                        </div>
-
-                        <!-- DESCRIÇÃO -->
-                        <div class="bloco-campo-novo">
-
-                            <label>
-                                <i class="bi bi-chat-left-text"></i>
-                                Descrição
-                            </label>
-
-                            <textarea
-                                id="desc-peca"
-                                rows="2"
-                                placeholder="Descrição ou observações da peça..."
-                            ></textarea>
-
-                        </div>
-
-                        <!-- BOTÃO -->
-                        <button
-                            type="submit"
-                            class="botao-acao"
-                            style="margin-top: 20px;"
-                        >
-                            <i class="bi bi-save"></i>
-                            Salvar Peça
-                        </button>
-
                     </div>
-
-                </form>
-
-                <!-- LISTA -->
-                <div class="secao-formulario-novo">
-
-                    <h3>
-                        <i class="bi bi-list-ul"></i>
-                        Peças Cadastradas
-                    </h3>
-
-                    <div id="lista-pecas-cadastradas"></div>
-
                 </div>
 
             </div>
-
         </main>
-
     </div>
 
     <script>
-
         const formPeca = document.getElementById('formCadastroPeca');
+        let telaAtual = 'cadastro';
+        let pecaEmEdicao = null;
+
+        function mostrarNotificacao(mensagem) {
+            const notif = document.createElement('div');
+            notif.className = 'notificacao-sucesso';
+            notif.innerHTML = `<i class="bi bi-check-circle"></i> ${mensagem}`;
+            document.body.appendChild(notif);
+            setTimeout(() => notif.remove(), 3000);
+        }
+
+        function mostrarTela(tela) {
+            telaAtual = tela;
+            document.getElementById('view-cadastro').classList.toggle('tela-oculta', tela !== 'cadastro');
+            document.getElementById('view-estoque').classList.toggle('tela-oculta', tela !== 'estoque');
+            document.getElementById('btn-cadastro').classList.toggle('botao-aba-ativo', tela === 'cadastro');
+            document.getElementById('btn-estoque').classList.toggle('botao-aba-ativo', tela === 'estoque');
+            renderizarPecas();
+        }
 
         function renderizarPecas() {
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            const container = document.getElementById('lista-pecas-cadastradas');
+            if (!container) return;
 
-            const pecas =
-                JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            if (telaAtual !== 'estoque') {
+                container.innerHTML = '';
+                return;
+            }
 
-            const container =
-                document.getElementById('lista-pecas-cadastradas');
+            const query = document.getElementById('filtro-estoque')?.value.trim().toLowerCase() || '';
 
-            if (pecas.length === 0) {
+            const pecasFiltradas = pecas
+                .map((p, index) => ({ ...p, originalIndex: index }))
+                .filter(p => {
+                    const nome   = String(p.nome   || '').toLowerCase();
+                    const codigo = String(p.codigo || '').toLowerCase();
+                    return nome.includes(query) || codigo.includes(query);
+                })
+                .sort((a, b) => {
+                    const estoqueA = Number(a.estoque) > 0 ? 1 : 0;
+                    const estoqueB = Number(b.estoque) > 0 ? 1 : 0;
+                    if (estoqueA !== estoqueB) return estoqueB - estoqueA;
+                    if (Number(b.estoque) !== Number(a.estoque)) return Number(b.estoque) - Number(a.estoque);
+                    return String(a.nome || '').localeCompare(String(b.nome || ''), 'pt-BR', { sensitivity: 'base' });
+                });
 
-                container.innerHTML = `
-                    <p style="color: var(--texto-secundario);">
-                        Nenhuma peça cadastrada.
-                    </p>
-                `;
-
+            if (pecasFiltradas.length === 0) {
+                container.innerHTML = `<p style="color: var(--texto-secundario); margin: 0;">Nenhuma peça encontrada.</p>`;
                 return;
             }
 
             container.innerHTML = `
-                <table
-                    class="tabela-custom"
-                    style="width: 100%; color: var(--texto-principal);"
-                >
-
+                <table class="tabela-custom" style="width: 100%; color: #000000;">
                     <thead>
-
-                        <tr
-                            style="
-                                text-align: left;
-                                border-bottom: 1px solid var(--bordar);
-                            "
-                        >
+                        <tr style="text-align: left; border-bottom: 1px solid var(--bordar);">
                             <th>Peça</th>
                             <th>Categoria</th>
                             <th>Marca</th>
                             <th>Fornecedor</th>
                             <th>Código</th>
+                            <th>Compatibilidade</th>
                             <th>Estoque</th>
+                            <th>Unidade</th>
                             <th>Valor</th>
                             <th>Status</th>
                             <th>Ação</th>
                         </tr>
-
                     </thead>
-
                     <tbody>
-
-                        ${pecas.map((p, index) => `
-
+                        ${pecasFiltradas.map(p => `
                             <tr>
-
-                                <td>${p.nome}</td>
-
-                                <td>${p.categoria}</td>
-
+                                <td><strong>${p.nome}</strong></td>
+                                <td><span class="badge-categoria">${p.categoria}</span></td>
                                 <td>${p.marca}</td>
-
                                 <td>${p.fornecedor}</td>
-
                                 <td>${p.codigo}</td>
-
+                                <td>${p.compatibilidade || '-'}</td>
                                 <td>${p.estoque}</td>
-
-                                <td>
-                                    R$ ${parseFloat(p.valor).toFixed(2)}
-                                </td>
-
+                                <td>${p.unidade || '-'}</td>
+                                <td>R$ ${parseFloat(p.valor || 0).toFixed(2)}</td>
                                 <td>${p.status}</td>
-
-                                <td>
-
-                                    <button
-                                        onclick="removerPeca(${index})"
-                                        class="botao-cancelar"
-                                        style="padding: 5px 10px;"
-                                    >
+                                <td style="display: flex; gap: 8px;">
+                                    <button onclick="editarPeca(${p.originalIndex})" class="botao-acao"
+                                        style="padding: 5px 10px; background: #3b82f6; color: white;">
+                                        <i class="bi bi-pencil"></i>
+                                    </button>
+                                    <button onclick="removerPeca(${p.originalIndex})" class="botao-cancelar"
+                                        style="padding: 5px 10px;">
                                         <i class="bi bi-trash"></i>
                                     </button>
-
                                 </td>
-
                             </tr>
-
                         `).join('')}
-
                     </tbody>
-
                 </table>
             `;
         }
 
-        formPeca.addEventListener('submit', (e) => {
-
+        formPeca.addEventListener('submit', e => {
             e.preventDefault();
 
-            const valor =
-                parseFloat(document.getElementById('valor-peca').value);
+            const valor   = parseFloat(document.getElementById('valor-peca').value);
+            const estoque = parseInt(document.getElementById('estoque-peca').value);
 
-            const estoque =
-                parseInt(document.getElementById('estoque-peca').value);
+            if (valor < 0 || estoque < 0) { alert('Valores inválidos.'); return; }
 
-            if (valor < 0 || estoque < 0) {
-
-                alert('Valores inválidos.');
-
-                return;
-            }
-
-            const novaPeca = {
-
-                id: Date.now(),
-
-                nome:
-                    document.getElementById('nome-peca').value,
-
-                categoria:
-                    document.getElementById('categoria-peca').value,
-
-                marca:
-                    document.getElementById('marca-peca').value,
-
-                fornecedor:
-                    document.getElementById('fornecedor-peca').value,
-
-                codigo:
-                    document.getElementById('codigo-peca').value,
-
-                compatibilidade:
-                    document.getElementById('compatibilidade-peca').value,
-
-                estoque:
-                    estoque,
-
-                estoqueMinimo:
-                    parseInt(
-                        document.getElementById('estoque-minimo-peca').value
-                    ) || 0,
-
-                localizacao:
-                    document.getElementById('localizacao-peca').value,
-
-                unidade:
-                    document.getElementById('unidade-peca').value,
-
-                valor:
-                    valor,
-
-                status:
-                    document.getElementById('status-peca').value,
-
-                imagem:
-                    document.getElementById('imagem-peca').value,
-
-                desc:
-                    document.getElementById('desc-peca').value,
-
-                dataCadastro:
-                    new Date().toLocaleDateString('pt-BR')
-
+            const dados = {
+                nome:           document.getElementById('nome-peca').value,
+                categoria:      document.getElementById('categoria-peca').value,
+                marca:          document.getElementById('marca-peca').value,
+                fornecedor:     document.getElementById('fornecedor-peca').value,
+                codigo:         document.getElementById('codigo-peca').value,
+                compatibilidade:document.getElementById('compatibilidade-peca').value,
+                estoque:        estoque,
+                estoqueMinimo:  parseInt(document.getElementById('estoque-minimo-peca').value) || 0,
+                localizacao:    document.getElementById('localizacao-peca').value,
+                unidade:        document.getElementById('unidade-peca').value,
+                valor:          valor,
+                status:         document.getElementById('status-peca').value,
+                imagem:         document.getElementById('imagem-peca').value,
+                desc:           document.getElementById('desc-peca').value
             };
 
-            const pecas =
-                JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
 
-            pecas.push(novaPeca);
+            if (pecaEmEdicao !== null) {
+                pecas[pecaEmEdicao] = { ...pecas[pecaEmEdicao], ...dados };
+                mostrarNotificacao(`Peça "${dados.nome}" atualizada com sucesso!`);
+                pecaEmEdicao = null;
+            } else {
+                pecas.push({ id: Date.now(), ...dados, dataCadastro: new Date().toLocaleDateString('pt-BR') });
+                registrarAtividade('peca_cadastrada', `Nova peça cadastrada: ${dados.nome}`, `Código: ${dados.codigo} | Estoque: ${dados.estoque}`);
+                mostrarNotificacao(`Peça "${dados.nome}" cadastrada com sucesso!`);
+            }
 
-            localStorage.setItem(
-                'nexus_pecas',
-                JSON.stringify(pecas)
-            );
-
-            formPeca.reset();
-
-            renderizarPecas();
-
+            localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
+            resetarFormulario();
         });
 
+        function editarPeca(index) {
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            const p = pecas[index];
+
+            document.getElementById('nome-peca').value            = p.nome            || '';
+            document.getElementById('categoria-peca').value       = p.categoria       || '';
+            document.getElementById('marca-peca').value           = p.marca           || '';
+            document.getElementById('fornecedor-peca').value      = p.fornecedor      || '';
+            document.getElementById('codigo-peca').value          = p.codigo          || '';
+            document.getElementById('compatibilidade-peca').value = p.compatibilidade || '';
+            document.getElementById('estoque-peca').value         = p.estoque         || 0;
+            document.getElementById('estoque-minimo-peca').value  = p.estoqueMinimo   || 0;
+            document.getElementById('localizacao-peca').value     = p.localizacao     || '';
+            document.getElementById('unidade-peca').value         = p.unidade         || 'Unidade';
+            document.getElementById('valor-peca').value           = p.valor           || 0;
+            document.getElementById('status-peca').value          = p.status          || 'Ativa';
+            document.getElementById('imagem-peca').value          = p.imagem          || '';
+            document.getElementById('desc-peca').value            = p.desc            || '';
+
+            pecaEmEdicao = index;
+            document.getElementById('titulo-form-peca').innerHTML = '<i class="bi bi-pencil"></i> Editar Peça';
+            mostrarTela('cadastro');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
         function removerPeca(index) {
-
             if (confirm('Deseja excluir esta peça?')) {
-
-                const pecas =
-                    JSON.parse(localStorage.getItem('nexus_pecas')) || [];
-
+                const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+                const nome = pecas[index].nome;
                 pecas.splice(index, 1);
-
-                localStorage.setItem(
-                    'nexus_pecas',
-                    JSON.stringify(pecas)
-                );
-
+                localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
+                mostrarNotificacao(`Peça "${nome}" removida com sucesso!`);
                 renderizarPecas();
             }
         }
 
-        window.onload = renderizarPecas;
+        function resetarFormulario() {
+            formPeca.reset();
+            pecaEmEdicao = null;
+            document.getElementById('titulo-form-peca').innerHTML = '<i class="bi bi-plus-lg"></i> Nova Peça';
+        }
 
+        document.getElementById('btn-cadastro').addEventListener('click', () => mostrarTela('cadastro'));
+        document.getElementById('btn-estoque').addEventListener('click', () => mostrarTela('estoque'));
+        document.getElementById('filtro-estoque')?.addEventListener('input', renderizarPecas);
     </script>
 
     <script>
-
-        document.addEventListener('DOMContentLoaded', function() {
-
-            document
-                .querySelector('.layout-erp')
-                .insertAdjacentHTML(
-                    'afterbegin',
-                    getSidebarHTML('cadastro_pecas')
-                );
-
-            document
-                .querySelector('.conteudo-principal')
-                .insertAdjacentHTML(
-                    'afterbegin',
-                    getHeaderHTML()
-                );
+        document.addEventListener('DOMContentLoaded', function () {
+            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('cadastro_pecas'));
+            document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
+            mostrarTela('cadastro');
         });
-
     </script>
-
 </body>
 </html>
-```

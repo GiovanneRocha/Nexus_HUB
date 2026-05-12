@@ -27,7 +27,6 @@
                         <select id="filtro-status" class="filtro-select">
                             <option value="todos">Todos os Status</option>
                             <option value="pendente_revisao">Pendente de Revisão</option>
-                            <option value="em_analise">Em Análise</option>
                             <option value="aprovada">Aprovada</option>
                             <option value="recusada">Recusada</option>
                         </select>
@@ -52,11 +51,7 @@
                         <h3 id="os-abertas">0</h3>
                         <span class="tendencia">Aguardando</span>
                     </div>
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-hourglass-split"></i> Em Análise</p>
-                        <h3 id="os-analise">0</h3>
-                        <span class="tendencia">Processando</span>
-                    </div>
+                    <!-- 'Em Análise' removido conforme solicitado -->
                     <div class="card-metrica destaque-escuro">
                         <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
                         <h3 id="os-finalizadas">0</h3>
@@ -205,7 +200,6 @@
                 const currentYear = agora.getFullYear();
 
                 const os_abertas = atendimentosFiltrados.filter(a => a.status === 'pendente_revisao').length;
-                const os_analise = atendimentosFiltrados.filter(a => a.status === 'em_analise').length;
                 const os_finalizadas_mes = atendimentos.filter(a => a.status === 'aprovada' && new Date(a.data).getMonth() === currentMonth && new Date(a.data).getFullYear() === currentYear).length;
                 const clientes = empresas.length;
                 const totalPecas = pecas.length;
@@ -224,7 +218,6 @@
                 }, {});
 
                 document.getElementById('os-abertas').textContent = os_abertas;
-                document.getElementById('os-analise').textContent = os_analise;
                 document.getElementById('os-finalizadas').textContent = os_finalizadas_mes;
                 document.getElementById('total-clientes').textContent = clientes;
                 document.getElementById('total-pecas').textContent = totalPecas;
@@ -293,7 +286,6 @@
             container.innerHTML = '';
             const legendas = [
                 { status: 'pendente_revisao', label: 'Pendente', color: '#f6ad55' },
-                { status: 'em_analise', label: 'Em Análise', color: '#63b3ed' },
                 { status: 'aprovada', label: 'Aprovada', color: '#38a169' },
                 { status: 'recusada', label: 'Recusada', color: '#e53e3e' }
             ];
@@ -334,7 +326,6 @@
         function getStatusLabel(status) {
             switch (status) {
                 case 'pendente_revisao': return 'Pendente';
-                case 'em_analise': return 'Em análise';
                 case 'aprovada': return 'Aprovada';
                 case 'recusada': return 'Recusada';
                 default: return 'Outro';

@@ -207,6 +207,28 @@
                         </tr>
                     `;
                 }).join('');
+
+                // Renderiza peças associadas ao veículo
+                const pecasHTML = (item.pecas && item.pecas.length > 0) ? `
+                    <div style="margin-top: 12px;">
+                        <p style="font-size: 0.8rem; font-weight: 700; color: #3b82f6; margin-bottom: 6px;"><i class="bi bi-box-seam"></i> Peças Utilizadas</p>
+                        <table class="tabela-mini-servicos">
+                            <thead>
+                                <tr><th>Peça</th><th>Qtde</th><th>Vlr Unit.</th><th>Total</th></tr>
+                            </thead>
+                            <tbody>
+                                ${item.pecas.map(p => `
+                                    <tr>
+                                        <td>${p.nome}</td>
+                                        <td>${p.quantidade}</td>
+                                        <td>R$ ${parseFloat(p.valorUnitario).toFixed(2)}</td>
+                                        <td style="font-weight: bold;">R$ ${parseFloat(p.valorTotal).toFixed(2)}</td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                ` : '';
                 
                 return `
                 <div class="bloco-detalhe-veiculo">
@@ -222,6 +244,7 @@
                             ${servicosHTML}
                         </tbody>
                     </table>
+                    ${pecasHTML}
                 </div>
             `;
             }).join('');
@@ -247,6 +270,31 @@
             atendimentos[idx].dataRegistro = new Date().toLocaleDateString('pt-BR');
             atendimentos[idx].dataAprovacao = new Date().toISOString();
             localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+
+            // ==========================================
+            // DESCONTA ESTOQUE DAS PEÇAS UTILIZADAS
+            // ==========================================
+            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
+            let estoqueAtualizado = false;
+
+            (atendimentos[idx].frota || []).forEach(veiculo => {
+                (veiculo.pecas || []).forEach(pecaOS => {
+                    if (!pecaOS.pecaId) return;
+                    const idxPeca = pecas.findIndex(p => String(p.id) === String(pecaOS.pecaId));
+                    if (idxPeca === -1) return;
+                    const estoqueAtual = parseInt(pecas[idxPeca].estoque) || 0;
+                    const novoEstoque = Math.max(0, estoqueAtual - pecaOS.quantidade);
+                    pecas[idxPeca].estoque = novoEstoque;
+                    if (novoEstoque === 0) {
+                        pecas[idxPeca].status = 'Em falta';
+                    }
+                    estoqueAtualizado = true;
+                });
+            });
+
+            if (estoqueAtualizado) {
+                localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
+            }
             
             // Add activity to company
             const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];

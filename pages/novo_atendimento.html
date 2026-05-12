@@ -131,7 +131,7 @@
                         <button type="button" onclick="adicionarServicoAoVeiculo(this)" style="width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
                             <i class="bi bi-plus"></i> Adicionar Serviço
                         </button>
-                        <button type="button" onclick="adicionarPecaAoVeiculo(this)" style="width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(59, 130, 246, 0.05) 100%); border: 1px dashed var(--azul-escuro); color: var(--azul-escuro); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
+                        <button type="button" onclick="adicionarPecaAoVeiculo(this)" style="width: 100%; padding: 12px; background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(16, 185, 129, 0.05) 100%); border: 1px dashed var(--verde-esmeralda); color: var(--verde-esmeralda); border-radius: 8px; font-weight: 600; cursor: pointer; transition: all 0.3s ease;">
                             <i class="bi bi-box-seam"></i> Adicionar Peça
                         </button>
                     </div>
@@ -270,24 +270,51 @@
         
         function adicionarPecaAoVeiculo(botao) {
             const blocoVeiculo = botao.closest('.bloco-veiculo');
-            const container = blocoVeiculo.querySelector('.container-pecas-veiculo');
+            
+            // Garante que o container de peças existe no bloco do veículo
+            let container = blocoVeiculo.querySelector('.container-pecas-veiculo');
+            if (!container) {
+                container = document.createElement('div');
+                container.className = 'container-pecas-veiculo';
+                container.style = 'margin-top: 16px; padding-top: 16px; border-top: 1px dashed var(--bordar);';
+                // Insere o container antes dos botões de ação
+                const botoesAcao = blocoVeiculo.querySelector('div[style*="display: grid"]');
+                if (botoesAcao) {
+                    botoesAcao.parentElement.insertBefore(container, botoesAcao);
+                } else {
+                    blocoVeiculo.querySelector('.secao-formulario-novo').appendChild(container);
+                }
+            }
+
             const pecasCadastradas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
 
+            // Filtra apenas peças com estoque disponível
+            const pecasEmEstoque = pecasCadastradas
+                .map((peca, index) => ({ ...peca, originalIndex: index }))
+                .filter(peca => parseInt(peca.estoque) > 0);
+
             if (pecasCadastradas.length === 0) {
-                alert('Cadastre peças antes de adicioná-las à OS. Acesse Gestão de Peças.');
+                alert('Nenhuma peça cadastrada. Acesse Gestão de Peças para cadastrar.');
+                return;
+            }
+
+            if (pecasEmEstoque.length === 0) {
+                alert('Nenhuma peça disponível em estoque no momento.');
                 return;
             }
 
             const div = document.createElement('div');
             div.className = 'item-peca';
-            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); border-radius: 8px;';
+            div.style = 'position: relative; margin-bottom: 16px; padding: 16px; background: var(--surface-strong); border: 1px solid var(--bordar); border-radius: 8px; border-left: 4px solid #3b82f6;';
 
-            const optionsHTML = pecasCadastradas.map((peca, index) => `
-                <option value="peca_${index}">${peca.nome} — R$ ${parseFloat(peca.valor).toFixed(2)}</option>
+            const optionsHTML = pecasEmEstoque.map(peca => `
+                <option value="peca_${peca.id}" data-estoque="${peca.estoque}" data-valor="${peca.valor}" data-nome="${peca.nome}" data-id="${peca.id}">
+                    ${peca.nome} — R$ ${parseFloat(peca.valor).toFixed(2)} (Estoque: ${peca.estoque} ${peca.unidade || 'un.'})
+                </option>
             `).join('');
 
             div.innerHTML = `
-                ${container.children.length > 0 ? '<button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--erro); cursor: pointer; font-weight: 600;"><i class="bi bi-x-circle"></i></button>' : ''}
+                <button type="button" onclick="this.parentElement.remove(); calcularTotalGeral();" style="position: absolute; top: 10px; right: 10px; background: none; border: none; color: var(--erro, #ef4444); cursor: pointer; font-size: 1.1rem;"><i class="bi bi-x-circle"></i></button>
                 <div class="linha-campos">
                     <div class="bloco-campo-novo">
                         <label><i class="bi bi-box-seam"></i> Peça</label>
@@ -298,28 +325,25 @@
                     </div>
                     <div class="bloco-campo-novo">
                         <label><i class="bi bi-sort-numeric-up"></i> Quantidade</label>
-                        <input type="number" class="p-qtde" min="1" value="1" required oninput="calcularTotalGeral()">
+                        <input type="number" class="p-qtde" min="1" value="1" required oninput="validarQuantidadePeca(this); calcularTotalGeral();">
+                        <small class="aviso-estoque" style="color: #f59e0b; font-size: 0.78rem; display: none;"></small>
                     </div>
                 </div>
                 <div class="linha-campos">
                     <div class="bloco-campo-novo">
                         <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
-                        <input type="number" class="p-valor-unitario" placeholder="0,00" step="0.01" required oninput="calcularTotalGeral()">
+                        <input type="number" class="p-valor-unitario" placeholder="0,00" step="0.01" readonly style="background: var(--surface); opacity: 0.8;">
                     </div>
                     <div class="bloco-campo-novo">
-                        <label><i class="bi bi-calculator"></i> Total</label>
-                        <input type="text" class="p-total" value="R$ 0,00" readonly>
+                        <label><i class="bi bi-calculator"></i> Total da Peça</label>
+                        <input type="text" class="p-total" value="R$ 0,00" readonly style="background: var(--surface); font-weight: 700; color: var(--verde-esmeralda, #10b981);">
                     </div>
                 </div>
-                <div class="bloco-campo-novo">
-                    <label><i class="bi bi-chat-left-text"></i> Descrição</label>
-                    <textarea class="p-desc" placeholder="Observações sobre a peça..." rows="2" style="width: 100%;"></textarea>
-                    <input type="hidden" class="p-nome">
-                </div>
+                <input type="hidden" class="p-nome">
+                <input type="hidden" class="p-peca-id" value="">
             `;
 
             div.querySelector('.p-qtde').addEventListener('input', atualizarTotalPeca);
-            div.querySelector('.p-valor-unitario').addEventListener('input', atualizarTotalPeca);
             container.appendChild(div);
             calcularTotalGeral();
         }
@@ -358,18 +382,54 @@
         }
 
         function aplicarPecaSelecionada(selectElement) {
-            const valor = selectElement.value;
+            const opcao = selectElement.selectedOptions[0];
             const item = selectElement.closest('.item-peca');
-            const pecasCadastradas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
-            const index = parseInt(valor.replace('peca_', ''));
-            const peca = pecasCadastradas[index];
 
-            if (peca) {
-                item.querySelector('.p-valor-unitario').value = parseFloat(peca.valor).toFixed(2);
-                item.querySelector('.p-desc').value = peca.desc || `${peca.fornecedor} • ${peca.codigo}`;
-                item.querySelector('.p-nome').value = peca.nome;
-            }
+            if (!opcao || !opcao.value) return;
+
+            const estoqueDisponivel = parseInt(opcao.dataset.estoque) || 0;
+            const valorUnitario = parseFloat(opcao.dataset.valor) || 0;
+            const nomePeca = opcao.dataset.nome || '';
+            const pecaId = opcao.dataset.id || '';
+
+            item.querySelector('.p-valor-unitario').value = valorUnitario.toFixed(2);
+            item.querySelector('.p-nome').value = nomePeca;
+            item.querySelector('.p-peca-id').value = pecaId;
+
+            // Atualiza o max da quantidade e o aviso
+            const inputQtde = item.querySelector('.p-qtde');
+            inputQtde.max = estoqueDisponivel;
+            inputQtde.value = 1;
+            inputQtde.dataset.estoqueDisponivel = estoqueDisponivel;
+
+            const aviso = item.querySelector('.aviso-estoque');
+            aviso.textContent = `Disponível em estoque: ${estoqueDisponivel}`;
+            aviso.style.display = 'block';
+            aviso.style.color = '#10b981';
+
+            atualizarTotalPeca({ target: inputQtde });
             calcularTotalGeral();
+        }
+
+        function validarQuantidadePeca(inputEl) {
+            const estoqueDisponivel = parseInt(inputEl.dataset.estoqueDisponivel) || 0;
+            const qtde = parseInt(inputEl.value) || 0;
+            const item = inputEl.closest('.item-peca');
+            const aviso = item.querySelector('.aviso-estoque');
+
+            if (estoqueDisponivel === 0) return;
+
+            if (qtde > estoqueDisponivel) {
+                inputEl.value = estoqueDisponivel;
+                aviso.textContent = `⚠ Máximo disponível: ${estoqueDisponivel}`;
+                aviso.style.color = '#f59e0b';
+            } else if (qtde < 1) {
+                inputEl.value = 1;
+            } else {
+                aviso.textContent = `Disponível em estoque: ${estoqueDisponivel}`;
+                aviso.style.color = '#10b981';
+            }
+            aviso.style.display = 'block';
         }
 
         function calcularTotalGeral() {
@@ -411,13 +471,14 @@
                     const qtde = parseFloat(bp.querySelector('.p-qtde').value) || 0;
                     const valorUnitario = parseFloat(bp.querySelector('.p-valor-unitario').value) || 0;
                     const valorTotal = qtde * valorUnitario;
+                    const pecaId = bp.querySelector('.p-peca-id').value;
                     totalOS += valorTotal;
                     pecasDoVeiculo.push({
                         nome: bp.querySelector('.p-nome').value || bp.querySelector('.p-peca').selectedOptions[0].text,
+                        pecaId: pecaId,
                         quantidade: qtde,
                         valorUnitario: valorUnitario,
-                        valorTotal: valorTotal,
-                        descricao: bp.querySelector('.p-desc').value
+                        valorTotal: valorTotal
                     });
                 });
 
