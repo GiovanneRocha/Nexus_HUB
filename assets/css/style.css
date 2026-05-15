@@ -1218,6 +1218,33 @@ select option.placeholder {
 .titulo-pagina p {
     margin: 0;
 }
+/* ==========================================
+   TITULO EMPILHADO (título + subtítulo abaixo)
+   ========================================== */
+.titulo-pagina-stack {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 4px;
+    margin-bottom: 8px;
+}
+
+.titulo-pagina-stack h1 {
+    margin: 0;
+    font-size: 2.2rem;
+    font-weight: 800;
+    color: var(--texto-principal);
+    line-height: 1.15;
+}
+
+.titulo-pagina-stack p {
+    margin: 0;
+    font-size: 0.95rem;
+    color: var(--texto-secundario);
+    line-height: 1.4;
+}
+
+
 
 .card-os table {
     width: 100%;

@@ -112,7 +112,7 @@
 
         <main class="conteudo-principal">
 
-            <section class="titulo-pagina">
+            <section class="titulo-pagina-stack">
                 <h1><i class="bi bi-box-seam"></i> Gestão de Peças</h1>
                 <p>Cadastre e gerencie as peças utilizadas nas Ordens de Serviço.</p>
             </section>
@@ -136,7 +136,7 @@
 
                             <h3 id="titulo-form-peca"><i class="bi bi-plus-lg"></i> Nova Peça</h3>
 
-                            <!-- LINHA 1 -->
+                            <!-- LINHA 1: Nome + Categoria -->
                             <div class="linha-campos">
                                 <div class="bloco-campo-novo">
                                     <label><i class="bi bi-box-seam"></i> Nome da Peça</label>
@@ -156,7 +156,7 @@
                                 </div>
                             </div>
 
-                            <!-- LINHA 2 -->
+                            <!-- LINHA 2: Marca + Fornecedor -->
                             <div class="linha-campos">
                                 <div class="bloco-campo-novo">
                                     <label><i class="bi bi-award"></i> Marca / Fabricante</label>
@@ -168,36 +168,20 @@
                                 </div>
                             </div>
 
-                            <!-- LINHA 3 -->
+                            <!-- LINHA 3: Código + Estoque -->
                             <div class="linha-campos">
                                 <div class="bloco-campo-novo">
                                     <label><i class="bi bi-card-text"></i> Código / Referência</label>
                                     <input type="text" id="codigo-peca" placeholder="Ex: PF-0012" required>
                                 </div>
                                 <div class="bloco-campo-novo">
-                                    <label><i class="bi bi-car-front"></i> Compatibilidade</label>
-                                    <input type="text" id="compatibilidade-peca" placeholder="Ex: Honda Civic 2018-2022">
-                                </div>
-                            </div>
-
-                            <!-- LINHA 4 -->
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
                                     <label><i class="bi bi-boxes"></i> Quantidade em Estoque</label>
                                     <input type="number" id="estoque-peca" min="0" placeholder="0" required>
                                 </div>
-                                <div class="bloco-campo-novo">
-                                    <label><i class="bi bi-exclamation-triangle"></i> Estoque Mínimo</label>
-                                    <input type="number" id="estoque-minimo-peca" min="0" placeholder="0">
-                                </div>
                             </div>
 
-                            <!-- LINHA 5 -->
+                            <!-- LINHA 4: Unidade + Status -->
                             <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label><i class="bi bi-geo-alt"></i> Localização no Estoque</label>
-                                    <input type="text" id="localizacao-peca" placeholder="Ex: Prateleira A3">
-                                </div>
                                 <div class="bloco-campo-novo">
                                     <label><i class="bi bi-rulers"></i> Unidade</label>
                                     <select id="unidade-peca">
@@ -207,28 +191,37 @@
                                         <option value="Litro">Litro</option>
                                     </select>
                                 </div>
-                            </div>
-
-                            <!-- LINHA 6 -->
-                            <div class="linha-campos">
-                                <div class="bloco-campo-novo">
-                                    <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
-                                    <input type="number" id="valor-peca" placeholder="0.00" step="0.01" min="0" required>
-                                </div>
                                 <div class="bloco-campo-novo">
                                     <label><i class="bi bi-check-circle"></i> Status</label>
                                     <select id="status-peca">
                                         <option value="Ativa">Ativa</option>
-                                        <option value="Em falta">Em falta</option>
                                         <option value="Descontinuada">Descontinuada</option>
                                     </select>
                                 </div>
                             </div>
 
+                            <!-- LINHA 5: Valor (full width) -->
+                            <div class="linha-campos">
+                                <div class="bloco-campo-novo">
+                                    <label><i class="bi bi-currency-dollar"></i> Valor Unitário (R$)</label>
+                                    <input type="number" id="valor-peca" placeholder="0.00" step="0.01" min="0" required>
+                                </div>
+                            </div>
+
                             <!-- LINHA 7 -->
                             <div class="bloco-campo-novo">
-                                <label><i class="bi bi-image"></i> URL da Imagem</label>
-                                <input type="text" id="imagem-peca" placeholder="https://...">
+                                <label><i class="bi bi-image"></i> Imagem da Peça</label>
+                                <input type="file" id="imagem-peca-file" accept="image/*" onchange="carregarImagemPeca(this)"
+                                    style="padding: 10px; border: 1px dashed #d1d5db; border-radius: 8px; cursor: pointer; width: 100%; background: var(--surface);">
+                                <input type="hidden" id="imagem-peca">
+                                <div id="preview-imagem-peca" style="margin-top: 10px; display: none;">
+                                    <img id="img-preview" src="" alt="Preview"
+                                        style="max-height: 120px; border-radius: 8px; border: 1px solid #eee; object-fit: contain;">
+                                    <button type="button" onclick="removerImagemPeca()"
+                                        style="display: block; margin-top: 6px; background: none; border: none; color: #ef4444; cursor: pointer; font-size: 0.8rem;">
+                                        <i class="bi bi-x-circle"></i> Remover imagem
+                                    </button>
+                                </div>
                             </div>
 
                             <!-- DESCRIÇÃO -->
@@ -337,7 +330,6 @@
                             <th>Marca</th>
                             <th>Fornecedor</th>
                             <th>Código</th>
-                            <th>Compatibilidade</th>
                             <th>Estoque</th>
                             <th>Unidade</th>
                             <th>Valor</th>
@@ -353,7 +345,7 @@
                                 <td>${p.marca}</td>
                                 <td>${p.fornecedor}</td>
                                 <td>${p.codigo}</td>
-                                <td>${p.compatibilidade || '-'}</td>
+
                                 <td>${p.estoque}</td>
                                 <td>${p.unidade || '-'}</td>
                                 <td>R$ ${parseFloat(p.valor || 0).toFixed(2)}</td>
@@ -384,20 +376,17 @@
             if (valor < 0 || estoque < 0) { alert('Valores inválidos.'); return; }
 
             const dados = {
-                nome:           document.getElementById('nome-peca').value,
-                categoria:      document.getElementById('categoria-peca').value,
-                marca:          document.getElementById('marca-peca').value,
-                fornecedor:     document.getElementById('fornecedor-peca').value,
-                codigo:         document.getElementById('codigo-peca').value,
-                compatibilidade:document.getElementById('compatibilidade-peca').value,
-                estoque:        estoque,
-                estoqueMinimo:  parseInt(document.getElementById('estoque-minimo-peca').value) || 0,
-                localizacao:    document.getElementById('localizacao-peca').value,
-                unidade:        document.getElementById('unidade-peca').value,
-                valor:          valor,
-                status:         document.getElementById('status-peca').value,
-                imagem:         document.getElementById('imagem-peca').value,
-                desc:           document.getElementById('desc-peca').value
+                nome:      document.getElementById('nome-peca').value,
+                categoria: document.getElementById('categoria-peca').value,
+                marca:     document.getElementById('marca-peca').value,
+                fornecedor:document.getElementById('fornecedor-peca').value,
+                codigo:    document.getElementById('codigo-peca').value,
+                estoque:   estoque,
+                unidade:   document.getElementById('unidade-peca').value,
+                valor:     valor,
+                status:    document.getElementById('status-peca').value,
+                imagem:    document.getElementById('imagem-peca').value,
+                desc:      document.getElementById('desc-peca').value
             };
 
             const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
@@ -425,14 +414,18 @@
             document.getElementById('marca-peca').value           = p.marca           || '';
             document.getElementById('fornecedor-peca').value      = p.fornecedor      || '';
             document.getElementById('codigo-peca').value          = p.codigo          || '';
-            document.getElementById('compatibilidade-peca').value = p.compatibilidade || '';
+
             document.getElementById('estoque-peca').value         = p.estoque         || 0;
-            document.getElementById('estoque-minimo-peca').value  = p.estoqueMinimo   || 0;
-            document.getElementById('localizacao-peca').value     = p.localizacao     || '';
+
+
             document.getElementById('unidade-peca').value         = p.unidade         || 'Unidade';
             document.getElementById('valor-peca').value           = p.valor           || 0;
             document.getElementById('status-peca').value          = p.status          || 'Ativa';
-            document.getElementById('imagem-peca').value          = p.imagem          || '';
+            document.getElementById('imagem-peca').value = p.imagem || '';
+            if (p.imagem) {
+                document.getElementById('img-preview').src = p.imagem;
+                document.getElementById('preview-imagem-peca').style.display = 'block';
+            }
             document.getElementById('desc-peca').value            = p.desc            || '';
 
             pecaEmEdicao = index;
@@ -452,10 +445,31 @@
             }
         }
 
+        function carregarImagemPeca(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const base64 = e.target.result;
+                document.getElementById('imagem-peca').value = base64;
+                document.getElementById('img-preview').src = base64;
+                document.getElementById('preview-imagem-peca').style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function removerImagemPeca() {
+            document.getElementById('imagem-peca').value = '';
+            document.getElementById('imagem-peca-file').value = '';
+            document.getElementById('img-preview').src = '';
+            document.getElementById('preview-imagem-peca').style.display = 'none';
+        }
+
         function resetarFormulario() {
             formPeca.reset();
             pecaEmEdicao = null;
             document.getElementById('titulo-form-peca').innerHTML = '<i class="bi bi-plus-lg"></i> Nova Peça';
+            removerImagemPeca();
         }
 
         document.getElementById('btn-cadastro').addEventListener('click', () => mostrarTela('cadastro'));

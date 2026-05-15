@@ -109,7 +109,7 @@
         <main class="conteudo-principal">
             <!-- Header will be inserted here via JavaScript -->
 
-            <section class="titulo-pagina">
+            <section class="titulo-pagina-stack">
                 <h1><i class="bi bi-clock-history"></i> Histórico de OS</h1>
                 <p>Visualize e edite as páginas do relatório antes de exportar.</p>
             </section>
@@ -180,7 +180,29 @@
             }).join('');
         }
 
-        function abrirEditor(id) {
+        const CONFIG_SERVICOS_HIST = {
+            "Manutencao_Preventiva": "Manutenção Preventiva",
+            "Troca_Oleo": "Troca de Óleo",
+            "Suspensao": "Suspensão",
+            "Freios": "Freios",
+            "Eletrica": "Elétrica"
+        };
+
+        function resolverNomeServico(tipo) {
+            if (!tipo) return '-';
+            if (tipo.startsWith('predefinido_')) {
+                const key = tipo.replace('predefinido_', '');
+                return CONFIG_SERVICOS_HIST[key] || key.replace(/_/g, ' ');
+            }
+            if (tipo.startsWith('customizado_')) {
+                const index = parseInt(tipo.replace('customizado_', ''));
+                const custom = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
+                return custom[index] ? custom[index].nome : tipo.replace(/_/g, ' ');
+            }
+            return tipo.replace(/_/g, ' ');
+        }
+
+                function abrirEditor(id) {
             const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
             const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
             osSelecionada = atendimentos.find(a => a.id == id);
@@ -264,7 +286,7 @@
                             <tbody>
                                 ${veiculo.servicos.map(s => `
                                     <tr>
-                                        <td><strong>${s.tipo.replace(/_/g, ' ')}</strong></td>
+                                        <td><strong>${resolverNomeServico(s.tipo)}</strong></td>
                                         <td contenteditable="true" style="color: #666; font-size: 13px;">${s.descricao}</td>
                                         <td style="text-align: right; font-weight: 600;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
                                     </tr>

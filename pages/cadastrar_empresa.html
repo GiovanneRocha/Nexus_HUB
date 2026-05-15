@@ -76,9 +76,121 @@
     </div>
 
     <script>
+        // ==========================================
+        // MÁSCARAS DE CAMPO
+        // ==========================================
+        function aplicarMascaraCNPJ(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 14);
+            if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
+            else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
+            else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
+            input.value = v;
+        }
+
+        function aplicarMascaraTelefone(input) {
+            let v = input.value.replace(/\D/g, '').slice(0, 11);
+            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
+            else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
+            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+            else if (v.length > 0) v = v.replace(/^(\d{0,2})/, '($1');
+            input.value = v;
+        }
+
+        // ==========================================
+        // VALIDAÇÕES
+        // ==========================================
+        function validarCNPJ(cnpj) {
+            const numeros = cnpj.replace(/\D/g, '');
+            if (numeros.length !== 14) return false;
+            if (/^(\d)\1+$/.test(numeros)) return false;
+
+            const calcDigito = (nums, pesos) => {
+                const soma = nums.split('').reduce((acc, n, i) => acc + parseInt(n) * pesos[i], 0);
+                const resto = soma % 11;
+                return resto < 2 ? 0 : 11 - resto;
+            };
+            const d1 = calcDigito(numeros.slice(0, 12), [5,4,3,2,9,8,7,6,5,4,3,2]);
+            const d2 = calcDigito(numeros.slice(0, 13), [6,5,4,3,2,9,8,7,6,5,4,3,2]);
+            return parseInt(numeros[12]) === d1 && parseInt(numeros[13]) === d2;
+        }
+
+        function validarEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+        }
+
+        function validarTelefone(tel) {
+            const numeros = tel.replace(/\D/g, '');
+            return numeros.length === 10 || numeros.length === 11;
+        }
+
+        function marcarErro(inputId, mensagem) {
+            const input = document.getElementById(inputId);
+            input.style.border = '2px solid #ef4444';
+            input.style.background = '#fff5f5';
+            let erroEl = input.parentElement.querySelector('.msg-erro-campo');
+            if (!erroEl) {
+                erroEl = document.createElement('small');
+                erroEl.className = 'msg-erro-campo';
+                erroEl.style.cssText = 'color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: block;';
+                input.parentElement.appendChild(erroEl);
+            }
+            erroEl.textContent = mensagem;
+        }
+
+        function limparErro(inputId) {
+            const input = document.getElementById(inputId);
+            input.style.border = '1px solid #f0f2f5';
+            input.style.background = '';
+            const erroEl = input.parentElement.querySelector('.msg-erro-campo');
+            if (erroEl) erroEl.remove();
+        }
+
+        // Aplicar máscaras nos eventos de input
+        document.addEventListener('DOMContentLoaded', function() {
+            const cnpjInput = document.getElementById('cnpj-empresa');
+            const telInput  = document.getElementById('tel-empresa');
+            const emailInput = document.getElementById('email-empresa');
+
+            cnpjInput.addEventListener('input', () => { aplicarMascaraCNPJ(cnpjInput); limparErro('cnpj-empresa'); });
+            telInput.addEventListener('input',  () => { aplicarMascaraTelefone(telInput); limparErro('tel-empresa'); });
+            emailInput.addEventListener('input', () => limparErro('email-empresa'));
+        });
+
         document.getElementById('formNovaEmpresa').addEventListener('submit', function(e) {
             e.preventDefault();
-            
+
+            // ---- Validações ----
+            let formularioValido = true;
+
+            const cnpjVal   = document.getElementById('cnpj-empresa').value;
+            const emailVal  = document.getElementById('email-empresa').value;
+            const telVal    = document.getElementById('tel-empresa').value;
+
+            if (!validarCNPJ(cnpjVal)) {
+                marcarErro('cnpj-empresa', 'CNPJ inválido. Verifique o número informado.');
+                formularioValido = false;
+            } else {
+                limparErro('cnpj-empresa');
+            }
+
+            if (!validarEmail(emailVal)) {
+                marcarErro('email-empresa', 'E-mail inválido. Use o formato nome@empresa.com.br');
+                formularioValido = false;
+            } else {
+                limparErro('email-empresa');
+            }
+
+            if (!validarTelefone(telVal)) {
+                marcarErro('tel-empresa', 'Telefone inválido. Use o formato (00) 00000-0000');
+                formularioValido = false;
+            } else {
+                limparErro('tel-empresa');
+            }
+
+            if (!formularioValido) return;
+            // ---- Fim das validações ----
+
             const novaEmpresa = {
                 id: Date.now(),
                 nome: document.getElementById('nome-empresa').value,

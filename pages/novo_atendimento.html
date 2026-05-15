@@ -27,7 +27,7 @@
                 <i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="irParaRevisao()" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>
             </div>
 
-            <section class="titulo-pagina">
+            <section class="titulo-pagina-stack">
                 <h1><i class="bi bi-plus-circle"></i> Registrar Nova OS</h1>
                 <p>Preencha os dados do cliente e serviços. O sistema valida duplicatas automaticamente.</p>
             </section>
@@ -117,7 +117,8 @@
                         </div>
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-calendar-event"></i> Ano</label>
-                            <input type="number" class="v-ano" placeholder="2024" required>
+                            <input type="number" class="v-ano" placeholder="2024" min="1900" max="2025" step="1" required oninput="validarAnoVeiculo(this)">
+                            <small class="aviso-ano" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:4px; display:block;"></small>
                         </div>
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-palette"></i> Cor</label>
@@ -325,7 +326,7 @@
                     </div>
                     <div class="bloco-campo-novo">
                         <label><i class="bi bi-sort-numeric-up"></i> Quantidade</label>
-                        <input type="number" class="p-qtde" min="1" value="1" required oninput="validarQuantidadePeca(this); calcularTotalGeral();">
+                        <input type="number" class="p-qtde" min="1" value="" placeholder="0" required oninput="validarQuantidadePeca(this); calcularTotalGeral();">
                         <small class="aviso-estoque" style="color: #f59e0b; font-size: 0.78rem; display: none;"></small>
                     </div>
                 </div>
@@ -399,7 +400,7 @@
             // Atualiza o max da quantidade e o aviso
             const inputQtde = item.querySelector('.p-qtde');
             inputQtde.max = estoqueDisponivel;
-            inputQtde.value = 1;
+            inputQtde.value = "";
             inputQtde.dataset.estoqueDisponivel = estoqueDisponivel;
 
             const aviso = item.querySelector('.aviso-estoque');
@@ -423,13 +424,36 @@
                 inputEl.value = estoqueDisponivel;
                 aviso.textContent = `⚠ Máximo disponível: ${estoqueDisponivel}`;
                 aviso.style.color = '#f59e0b';
-            } else if (qtde < 1) {
-                inputEl.value = 1;
+            } else if (inputEl.value !== '' && qtde < 1) {
+                inputEl.value = '';
             } else {
                 aviso.textContent = `Disponível em estoque: ${estoqueDisponivel}`;
                 aviso.style.color = '#10b981';
             }
             aviso.style.display = 'block';
+        }
+
+        function validarAnoVeiculo(input) {
+            // Remove qualquer caractere não numérico
+            input.value = input.value.replace(/[^0-9]/g, '');
+            const ano = parseInt(input.value);
+            const aviso = input.parentElement.querySelector('.aviso-ano');
+            if (!aviso) return;
+
+            if (!input.value) {
+                aviso.style.display = 'none';
+                input.style.border = '';
+                return;
+            }
+
+            if (isNaN(ano) || ano < 1900 || ano > 2025) {
+                aviso.textContent = 'Ano inválido. Informe entre 1900 e 2025.';
+                aviso.style.display = 'block';
+                input.style.border = '2px solid #ef4444';
+            } else {
+                aviso.style.display = 'none';
+                input.style.border = '2px solid #10b981';
+            }
         }
 
         function calcularTotalGeral() {
@@ -445,6 +469,68 @@
 
         document.getElementById('formNovoAtendimento').addEventListener('submit', function(e) {
             e.preventDefault();
+
+            // ==========================================
+            // VALIDAÇÕES ANTES DE SALVAR
+            // ==========================================
+            let errosEncontrados = [];
+
+            // 1. Empresa selecionada
+            if (!document.getElementById('selecao-empresa').value) {
+                errosEncontrados.push('Selecione uma empresa.');
+            }
+
+            // 2. Veículos: campos obrigatórios + validação de ano
+            const blocosVeiculosValidacao = document.querySelectorAll('.bloco-veiculo');
+            if (blocosVeiculosValidacao.length === 0) {
+                errosEncontrados.push('Adicione ao menos um veículo.');
+            }
+
+            blocosVeiculosValidacao.forEach((bloco, idx) => {
+                const numVeiculo = idx + 1;
+                const placa  = bloco.querySelector('.v-placa').value.trim();
+                const modelo = bloco.querySelector('.v-modelo').value.trim();
+                const corEl  = bloco.querySelector('.v-cor').value.trim();
+                const anoEl  = bloco.querySelector('.v-ano');
+                const ano    = parseInt(anoEl.value);
+
+                if (!placa)  errosEncontrados.push(`Veículo ${numVeiculo}: informe a placa.`);
+                if (!modelo) errosEncontrados.push(`Veículo ${numVeiculo}: informe o modelo.`);
+                if (!corEl)  errosEncontrados.push(`Veículo ${numVeiculo}: informe a cor.`);
+
+                if (!anoEl.value.trim()) {
+                    errosEncontrados.push(`Veículo ${numVeiculo}: informe o ano.`);
+                } else if (isNaN(ano) || ano < 1900 || ano > 2025) {
+                    errosEncontrados.push(`Veículo ${numVeiculo}: ano inválido (deve ser entre 1900 e 2025).`);
+                }
+
+                // Serviços: todos os campos obrigatórios
+                bloco.querySelectorAll('.item-servico').forEach((srv, si) => {
+                    if (!srv.querySelector('.s-tipo').value)
+                        errosEncontrados.push(`Veículo ${numVeiculo}, Serviço ${si+1}: selecione o tipo de serviço.`);
+                    if (!srv.querySelector('.s-data').value)
+                        errosEncontrados.push(`Veículo ${numVeiculo}, Serviço ${si+1}: informe a data.`);
+                    if (!srv.querySelector('.s-valor').value || parseFloat(srv.querySelector('.s-valor').value) <= 0)
+                        errosEncontrados.push(`Veículo ${numVeiculo}, Serviço ${si+1}: informe o valor do serviço.`);
+                });
+
+                // Peças: quantidade obrigatória e maior que zero
+                bloco.querySelectorAll('.item-peca').forEach((peca, pi) => {
+                    if (!peca.querySelector('.p-peca').value)
+                        errosEncontrados.push(`Veículo ${numVeiculo}, Peça ${pi+1}: selecione a peça.`);
+                    const qtde = parseInt(peca.querySelector('.p-qtde').value);
+                    if (!peca.querySelector('.p-qtde').value || isNaN(qtde) || qtde < 1)
+                        errosEncontrados.push(`Veículo ${numVeiculo}, Peça ${pi+1}: informe a quantidade (mínimo 1).`);
+                });
+            });
+
+            if (errosEncontrados.length > 0) {
+                alert('⚠ Corrija os seguintes erros antes de salvar:\n\n• ' + errosEncontrados.join('\n• '));
+                return;
+            }
+            // ==========================================
+            // FIM DAS VALIDAÇÕES
+            // ==========================================
             
             const blocosVeiculos = document.querySelectorAll('.bloco-veiculo');
             const frotaCompleta = [];
