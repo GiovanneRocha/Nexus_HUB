@@ -758,7 +758,9 @@ textarea {
 .status-pendente_revisao { background: #fef3c7; color: #92400e; }
 .status-em_analise { background: #ebf8ff; color: #2b6cb0; }
 .status-aprovada { background: #ecfdf5; color: #2f855a; }
+.status-finalizada { background: #ecfdf5; color: #2f855a; }
 .status-recusada { background: #ffe6e6; color: #c53030; }
+.status-reprovada { background: #ffe6e6; color: #c53030; }
 .status-outros { background: #edf2f7; color: #4a5568; }
 
 .tabela-historico td {
@@ -1011,7 +1013,9 @@ textarea {
 .status-pendente_revisao { background: #fff3cd; color: #856404; }
 .status-em_analise { background: #d1ecf1; color: #0c5460; }
 .status-aprovado { background: #d4edda; color: #155724; }
+.status-finalizada { background: #d4edda; color: #155724; }
 .status-rejeitado { background: #f8d7da; color: #721c24; }
+.status-reprovada { background: #f8d7da; color: #721c24; }
 
 .data-criacao { font-size: 0.88rem; color: #8f97ab; }
 

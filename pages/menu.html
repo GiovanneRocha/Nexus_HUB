@@ -27,8 +27,8 @@
                         <select id="filtro-status" class="filtro-select">
                             <option value="todos">Todos os Status</option>
                             <option value="pendente_revisao">Pendente de Revisão</option>
-                            <option value="aprovada">Aprovada</option>
-                            <option value="recusada">Recusada</option>
+                            <option value="finalizada">Aprovada</option>
+                            <option value="reprovada">Rejeitada</option>
                         </select>
                         <select id="filtro-periodo" class="filtro-select">
                             <option value="mes_atual">Mês Atual</option>
@@ -199,17 +199,24 @@
                 const currentMonth = agora.getMonth();
                 const currentYear = agora.getFullYear();
 
-                const os_abertas = atendimentosFiltrados.filter(a => a.status === 'pendente_revisao').length;
-                const os_finalizadas_mes = atendimentos.filter(a => a.status === 'aprovada' && new Date(a.data).getMonth() === currentMonth && new Date(a.data).getFullYear() === currentYear).length;
+                const os_abertas = atendimentos.filter(a => a.status === 'pendente_revisao').length;
+                const os_finalizadas_mes = atendimentos.filter(a => {
+                    const data = new Date(a.data);
+                    return (a.status === 'finalizada' || a.status === 'reprovada') && 
+                           data.getMonth() === currentMonth && 
+                           data.getFullYear() === currentYear;
+                }).length;
                 const clientes = empresas.length;
                 const totalPecas = pecas.length;
                 const totalVeiculos = veiculos.length;
-                const receitaMes = atendimentos.reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
+                
+                // Receita e ticket médio considerando apenas OS finalizadas (aprovadas)
                 const atendimentosMes = atendimentos.filter(a => {
                     const data = new Date(a.data);
-                    return data.getMonth() === currentMonth && data.getFullYear() === currentYear;
-                }).length;
-                const ticketMedio = atendimentosMes ? receitaMes / atendimentosMes : 0;
+                    return a.status === 'finalizada' && data.getMonth() === currentMonth && data.getFullYear() === currentYear;
+                });
+                const receitaMes = atendimentosMes.reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
+                const ticketMedio = atendimentosMes.length ? receitaMes / atendimentosMes.length : 0;
 
                 const statusCounts = atendimentos.reduce((acc, item) => {
                     const status = item.status || 'outros';
@@ -286,8 +293,8 @@
             container.innerHTML = '';
             const legendas = [
                 { status: 'pendente_revisao', label: 'Pendente', color: '#f6ad55' },
-                { status: 'aprovada', label: 'Aprovada', color: '#38a169' },
-                { status: 'recusada', label: 'Recusada', color: '#e53e3e' }
+                { status: 'finalizada', label: 'Aprovada', color: '#38a169' },
+                { status: 'reprovada', label: 'Rejeitada', color: '#e53e3e' }
             ];
             legendas.forEach(item => {
                 const badge = document.createElement('span');
@@ -326,8 +333,8 @@
         function getStatusLabel(status) {
             switch (status) {
                 case 'pendente_revisao': return 'Pendente';
-                case 'aprovada': return 'Aprovada';
-                case 'recusada': return 'Recusada';
+                case 'finalizada': return 'Aprovada';
+                case 'reprovada': return 'Rejeitada';
                 default: return 'Outro';
             }
         }
