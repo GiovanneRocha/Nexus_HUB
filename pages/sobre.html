@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus HUB - Sobre</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <style>
+        body {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #0f1b2f 0%, #1a3a4e 100%);
+            padding: 0;
+        }
+
+        .container-sobre {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 40px 24px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .barra-superior {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 60px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--bordar);
+        }
+
+        .logo-topo {
+            font-weight: 800;
+            letter-spacing: 2px;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: var(--branco);
+        }
+
+        .logo-topo img {
+            width: 32px;
+            height: 32px;
+        }
+
+        .botao-voltar {
+            padding: 10px 20px;
+            background: var(--surface);
+            border: 1px solid var(--bordar);
+            border-radius: 8px;
+            color: var(--texto-principal);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+
+        .botao-voltar:hover {
+            background: var(--surface-light);
+            border-color: var(--verde-esmeralda);
+            color: var(--verde-esmeralda);
+        }
+
+        .secao-conteudo {
+            background: var(--surface);
+            border: 1px solid var(--bordar);
+            border-radius: 16px;
+            padding: 48px;
+            box-shadow: var(--sombra-lg);
+            margin-bottom: 40px;
+        }
+
+        .cabecalho-sobre {
+            text-align: center;
+            margin-bottom: 48px;
+        }
+
+        .icone-grande {
+            font-size: 4rem;
+            color: var(--verde-esmeralda);
+            margin-bottom: 20px;
+            display: block;
+        }
+
+        .cabecalho-sobre h1 {
+            font-size: 2.5rem;
+            margin-bottom: 16px;
+            color: var(--branco);
+        }
+
+        .cabecalho-sobre p {
+            font-size: 1.2rem;
+            color: var(--texto-secundario);
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .secao {
+            margin-bottom: 48px;
+        }
+
+        .secao:last-child {
+            margin-bottom: 0;
+        }
+
+        .secao h2 {
+            font-size: 1.8rem;
+            margin-bottom: 20px;
+            color: var(--verde-esmeralda);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .secao h2 i {
+            font-size: 1.6rem;
+        }
+
+        .secao p {
+            color: var(--texto-principal);
+            line-height: 1.8;
+            margin-bottom: 16px;
+            font-size: 1rem;
+        }
+
+        .lista-recursos {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .item-recurso {
+            background: rgba(16, 185, 129, 0.05);
+            border: 1px solid rgba(16, 185, 129, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            gap: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .item-recurso:hover {
+            background: rgba(16, 185, 129, 0.1);
+            border-color: var(--verde-esmeralda);
+            transform: translateY(-2px);
+            box-shadow: var(--sombra-md);
+        }
+
+        .icone-recurso {
+            font-size: 2rem;
+            color: var(--verde-esmeralda);
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 8px;
+        }
+
+        .info-recurso h3 {
+            color: var(--texto-principal);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .info-recurso p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--texto-secundario);
+        }
+
+        .valores {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 24px;
+        }
+
+        .valor {
+            text-align: center;
+            padding: 24px;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 12px;
+            border-left: 4px solid var(--verde-esmeralda);
+        }
+
+        .valor-titulo {
+            color: var(--verde-esmeralda);
+            font-weight: 700;
+            font-size: 1.1rem;
+            margin-bottom: 8px;
+        }
+
+        .valor-descricao {
+            color: var(--texto-secundario);
+            font-size: 0.95rem;
+            line-height: 1.6;
+        }
+
+        .rodape-sobre {
+            text-align: center;
+            padding-top: 40px;
+            border-top: 1px solid var(--bordar);
+            color: var(--texto-secundario);
+            font-size: 0.95rem;
+        }
+
+        @media (max-width: 768px) {
+            .container-sobre {
+                padding: 24px 16px;
+            }
+
+            .barra-superior {
+                flex-direction: column;
+                gap: 16px;
+                margin-bottom: 40px;
+            }
+
+            .secao-conteudo {
+                padding: 32px 24px;
+            }
+
+            .cabecalho-sobre h1 {
+                font-size: 2rem;
+            }
+
+            .secao h2 {
+                font-size: 1.5rem;
+            }
+
+            .icone-grande {
+                font-size: 3rem;
+            }
+
+            .lista-recursos {
+                grid-template-columns: 1fr;
+            }
+
+            .valores {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container-sobre">
+        <div class="barra-superior">
+            <div class="logo-topo">
+                <img src="../assets/images/icon-sistem.png" alt="Nexus HUB">
+                Nexus HUB
+            </div>
+            <a href="../index.html" class="botao-voltar">
+                <i class="bi bi-arrow-left"></i> Voltar ao Login
+            </a>
+        </div>
+
+        <div class="secao-conteudo">
+            <div class="cabecalho-sobre">
+                <i class="bi bi-info-circle icone-grande"></i>
+                <h1>Sobre o Nexus HUB</h1>
+                <p>Descubra como nosso sistema revoluciona a gestão de ordens de serviço</p>
+            </div>
+
+            <div class="secao">
+                <h2><i class="bi bi-star"></i> O que é o Nexus HUB?</h2>
+                <p>O Nexus HUB é uma plataforma completa e moderna de gestão de ordens de serviço, desenvolvida para empresas que buscam eficiência, controle e rastreabilidade em seus processos operacionais. Com uma interface intuitiva e funcionalidades poderosas, o sistema permite que administradores e técnicos trabalhem de forma coordenada e produtiva.</p>
+                <p>Nossa solução foi criada pensando nas necessidades reais do mercado de serviços, oferecendo ferramentas que simplificam o dia a dia e aumentam a produtividade das equipes.</p>
+            </div>
+
+            <div class="secao">
+                <h2><i class="bi bi-target"></i> Foco e Objetivo</h2>
+                <p>O foco principal do Nexus HUB é proporcionar uma experiência integrada e completa para o gerenciamento de operações de serviço. Buscamos:</p>
+                <div class="lista-recursos">
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-speedometer2"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Eficiência</h3>
+                            <p>Automatizar processos e reduzir tempos operacionais</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Confiabilidade</h3>
+                            <p>Garantir dados seguros e acesso controlado</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-diagram-3"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Rastreabilidade</h3>
+                            <p>Acompanhar cada passo do processo</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Colaboração</h3>
+                            <p>Facilitar a comunicação entre equipes</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secao">
+                <h2><i class="bi bi-lightbulb"></i> Recursos Principais</h2>
+                <p>O Nexus HUB oferece um conjunto completo de funcionalidades para atender às suas necessidades:</p>
+                <div class="lista-recursos">
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Gestão de Atendimentos</h3>
+                            <p>Cadastre e acompanhe todos os atendimentos em um único lugar</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-tools"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Ordens de Serviço</h3>
+                            <p>Crie e gerencie ordens com histórico completo</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-truck"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Cadastro de Veículos</h3>
+                            <p>Controle completo de sua frota</p>
+                        </div>
+                    </div>
+                    <div class="item-recurso">
+                        <div class="icone-recurso">
+                            <i class="bi bi-file-earmark-check"></i>
+                        </div>
+                        <div class="info-recurso">
+                            <h3>Histórico Detalhado</h3>
+                            <p>Acesse todo o histórico de trabalhos realizados</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secao">
+                <h2><i class="bi bi-gem"></i> Nossos Valores</h2>
+                <div class="valores">
+                    <div class="valor">
+                        <div class="valor-titulo">Qualidade</div>
+                        <div class="valor-descricao">Garantir a excelência em cada funcionalidade e serviço prestado</div>
+                    </div>
+                    <div class="valor">
+                        <div class="valor-titulo">Inovação</div>
+                        <div class="valor-descricao">Estar sempre à frente com tecnologias e soluções modernas</div>
+                    </div>
+                    <div class="valor">
+                        <div class="valor-titulo">Suporte</div>
+                        <div class="valor-descricao">Equipe dedicada pronta para ajudar você sempre</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="secao">
+                <h2><i class="bi bi-chat-dots"></i> Precisa de Ajuda?</h2>
+                <p>Se tiver dúvidas sobre o sistema ou precisar de suporte técnico, nossa equipe está disponível para ajudá-lo. Acesse a <a href="suporte.html" style="color: var(--verde-esmeralda); font-weight: 700; text-decoration: none;">página de suporte</a> para entrar em contato conosco.</p>
+            </div>
+
+            <div class="rodape-sobre">
+                <p>© 2026 Nexus HUB. Todos os direitos reservados.</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

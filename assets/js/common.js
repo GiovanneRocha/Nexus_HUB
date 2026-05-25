@@ -1,32 +1,122 @@
+// ==========================================
+// SISTEMA DE TEMA CLARO/ESCURO APRIMORADO
+// ==========================================
+
+/**
+ * Obtém a preferência de tema do sistema
+ * @returns {string} 'light' ou 'dark'
+ */
+function getSystemThemePreference() {
+    if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        return 'dark';
+    }
+    return 'light';
+}
+
+/**
+ * Aplica o tema ao documento
+ * @param {string} theme - 'light' ou 'dark'
+ */
+function applyTheme(theme) {
+    const html = document.documentElement;
+    
+    if (theme === 'light') {
+        document.body.classList.add('light-mode');
+        html.style.colorScheme = 'light';
+    } else {
+        document.body.classList.remove('light-mode');
+        html.style.colorScheme = 'dark';
+    }
+    
+    // Atualizar os botões de theme em toda a página
+    updateThemeButtonText();
+    
+    // Disparar evento customizado para sincronizar entre abas
+    window.dispatchEvent(new CustomEvent('themechanged', { detail: { theme } }));
+}
+
+/**
+ * Obtém o tema salvo ou detecta do sistema
+ * @returns {string} 'light' ou 'dark'
+ */
+function getSavedTheme() {
+    const saved = localStorage.getItem('nexus-theme');
+    if (saved) {
+        return saved;
+    }
+    
+    // Se não tiver salvo, detectar preferência do sistema
+    return getSystemThemePreference();
+}
+
+/**
+ * Inicializa o tema na primeira carga
+ */
+function initTheme() {
+    const theme = getSavedTheme();
+    applyTheme(theme);
+    
+    // Sincronizar com mudanças de preferência do sistema
+    if (window.matchMedia) {
+        const darkModeQuery = window.matchMedia('(prefers-color-scheme: dark)');
+        darkModeQuery.addListener((e) => {
+            if (!localStorage.getItem('nexus-theme')) {
+                applyTheme(e.matches ? 'dark' : 'light');
+            }
+        });
+    }
+    
+    // Sincronizar entre abas
+    window.addEventListener('storage', (e) => {
+        if (e.key === 'nexus-theme' && e.newValue) {
+            applyTheme(e.newValue);
+        }
+    });
+}
+
+/**
+ * Alterna entre tema claro e escuro
+ */
+function toggleTheme() {
+    const isLight = document.body.classList.contains('light-mode');
+    const newTheme = isLight ? 'dark' : 'light';
+    
+    // Salvar preferência
+    localStorage.setItem('nexus-theme', newTheme);
+    
+    // Aplicar tema
+    applyTheme(newTheme);
+}
+
+/**
+ * Atualiza o texto e ícone do botão de tema
+ */
+function updateThemeButtonText() {
+    const buttons = document.querySelectorAll('#themeToggleButton');
+    const isLight = document.body.classList.contains('light-mode');
+    
+    buttons.forEach(button => {
+        if (isLight) {
+            button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro';
+            button.title = 'Alternar para modo escuro';
+        } else {
+            button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro';
+            button.title = 'Alternar para modo claro';
+        }
+    });
+}
+
+// Inicializar tema quando DOM estiver pronto
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initTheme);
+} else {
+    initTheme();
+}
+
 function alternarMenu() {
     const menu = document.getElementById('menuSuspenso');
     if (!menu) return;
     menu.classList.toggle('visivel');
-}
-
-function updateThemeButtonText() {
-    const button = document.getElementById('themeToggleButton');
-    if (!button) return;
-    if (document.body.classList.contains('light-mode')) {
-        button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro';
-    } else {
-        button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro';
-    }
-}
-
-function toggleTheme() {
-    const isLight = document.body.classList.toggle('light-mode');
-    localStorage.setItem('nexus-theme', isLight ? 'light' : 'dark');
-    updateThemeButtonText();
-}
-
-function initTheme() {
-    if (localStorage.getItem('nexus-theme') === 'light') {
-        document.body.classList.add('light-mode');
-    } else {
-        document.body.classList.remove('light-mode');
-    }
-    updateThemeButtonText();
 }
 
 function closeSuspensoMenus(event) {
