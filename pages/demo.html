@@ -1,335 +1,107 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Dados de Demonstração - Sistema OS</title>
+
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
+
     <script src="../assets/js/common.js"></script>
+
+    <script src="../assets/js/pages.js"></script>
+
 </head>
+
 <body class="corpo-dashboard">
+
     <div class="layout-erp">
+
         <!-- Sidebar and Header will be inserted here via JavaScript -->
 
         <main class="conteudo-principal">
+
             <!-- Header will be inserted here via JavaScript -->
 
             <section class="sessao-metricas">
+
                 <div class="titulo-pagina">
+
                     <h1>Carregar Dados de Demonstração</h1>
+
                     <p>Popule o sistema com dados de exemplo para testar todas as funcionalidades</p>
+
                 </div>
 
                 <div class="container-demo" style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 600px; margin-top: 30px;">
+
                     <div style="margin-bottom: 30px;">
+
                         <h3 style="color: #0f1221; margin-bottom: 15px;"><i class="bi bi-bullseye"></i> Dados Disponíveis</h3>
+
                         <ul style="line-height: 2; color: #666; font-size: 0.95rem;">
+
                             <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 5 clientes variados com múltiplos veículos</li>
+
                             <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 15 atendimentos com diferentes status</li>
+
                             <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Serviços de diversos tipos</li>
+
                             <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Dados realistas para teste completo</li>
+
                         </ul>
+
                     </div>
 
                     <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+
                         <strong style="color: #856404;"><i class="bi bi-exclamation-triangle" style="margin-right: 5px;"></i> Atenção:</strong>
+
                         <p style="margin: 5px 0 0 0; color: #856404; font-size: 0.9rem;">
+
                             Isso irá <strong>substituir</strong> todos os dados existentes no localStorage. 
+
                             Certifique-se de exportar qualquer dado importante primeiro!
+
                         </p>
+
                     </div>
 
                     <div style="display: flex; gap: 10px;">
+
                         <button id="btn-carregar-demo" class="botao-acao" style="flex: 1; padding: 15px;">
+
                             <i class="bi bi-download"></i> Carregar Dados de Demonstração
+
                         </button>
+
                         <button id="btn-limpar" class="botao-cancelar" style="flex: 1; padding: 15px;">
+
                             <i class="bi bi-trash"></i> Limpar Todos os Dados
+
                         </button>
+
                     </div>
 
                     <div id="resultado-demo" style="margin-top: 20px; padding: 15px; border-radius: 6px; display: none;"></div>
+
                 </div>
+
             </section>
+
         </main>
+
     </div>
 
-    <script>
-        const dadosDemonstracaoe = [
-            {
-                id: 1704067200000,
-                cliente: {
-                    nome: "Carlos Oliveira",
-                    telefone: "(11) 98765-4321",
-                    email: "carlos.oliveira@email.com",
-                    endereco: "Av. Paulista, 1000"
-                },
-                veiculo: {
-                    placa: "ABC-1234",
-                    modelo: "Fiat Uno 1.4",
-                    ano: 2022,
-                    cor: "Branco"
-                },
-                servico: {
-                    tipo: "Manutenção Preventiva",
-                    descricao: "Troca de óleo, filtro de ar e filtro de óleo. Verificação de freios e alinhamento.",
-                    valor: 320.00,
-                    data: "2024-01-02",
-                    observacoes: "Cliente solicitou limpeza interna"
-                },
-                status: "aprovado",
-                dataCriacao: "02/01/2024 09:15:30",
-                observacoes_admin: "Atendimento excelente, cliente satisfeito"
-            },
-            {
-                id: 1704153600000,
-                cliente: {
-                    nome: "Marina Silva",
-                    telefone: "(11) 99876-5432",
-                    email: "marina.silva@email.com",
-                    endereco: "Rua Oscar Freire, 500"
-                },
-                veiculo: {
-                    placa: "XYZ-9876",
-                    modelo: "Hyundai HB20 1.0",
-                    ano: 2023,
-                    cor: "Prata"
-                },
-                servico: {
-                    tipo: "Reparo Geral",
-                    descricao: "Conserto de amortecedor traseiro danificado. Ajuste de suspensão dianteira.",
-                    valor: 680.00,
-                    data: "2024-01-03",
-                    observacoes: "Peça foi pedida conforme solicitação do cliente"
-                },
-                status: "aprovado",
-                dataCriacao: "03/01/2024 14:45:22",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704240000000,
-                cliente: {
-                    nome: "João Santos",
-                    telefone: "(21) 98765-4321",
-                    email: "joao.santos@email.com",
-                    endereco: "Copacabana, RJ"
-                },
-                veiculo: {
-                    placa: "DEF-5678",
-                    modelo: "Toyota Corolla 2.0",
-                    ano: 2020,
-                    cor: "Preto"
-                },
-                servico: {
-                    tipo: "Ar-Condicionado",
-                    descricao: "Limpeza completa do sistema de ar-condicionado. Recarga de gás refrigerante.",
-                    valor: 450.00,
-                    data: "2024-01-04",
-                    observacoes: ""
-                },
-                status: "aprovado",
-                dataCriacao: "04/01/2024 10:30:15",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704326400000,
-                cliente: {
-                    nome: "Ana Costa",
-                    telefone: "(31) 99876-5432",
-                    email: "ana.costa@email.com",
-                    endereco: "Belo Horizonte, MG"
-                },
-                veiculo: {
-                    placa: "GHI-3456",
-                    modelo: "Honda Civic 1.8",
-                    ano: 2019,
-                    cor: "Azul"
-                },
-                servico: {
-                    tipo: "Freios",
-                    descricao: "Substituição de pastilhas de freio dianteiras e traseiras. Polimento de discos.",
-                    valor: 520.00,
-                    data: "2024-01-05",
-                    observacoes: "Cliente aproveitou para fazer revisão completa"
-                },
-                status: "aprovado",
-                dataCriacao: "05/01/2024 15:20:45",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704412800000,
-                cliente: {
-                    nome: "Ricardo Ferreira",
-                    telefone: "(85) 98765-4321",
-                    email: "ricardo.ferreira@email.com",
-                    endereco: "Fortaleza, CE"
-                },
-                veiculo: {
-                    placa: "JKL-7890",
-                    modelo: "Volkswagen Gol 1.6",
-                    ano: 2021,
-                    cor: "Vermelho"
-                },
-                servico: {
-                    tipo: "Elétrica",
-                    descricao: "Diagnóstico e reparo do sistema elétrico. Troca da bateria e fiação de alternador.",
-                    valor: 380.00,
-                    data: "2024-01-06",
-                    observacoes: "Problema relacionado com partida do veículo"
-                },
-                status: "aprovado",
-                dataCriacao: "06/01/2024 11:00:30",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704499200000,
-                cliente: {
-                    nome: "Patricia Mendes",
-                    telefone: "(47) 99876-5432",
-                    email: "patricia.mendes@email.com",
-                    endereco: "Blumenau, SC"
-                },
-                veiculo: {
-                    placa: "MNO-4567",
-                    modelo: "Chevrolet Prisma 1.4",
-                    ano: 2020,
-                    cor: "Cinza"
-                },
-                servico: {
-                    tipo: "Suspensão",
-                    descricao: "Ajuste completo da suspensão. Substituição de buchas e estabilizadores.",
-                    valor: 890.00,
-                    data: "2024-01-07",
-                    observacoes: "Veículo estava com muito barulho durante curvas"
-                },
-                status: "em_analise",
-                dataCriacao: "07/01/2024 16:45:12",
-                observacoes_admin: "Aguardando confirmação do cliente sobre valor"
-            },
-            {
-                id: 1704585600000,
-                cliente: {
-                    nome: "Carlos Oliveira",
-                    telefone: "(11) 98765-4321",
-                    email: "carlos.oliveira@email.com",
-                    endereco: "Av. Paulista, 1000"
-                },
-                veiculo: {
-                    placa: "ABC-1234",
-                    modelo: "Fiat Uno 1.4",
-                    ano: 2022,
-                    cor: "Branco"
-                },
-                servico: {
-                    tipo: "Troca de Óleo",
-                    descricao: "Troca de óleo e filtro. Limpeza do sistema de lubrificação.",
-                    valor: 180.00,
-                    data: "2024-01-08",
-                    observacoes: "Manutenção preventiva regular"
-                },
-                status: "pendente_revisao",
-                dataCriacao: "08/01/2024 09:00:00",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704672000000,
-                cliente: {
-                    nome: "Marina Silva",
-                    telefone: "(11) 99876-5432",
-                    email: "marina.silva@email.com",
-                    endereco: "Rua Oscar Freire, 500"
-                },
-                veiculo: {
-                    placa: "PQR-8901",
-                    modelo: "BMW X1 2.0",
-                    ano: 2021,
-                    cor: "Prata"
-                },
-                servico: {
-                    tipo: "Manutenção Preventiva",
-                    descricao: "Revisão geral de 30mil km. Troca de óleo, filtros e velas.",
-                    valor: 1200.00,
-                    data: "2024-01-09",
-                    observacoes: "Veículo importado, cliente solicita serviço especializado"
-                },
-                status: "pendente_revisao",
-                dataCriacao: "09/01/2024 13:30:45",
-                observacoes_admin: ""
-            },
-            {
-                id: 1704758400000,
-                cliente: {
-                    nome: "João Santos",
-                    telefone: "(21) 98765-4321",
-                    email: "joao.santos@email.com",
-                    endereco: "Copacabana, RJ"
-                },
-                veiculo: {
-                    placa: "DEF-5678",
-                    modelo: "Toyota Corolla 2.0",
-                    ano: 2020,
-                    cor: "Preto"
-                },
-                servico: {
-                    tipo: "Outro",
-                    descricao: "Instalação de som estéreo premium com amplificador. Acabamento profissional.",
-                    valor: 2500.00,
-                    data: "2024-01-10",
-                    observacoes: "Cliente trouxe equipamento de terceiros"
-                },
-                status: "pendente_revisao",
-                dataCriacao: "10/01/2024 14:15:20",
-                observacoes_admin: ""
-            }
-        ];
+        </body>
 
-        document.getElementById('btn-carregar-demo').addEventListener('click', function() {
-            localStorage.setItem('atendimentos', JSON.stringify(dadosDemonstracaoe));
-            
-            const resultado = document.getElementById('resultado-demo');
-            resultado.style.display = 'block';
-            resultado.style.background = '#d4edda';
-            resultado.style.color = '#155724';
-            resultado.style.borderLeft = '4px solid #28a745';
-            resultado.innerHTML = `
-                <h4 style="margin-top: 0;">✅ Sucesso!</h4>
-                <p><strong>${dadosDemonstracaoe.length} atendimentos</strong> foram carregados com sucesso!</p>
-                <p style="font-size: 0.9rem; margin-bottom: 0;">
-                    📊 <strong>${dadosDemonstracaoe.filter(a => a.status === 'aprovado').length}</strong> aprovados |
-                    🔍 <strong>${dadosDemonstracaoe.filter(a => a.status === 'em_analise').length}</strong> em análise |
-                    ⏳ <strong>${dadosDemonstracaoe.filter(a => a.status === 'pendente_revisao').length}</strong> pendentes
-                </p>
-                <p style="margin-top: 15px;">
-                    <a href="menu.html" style="color: #155724; text-decoration: underline; font-weight: bold;">Ir para Dashboard →</a>
-                </p>
-            `;
-        });
-
-        document.getElementById('btn-limpar').addEventListener('click', function() {
-            if (confirm('⚠️ Tem certeza? Todos os dados serão apagados permanentemente!')) {
-                localStorage.removeItem('atendimentos');
-                
-                const resultado = document.getElementById('resultado-demo');
-                resultado.style.display = 'block';
-                resultado.style.background = '#f8d7da';
-                resultado.style.color = '#721c24';
-                resultado.style.borderLeft = '4px solid #dc3545';
-                resultado.innerHTML = `
-                    <h4 style="margin-top: 0;">🗑️ Limpado</h4>
-                    <p>Todos os dados foram removidos do sistema.</p>
-                    <p style="margin-bottom: 0; font-size: 0.9rem;">Você pode começar do zero ou carregar dados de demonstração.</p>
-                `;
-            }
-        });
-    </script>
-    <script>
-        // Insert sidebar and header from common.js
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('menu'));
-            document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML());
-        });
-    </script>
-</body>
 </html>
 

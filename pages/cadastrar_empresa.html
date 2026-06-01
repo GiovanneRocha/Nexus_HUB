@@ -1,228 +1,141 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Nova Empresa - Nexus HUB</title>
+
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
+
     <script src="../assets/js/common.js"></script>
+
+    <script src="../assets/js/pages.js"></script>
+
 </head>
+
 <body class="corpo-dashboard">
+
     <div class="layout-erp">
+
         <!-- Sidebar and Header will be inserted here via JavaScript -->
 
         <main class="conteudo-principal">
+
             <!-- Header will be inserted here via JavaScript -->
 
             <section class="titulo-pagina" style="display: flex; justify-content: space-between; align-items: center;">
+
                 <div>
+
                     <h1>Nova Empresa</h1>
+
                     <p>Cadastre os dados corporativos para gestão de frota.</p>
+
                 </div>
+
                 <button onclick="window.history.back()" class="botao-secundario" style="background: white; padding: 10px 25px; border-radius: 12px; font-weight: bold; border: 1px solid #ddd; cursor: pointer;">Voltar</button>
+
             </section>
 
             <form id="formNovaEmpresa" style="width: 100%;">
+
                 <div class="card-os" style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%;">
+
                     
+
                     <div style="border: 2px dashed #eee; border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 40px; cursor: pointer;">
+
                         <div style="font-size: 2.5rem; margin-bottom: 10px;"><i class="bi bi-building" style="font-size: 2.5rem; color: var(--azul-escuro);"></i></div>
+
                         <p style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro);">CLIQUE PARA CARREGAR A LOGO DA EMPRESA</p>
+
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">NOME DA EMPRESA *</label>
+
                             <input type="text" id="nome-empresa" placeholder="Ex: Transportadora Nexus" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">CNPJ *</label>
+
                             <input type="text" id="cnpj-empresa" placeholder="00.000.000/0000-00" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">LINK DO SITE (PARA BUSCAR LOGO)</label>
+
                             <input type="url" id="site-empresa" placeholder="https://www.empresa.com.br" style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">NOME DO CONTATO PRINCIPAL *</label>
+
                             <input type="text" id="contato-principal" placeholder="Ex: Gestor de Frota / Responsável" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                     </div>
 
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">E-MAIL CORPORATIVO *</label>
+
                             <input type="email" id="email-empresa" placeholder="contato@empresa.com.br" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                         <div class="bloco-campo-novo">
+
                             <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">TELEFONE / WHATSAPP *</label>
+
                             <input type="text" id="tel-empresa" placeholder="(00) 00000-0000" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
                         </div>
+
                     </div>
 
                     <div class="bloco-campo-novo" style="margin-bottom: 40px;">
+
                         <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">OBSERVAÇÕES INICIAIS</label>
+
                         <textarea id="obs-empresa" placeholder="Informações relevantes sobre o contrato ou frota..." rows="4" style="width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #f0f2f5; resize: none;"></textarea>
+
                     </div>
 
                     <button type="submit" class="botao-acao" style="width: 100%; padding: 22px; background: var(--azul-escuro); font-size: 1.1rem; border-radius: 15px;">Salvar Empresa</button>
+
                 </div>
+
             </form>
+
         </main>
+
     </div>
 
-    <script>
-        // ==========================================
-        // MÁSCARAS DE CAMPO
-        // ==========================================
-        function aplicarMascaraCNPJ(input) {
-            let v = input.value.replace(/\D/g, '').slice(0, 14);
-            if (v.length > 12) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{4})(\d{0,2})/, '$1.$2.$3/$4-$5');
-            else if (v.length > 8) v = v.replace(/^(\d{2})(\d{3})(\d{3})(\d{0,4})/, '$1.$2.$3/$4');
-            else if (v.length > 5) v = v.replace(/^(\d{2})(\d{3})(\d{0,3})/, '$1.$2.$3');
-            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,3})/, '$1.$2');
-            input.value = v;
-        }
+        </body>
 
-        function aplicarMascaraTelefone(input) {
-            let v = input.value.replace(/\D/g, '').slice(0, 11);
-            if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})$/, '($1) $2-$3');
-            else if (v.length > 6) v = v.replace(/^(\d{2})(\d{4,5})(\d{0,4})/, '($1) $2-$3');
-            else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
-            else if (v.length > 0) v = v.replace(/^(\d{0,2})/, '($1');
-            input.value = v;
-        }
-
-        // ==========================================
-        // VALIDAÇÕES
-        // ==========================================
-        function validarCNPJ(cnpj) {
-            const numeros = cnpj.replace(/\D/g, '');
-            if (numeros.length !== 14) return false;
-            if (/^(\d)\1+$/.test(numeros)) return false;
-
-            const calcDigito = (nums, pesos) => {
-                const soma = nums.split('').reduce((acc, n, i) => acc + parseInt(n) * pesos[i], 0);
-                const resto = soma % 11;
-                return resto < 2 ? 0 : 11 - resto;
-            };
-            const d1 = calcDigito(numeros.slice(0, 12), [5,4,3,2,9,8,7,6,5,4,3,2]);
-            const d2 = calcDigito(numeros.slice(0, 13), [6,5,4,3,2,9,8,7,6,5,4,3,2]);
-            return parseInt(numeros[12]) === d1 && parseInt(numeros[13]) === d2;
-        }
-
-        function validarEmail(email) {
-            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
-        }
-
-        function validarTelefone(tel) {
-            const numeros = tel.replace(/\D/g, '');
-            return numeros.length === 10 || numeros.length === 11;
-        }
-
-        function marcarErro(inputId, mensagem) {
-            const input = document.getElementById(inputId);
-            input.style.border = '2px solid #ef4444';
-            input.style.background = '#fff5f5';
-            let erroEl = input.parentElement.querySelector('.msg-erro-campo');
-            if (!erroEl) {
-                erroEl = document.createElement('small');
-                erroEl.className = 'msg-erro-campo';
-                erroEl.style.cssText = 'color: #ef4444; font-size: 0.75rem; margin-top: 4px; display: block;';
-                input.parentElement.appendChild(erroEl);
-            }
-            erroEl.textContent = mensagem;
-        }
-
-        function limparErro(inputId) {
-            const input = document.getElementById(inputId);
-            input.style.border = '1px solid #f0f2f5';
-            input.style.background = '';
-            const erroEl = input.parentElement.querySelector('.msg-erro-campo');
-            if (erroEl) erroEl.remove();
-        }
-
-        // Aplicar máscaras nos eventos de input
-        document.addEventListener('DOMContentLoaded', function() {
-            const cnpjInput = document.getElementById('cnpj-empresa');
-            const telInput  = document.getElementById('tel-empresa');
-            const emailInput = document.getElementById('email-empresa');
-
-            cnpjInput.addEventListener('input', () => { aplicarMascaraCNPJ(cnpjInput); limparErro('cnpj-empresa'); });
-            telInput.addEventListener('input',  () => { aplicarMascaraTelefone(telInput); limparErro('tel-empresa'); });
-            emailInput.addEventListener('input', () => limparErro('email-empresa'));
-        });
-
-        document.getElementById('formNovaEmpresa').addEventListener('submit', function(e) {
-            e.preventDefault();
-
-            // ---- Validações ----
-            let formularioValido = true;
-
-            const cnpjVal   = document.getElementById('cnpj-empresa').value;
-            const emailVal  = document.getElementById('email-empresa').value;
-            const telVal    = document.getElementById('tel-empresa').value;
-
-            if (!validarCNPJ(cnpjVal)) {
-                marcarErro('cnpj-empresa', 'CNPJ inválido. Verifique o número informado.');
-                formularioValido = false;
-            } else {
-                limparErro('cnpj-empresa');
-            }
-
-            if (!validarEmail(emailVal)) {
-                marcarErro('email-empresa', 'E-mail inválido. Use o formato nome@empresa.com.br');
-                formularioValido = false;
-            } else {
-                limparErro('email-empresa');
-            }
-
-            if (!validarTelefone(telVal)) {
-                marcarErro('tel-empresa', 'Telefone inválido. Use o formato (00) 00000-0000');
-                formularioValido = false;
-            } else {
-                limparErro('tel-empresa');
-            }
-
-            if (!formularioValido) return;
-            // ---- Fim das validações ----
-
-            const novaEmpresa = {
-                id: Date.now(),
-                nome: document.getElementById('nome-empresa').value,
-                cnpj: document.getElementById('cnpj-empresa').value,
-                site: document.getElementById('site-empresa').value,
-                contato: document.getElementById('contato-principal').value,
-                email: document.getElementById('email-empresa').value,
-                telefone: document.getElementById('tel-empresa').value,
-                observacoes: document.getElementById('obs-empresa').value,
-                historico_atividades: [{
-                    tipo: "registro",
-                    mensagem: "Empresa cadastrada no sistema Nexus HUB.",
-                    data: new Date().toLocaleString('pt-BR'),
-                    usuario: "Julian Vane"
-                }]
-            };
-
-            let empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            empresas.push(novaEmpresa);
-            localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
-
-            registrarAtividade('empresa_cadastrada', `Nova empresa cadastrada: ${novaEmpresa.nome}`, `CNPJ: ${novaEmpresa.cnpj}`);
-            alert('✅ Empresa salva com sucesso!');
-            window.location.href = 'clientes.html';
-        });
-    </script>
-    <script>
-        // Insert sidebar and header from common.js
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('clientes'));
-            document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML());
-        });
-    </script>
-</body>
 </html>

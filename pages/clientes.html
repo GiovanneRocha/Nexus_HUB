@@ -1,97 +1,86 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Clientes - Nexus HUB</title>
+
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
+
     <script src="../assets/js/common.js"></script>
+
+    <script src="../assets/js/pages.js"></script>
+
 </head>
+
 <body class="corpo-dashboard">
+
     <div class="layout-erp">
+
         <!-- Sidebar and Header will be inserted here via JavaScript -->
 
         <main class="conteudo-principal">
+
             <!-- Header will be inserted here via JavaScript -->
 
-            <section class="titulo-pagina">
-                <div>
-                    <h1><i class="bi bi-people"></i> Gestão de Clientes</h1>
-                    <p>Visualize e gerencie as empresas parceiras da AutoDiagnose.</p>
-                </div>
+            <section class="titulo-pagina-stack">
+
+                <h1><i class="bi bi-people"></i> Gestão de Clientes</h1>
+
+                <p>Visualize e gerencie as empresas parceiras do sistema.</p>
+
+            </section>
+
+            <div style="margin-bottom: 28px;">
                 <button onclick="window.location.href='cadastrar_empresa.html'" class="botao-acao">
                     <i class="bi bi-plus"></i> Nova Empresa
                 </button>
-            </section>
+            </div>
 
             <div class="card-tabela">
+
                 <table class="tabela-dados">
+
                     <thead>
+
                         <tr>
+
                             <th>EMPRESA</th>
+
                             <th>CNPJ</th>
+
                             <th>CONTATO PRINCIPAL</th>
+
                             <th>TELEFONE</th>
+
                             <th>E-MAIL</th>
+
                             <th>AÇÕES</th>
+
                         </tr>
+
                     </thead>
+
                     <tbody id="tabela-clientes-corpo"></tbody>
+
                 </table>
+
             </div>
+
         </main>
+
     </div>
 
-    <script>
-        function renderizarClientes() {
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            const corpo = document.getElementById('tabela-clientes-corpo');
-            
-            if (empresas.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma empresa cadastrada.</td></tr>`;
-                return;
-            }
+    
 
-            corpo.innerHTML = empresas.map(emp => {
-                return `
-                    <tr>
-                        <td>
-                            <div class="tabela-empresa">
-                                <div class="tabela-icone"><i class="bi bi-building"></i></div>
-                                <strong>${emp.nome}</strong>
-                            </div>
-                        </td>
-                        <td>${emp.cnpj}</td>
-                        <td>${emp.contato || '---'}</td>
-                        <td>${emp.telefone}</td>
-                        <td>${emp.email || '---'}</td>
-                        <td>
-                            <button onclick="verPerfil(${emp.id})" class="botao-pequeno btn-pequeno-acoes">
-                                Visualizar Perfil
-                            </button>
-                        </td>
-                    </tr>
-                `;  
-            }).join('');
-        }
+    </body>
 
-        function verPerfil(id) {
-            localStorage.setItem('empresa_selecionada', id);
-            window.location.href = 'perfil_empresa.html';
-        }
-
-        window.onload = renderizarClientes;
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Insert sidebar with active page 'clientes'
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('clientes'));
-            
-            // Insert header
-            document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
-        });
-    </script>
-</body>
 </html>

@@ -88,6 +88,30 @@ function toggleTheme() {
     applyTheme(newTheme);
 }
 
+function openSidebar() {
+    const sidebar = document.getElementById('barraLateral');
+    const overlay = document.getElementById('barraLateralOverlay');
+    if (sidebar) sidebar.classList.add('aberto');
+    if (overlay) overlay.classList.add('aberto');
+}
+
+function closeSidebar() {
+    const sidebar = document.getElementById('barraLateral');
+    const overlay = document.getElementById('barraLateralOverlay');
+    if (sidebar) sidebar.classList.remove('aberto');
+    if (overlay) overlay.classList.remove('aberto');
+}
+
+function toggleSidebar() {
+    const sidebar = document.getElementById('barraLateral');
+    if (!sidebar) return;
+    if (sidebar.classList.contains('aberto')) {
+        closeSidebar();
+    } else {
+        openSidebar();
+    }
+}
+
 /**
  * Atualiza o texto e ícone do botão de tema
  */
@@ -181,27 +205,39 @@ function getSidebarHTML(activePage = 'home') {
     }).join('\n                    ');
 
     return `
-        <aside class="barra-lateral">
-            <div class="topo-lateral">
-                <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
-                <div class="busca-global">
-                    <i class="bi bi-search"></i>
-                    <input type="text" placeholder="Buscar...">
+        <aside class="barra-lateral" id="barraLateral">
+            <div class="barra-lateral-topo">
+                <div class="topo-lateral">
+                    <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
+                    <div class="busca-global">
+                        <i class="bi bi-search"></i>
+                        <input type="text" placeholder="Buscar...">
+                    </div>
                 </div>
             </div>
 
-            <nav class="menu-navegacao">
-                <ul>
-                    ${menuHTML}
-                </ul>
-            </nav>
+            <div class="barra-lateral-meio">
+                <nav class="menu-navegacao">
+                    <ul>
+                        ${menuHTML}
+                    </ul>
+                </nav>
+            </div>
+
+            <div class="barra-lateral-rodape">
+                <a href="../index.html" class="link-rodape"><i class="bi bi-box-arrow-right"></i> Sair</a>
+            </div>
         </aside>
+        <div class="barra-lateral-overlay" id="barraLateralOverlay" onclick="closeSidebar()"></div>
     `;
 }
 
 function getHeaderHTML() {
     return `
         <header class="cabecalho-topo">
+            <button class="botao-abre-menu-lateral" type="button" onclick="toggleSidebar()" aria-label="Abrir menu">
+                <i class="bi bi-list"></i>
+            </button>
             <div class="alerta-notificacao">
                 <i class="bi bi-bell"></i>
             </div>

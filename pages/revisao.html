@@ -6,95 +6,8 @@
     <title>Revisão de OS - Nexus HUB</title>
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
     <link rel="stylesheet" href="../assets/css/style.css">
-    <style>
-        /* Estilos para o Modal de Verificação */
-        .modal-revisao {
-            display: none;
-            position: fixed;
-            z-index: 1000;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-        }
-        .modal-conteudo {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 25px;
-            width: 70%;
-            max-height: 85vh;
-            overflow-y: auto;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.2);
-        }
-        .bloco-detalhe-veiculo {
-            background: #f8f9fd;
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 5px solid #4f46e5;
-        }
-        .tabela-mini-servicos {
-            width: 100%;
-            margin-top: 10px;
-            font-size: 0.85rem;
-            border-collapse: collapse;
-        }
-        .tabela-mini-servicos th { color: #222; padding: 8px; text-align: left; border-bottom: 1px solid #ddd; font-weight: 700; }
-        .tabela-mini-servicos td { padding: 8px; border-bottom: 1px solid #eee; color: #111; }
-
-        /* Abas de navegação — padrão igual ao cadastro_servicos */
-        .abas-gestao {
-            display: flex;
-            gap: 12px;
-            margin: 28px 0 20px;
-            flex-wrap: wrap;
-        }
-        .botao-aba {
-            padding: 12px 22px;
-            border-radius: 999px;
-            border: 1px solid transparent;
-            background: var(--surface);
-            color: var(--texto-principal);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-        .botao-aba:hover { background: var(--surface-strong); }
-        .botao-aba-ativo {
-            background: var(--destaque);
-            color: #ffffff;
-            border-color: var(--destaque);
-        }
-        .tela-oculta { display: none; }
-
-        /* Badges de status */
-        .badge-status {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 999px;
-            font-size: 0.72rem;
-            font-weight: 700;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-        }
-        .badge-pendente   { background: rgba(245,158,11,0.15);  color: #d97706; }
-        .badge-finalizada { background: rgba(16,185,129,0.15);  color: #059669; }
-        .badge-reprovada  { background: rgba(239,68,68,0.15);   color: #dc2626; }
-
-        /* Bloco de motivo reprovação no modal */
-        .bloco-reprovacao {
-            background: #fef2f2;
-            border: 1px solid #fca5a5;
-            border-radius: 12px;
-            padding: 14px 18px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            color: #b91c1c;
-        }
-    </style>
+    <link rel="stylesheet" href="../assets/css/pages.css">
+    
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
@@ -470,6 +383,7 @@
     </script>
 
     <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/pages.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('revisao'));

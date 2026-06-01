@@ -1,432 +1,254 @@
 <!DOCTYPE html>
+
 <html lang="pt-br">
+
 <head>
+
     <meta charset="UTF-8">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Cadastro de Veículos - Nexus HUB</title>
+
     <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+
     <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
 
-    <style>
-        .abas-gestao {
-            display: flex;
-            gap: 12px;
-            margin: 28px 0 20px;
-            flex-wrap: wrap;
-        }
-
-        .botao-aba {
-            padding: 12px 22px;
-            border-radius: 999px;
-            border: 1px solid transparent;
-            background: var(--surface);
-            color: var(--texto-principal);
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .botao-aba:hover {
-            background: var(--surface-strong);
-        }
-
-        .botao-aba-ativo {
-            background: var(--destaque);
-            color: #ffffff;
-            border-color: var(--destaque);
-        }
-
-        .tela-oculta {
-            display: none;
-        }
-
-        #filtro-veiculos {
-            width: 100%;
-            padding: 14px 16px;
-            border: 1px solid #dfe4f0;
-            border-radius: 999px;
-            background: var(--surface);
-            color: var(--texto-principal);
-            font-size: 0.95rem;
-        }
-
-        .notificacao-sucesso {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: #10b981;
-            color: #ffffff;
-            padding: 16px 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.25);
-            z-index: 10000;
-            animation: slideIn 0.3s ease, slideOut 0.3s ease 2.7s forwards;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to   { transform: translateX(0);     opacity: 1; }
-        }
-
-        @keyframes slideOut {
-            from { transform: translateX(0);     opacity: 1; }
-            to   { transform: translateX(400px); opacity: 0; }
-        }
-
-        .fundo-lista {
-            background: #f0f4f8;
-            border-radius: 22px;
-            padding: 28px;
-            box-shadow: 0 18px 45px rgba(15,18,33,0.06);
-        }
-
-        body.light-mode .fundo-lista {
-            background: #f8fafb;
-        }
-
-        .tabela-lista-container {
-            overflow-x: auto;
-        }
-
-        .tabela-lista-container table {
-            min-width: 800px;
-        }
-
-        .badge-empresa {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            background: rgba(59,130,246,0.15);
-            color: #3b82f6;
-        }
-    </style>
+    
 
     <script src="../assets/js/common.js"></script>
+
+    <script src="../assets/js/pages.js"></script>
+
 </head>
 
 <body class="corpo-dashboard">
+
     <div class="layout-erp">
 
         <main class="conteudo-principal">
 
             <section class="titulo-pagina-stack">
+
                 <h1><i class="bi bi-truck"></i> Gestão de Veículos</h1>
+
                 <p>Cadastre e gerencie os veículos das frotas utilizados nas Ordens de Serviço.</p>
+
             </section>
 
             <!-- ABAS -->
+
             <div class="abas-gestao">
+
                 <button type="button" id="btn-cadastro" class="botao-aba botao-aba-ativo">
+
                     <i class="bi bi-plus-circle"></i> Cadastro
+
                 </button>
+
                 <button type="button" id="btn-frota" class="botao-aba">
+
                     <i class="bi bi-truck"></i> Frota Cadastrada
+
                 </button>
+
             </div>
 
             <div class="container-formulario-novo-atendimento">
 
                 <!-- ======================== TELA CADASTRO ======================== -->
+
                 <div id="view-cadastro">
+
                     <form id="formCadastroVeiculo">
+
                         <div class="secao-formulario-novo">
 
                             <h3 id="titulo-form-veiculo"><i class="bi bi-plus-lg"></i> Novo Veículo</h3>
 
                             <div class="linha-campos">
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-building"></i> Empresa</label>
+
                                     <select id="selecao-empresa-veiculo" required>
+
                                         <option value="">Escolha uma empresa...</option>
+
                                     </select>
+
                                 </div>
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-tag"></i> Placa</label>
+
                                     <input type="text" id="placa-veiculo" placeholder="ABC-1234" required>
+
                                 </div>
+
                             </div>
 
                             <div class="linha-campos">
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-type"></i> Modelo</label>
+
                                     <input type="text" id="modelo-veiculo" placeholder="Ex: Volkswagen Delivery" required>
+
                                 </div>
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-card-list"></i> Marca</label>
+
                                     <input type="text" id="marca-veiculo" placeholder="Ex: Volkswagen">
+
                                 </div>
+
                             </div>
 
                             <div class="linha-campos">
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-calendar-event"></i> Ano de Fabricação</label>
+
                                     <input type="number" id="ano-veiculo" placeholder="2024" min="1980" max="2030" required>
+
                                 </div>
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-palette"></i> Cor</label>
+
                                     <input type="text" id="cor-veiculo" placeholder="Ex: Branco" required>
+
                                 </div>
+
                             </div>
 
                             <div class="linha-campos">
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-fuel-pump"></i> Combustível</label>
+
                                     <select id="combustivel-veiculo">
+
                                         <option value="">Selecione</option>
+
                                         <option value="Flex">Flex</option>
+
                                         <option value="Gasolina">Gasolina</option>
+
                                         <option value="Diesel">Diesel</option>
+
                                         <option value="Elétrico">Elétrico</option>
+
                                         <option value="GNV">GNV</option>
+
                                     </select>
+
                                 </div>
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-speedometer2"></i> KM Atual</label>
+
                                     <input type="number" id="km-veiculo" min="0" placeholder="Ex: 85000">
+
                                 </div>
+
                             </div>
 
                             <div class="linha-campos">
+
                                 <div class="bloco-campo-novo">
+
                                     <label><i class="bi bi-card-text"></i> Chassi / RENAVAM</label>
+
                                     <input type="text" id="chassi-veiculo" placeholder="Opcional">
+
                                 </div>
+
                             </div>
 
                             <div class="bloco-campo-novo">
+
                                 <label><i class="bi bi-chat-left-text"></i> Observações</label>
+
                                 <textarea id="obs-veiculo" rows="2" placeholder="Informações adicionais sobre o veículo..."></textarea>
+
                             </div>
 
                             <div style="display: flex; gap: 12px; margin-top: 20px;">
+
                                 <button type="submit" class="botao-acao">
+
                                     <i class="bi bi-save"></i> Salvar Veículo
+
                                 </button>
+
                                 <button type="button" class="botao-secundario" onclick="resetarFormulario()"
+
                                     style="padding: 12px 20px; border-radius: 8px; border: 1px solid #d1d5db; background: transparent; cursor: pointer;">
+
                                     <i class="bi bi-x-circle"></i> Cancelar
+
                                 </button>
+
                             </div>
 
                         </div>
+
                     </form>
+
                 </div>
 
                 <!-- ======================== TELA FROTA ======================== -->
+
                 <div id="view-frota" class="tela-oculta">
+
                     <div class="secao-formulario-novo">
+
                         <h3><i class="bi bi-truck"></i> Frota Cadastrada</h3>
 
                         <div class="linha-campos" style="grid-template-columns: 1fr; margin-bottom: 20px;">
+
                             <div class="bloco-campo-novo">
+
                                 <label>Pesquise pela placa, modelo ou empresa</label>
+
                                 <input type="text" id="filtro-veiculos" placeholder="Digite para filtrar...">
+
                             </div>
+
                         </div>
 
                         <div class="fundo-lista tabela-lista-container">
+
                             <div id="lista-veiculos-cadastrados"></div>
+
                         </div>
+
                     </div>
+
                 </div>
 
             </div>
+
         </main>
+
     </div>
 
-    <script>
-        const formVeiculo = document.getElementById('formCadastroVeiculo');
-        let telaAtual = 'cadastro';
-        let veiculoEmEdicao = null;
+    
 
-        function mostrarNotificacao(mensagem) {
-            const notif = document.createElement('div');
-            notif.className = 'notificacao-sucesso';
-            notif.innerHTML = `<i class="bi bi-check-circle"></i> ${mensagem}`;
-            document.body.appendChild(notif);
-            setTimeout(() => notif.remove(), 3000);
-        }
+    </body>
 
-        function mostrarTela(tela) {
-            telaAtual = tela;
-            document.getElementById('view-cadastro').classList.toggle('tela-oculta', tela !== 'cadastro');
-            document.getElementById('view-frota').classList.toggle('tela-oculta', tela !== 'frota');
-            document.getElementById('btn-cadastro').classList.toggle('botao-aba-ativo', tela === 'cadastro');
-            document.getElementById('btn-frota').classList.toggle('botao-aba-ativo', tela === 'frota');
-            renderizarVeiculos();
-        }
-
-        function popularEmpresas(valorAtual) {
-            const select = document.getElementById('selecao-empresa-veiculo');
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            // Mantém apenas a option padrão e repopula
-            select.innerHTML = '<option value="">Escolha uma empresa...</option>';
-            empresas.forEach(emp => {
-                const opt = document.createElement('option');
-                opt.value = emp.nome;
-                opt.textContent = emp.nome;
-                if (valorAtual && emp.nome === valorAtual) opt.selected = true;
-                select.appendChild(opt);
-            });
-        }
-
-        function renderizarVeiculos() {
-            const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
-            const container = document.getElementById('lista-veiculos-cadastrados');
-            if (!container) return;
-
-            if (telaAtual !== 'frota') {
-                container.innerHTML = '';
-                return;
-            }
-
-            const query = document.getElementById('filtro-veiculos')?.value.trim().toLowerCase() || '';
-
-            const filtrados = veiculos
-                .map((v, index) => ({ ...v, originalIndex: index }))
-                .filter(v => {
-                    const placa   = String(v.placa   || '').toLowerCase();
-                    const modelo  = String(v.modelo  || '').toLowerCase();
-                    const empresa = String(v.empresa || '').toLowerCase();
-                    return placa.includes(query) || modelo.includes(query) || empresa.includes(query);
-                })
-                .sort((a, b) => String(a.placa || '').localeCompare(String(b.placa || ''), 'pt-BR', { sensitivity: 'base' }));
-
-            if (filtrados.length === 0) {
-                container.innerHTML = `<p style="color: var(--texto-secundario); margin: 0;">Nenhum veículo encontrado.</p>`;
-                return;
-            }
-
-            container.innerHTML = `
-                <table class="tabela-custom" style="width: 100%; color: #000000;">
-                    <thead>
-                        <tr style="text-align: left; border-bottom: 1px solid var(--bordar);">
-                            <th>Placa</th>
-                            <th>Empresa</th>
-                            <th>Modelo</th>
-                            <th>Marca</th>
-                            <th>Ano</th>
-                            <th>Cor</th>
-                            <th>Combustível</th>
-                            <th>KM</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        ${filtrados.map(v => `
-                            <tr>
-                                <td><strong>${v.placa}</strong></td>
-                                <td><span class="badge-empresa">${v.empresa}</span></td>
-                                <td>${v.modelo}</td>
-                                <td>${v.marca || '-'}</td>
-                                <td>${v.ano}</td>
-                                <td>${v.cor}</td>
-                                <td>${v.combustivel || '-'}</td>
-                                <td>${v.km ? Number(v.km).toLocaleString('pt-BR') + ' km' : '-'}</td>
-                                <td style="display: flex; gap: 8px;">
-                                    <button onclick="editarVeiculo(${v.originalIndex})" class="botao-acao"
-                                        style="padding: 5px 10px; background: #3b82f6; color: white;">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button onclick="removerVeiculo(${v.originalIndex})" class="botao-cancelar"
-                                        style="padding: 5px 10px;">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                            </tr>
-                        `).join('')}
-                    </tbody>
-                </table>
-            `;
-        }
-
-        formVeiculo.addEventListener('submit', e => {
-            e.preventDefault();
-
-            const dados = {
-                empresa:     document.getElementById('selecao-empresa-veiculo').value,
-                placa:       document.getElementById('placa-veiculo').value.toUpperCase(),
-                modelo:      document.getElementById('modelo-veiculo').value,
-                marca:       document.getElementById('marca-veiculo').value,
-                ano:         document.getElementById('ano-veiculo').value,
-                cor:         document.getElementById('cor-veiculo').value,
-                combustivel: document.getElementById('combustivel-veiculo').value,
-                km:          document.getElementById('km-veiculo').value,
-                chassi:      document.getElementById('chassi-veiculo').value,
-                obs:         document.getElementById('obs-veiculo').value
-            };
-
-            const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
-
-            if (veiculoEmEdicao !== null) {
-                veiculos[veiculoEmEdicao] = { ...veiculos[veiculoEmEdicao], ...dados };
-                mostrarNotificacao(`Veículo "${dados.placa}" atualizado com sucesso!`);
-                veiculoEmEdicao = null;
-            } else {
-                veiculos.push({ id: Date.now(), ...dados, dataCadastro: new Date().toLocaleDateString('pt-BR') });
-                registrarAtividade('veiculo_cadastrado', `Novo veículo cadastrado: ${dados.placa}`, `${dados.modelo} (${dados.ano}) - ${dados.cor}`);
-                mostrarNotificacao(`Veículo "${dados.placa}" cadastrado com sucesso!`);
-            }
-
-            localStorage.setItem('nexus_veiculos', JSON.stringify(veiculos));
-            resetarFormulario();
-        });
-
-        function editarVeiculo(index) {
-            const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
-            const v = veiculos[index];
-
-            popularEmpresas(v.empresa);
-
-            document.getElementById('placa-veiculo').value       = v.placa       || '';
-            document.getElementById('modelo-veiculo').value      = v.modelo      || '';
-            document.getElementById('marca-veiculo').value       = v.marca       || '';
-            document.getElementById('ano-veiculo').value         = v.ano         || '';
-            document.getElementById('cor-veiculo').value         = v.cor         || '';
-            document.getElementById('combustivel-veiculo').value = v.combustivel || '';
-            document.getElementById('km-veiculo').value          = v.km          || '';
-            document.getElementById('chassi-veiculo').value      = v.chassi      || '';
-            document.getElementById('obs-veiculo').value         = v.obs         || '';
-
-            veiculoEmEdicao = index;
-            document.getElementById('titulo-form-veiculo').innerHTML = '<i class="bi bi-pencil"></i> Editar Veículo';
-            mostrarTela('cadastro');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function removerVeiculo(index) {
-            if (confirm('Deseja excluir este veículo?')) {
-                const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
-                const placa = veiculos[index].placa;
-                veiculos.splice(index, 1);
-                localStorage.setItem('nexus_veiculos', JSON.stringify(veiculos));
-                mostrarNotificacao(`Veículo "${placa}" removido com sucesso!`);
-                renderizarVeiculos();
-            }
-        }
-
-        function resetarFormulario() {
-            formVeiculo.reset();
-            veiculoEmEdicao = null;
-            document.getElementById('titulo-form-veiculo').innerHTML = '<i class="bi bi-plus-lg"></i> Novo Veículo';
-            popularEmpresas();
-        }
-
-        document.getElementById('btn-cadastro').addEventListener('click', () => mostrarTela('cadastro'));
-        document.getElementById('btn-frota').addEventListener('click', () => mostrarTela('frota'));
-        document.getElementById('filtro-veiculos')?.addEventListener('input', renderizarVeiculos);
-    </script>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('cadastro_veiculo'));
-            document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
-            popularEmpresas();
-            mostrarTela('cadastro');
-        });
-    </script>
-</body>
 </html>
