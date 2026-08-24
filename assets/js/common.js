@@ -112,6 +112,25 @@ function toggleSidebar() {
     }
 }
 
+function setSidebarCollapsedState(collapsed) {
+    const body = document.body;
+    if (!body) return;
+    body.classList.toggle('sidebar-collapsed', collapsed);
+}
+
+function toggleSidebarCollapse() {
+    const body = document.body;
+    if (!body) return;
+
+    const isCollapsed = body.classList.contains('sidebar-collapsed');
+    body.classList.toggle('sidebar-collapsed', !isCollapsed);
+
+    const sidebar = document.getElementById('barraLateral');
+    if (sidebar) {
+        sidebar.classList.toggle('aberto', !isCollapsed);
+    }
+}
+
 /**
  * Atualiza o texto e ícone do botão de tema
  */
@@ -154,6 +173,73 @@ function closeSuspensoMenus(event) {
     }
 }
 
+function normalizeRole(role) {
+    const normalized = String(role || '').trim().toLowerCase();
+    const aliases = {
+        'admin': 'administrador',
+        'adm': 'administrador',
+        'administrador': 'administrador',
+        'tecnico': 'mecanico',
+        'mecanico': 'mecanico',
+        'mechanic': 'mecanico',
+        'usuario': 'usuario',
+        'user': 'usuario',
+        'cliente': 'usuario',
+        'cliente': 'usuario'
+    };
+
+    return aliases[normalized] || 'administrador';
+}
+
+function getCurrentUserRole() {
+    const savedRole = localStorage.getItem('nexus-role') || sessionStorage.getItem('nexus-role');
+    return normalizeRole(savedRole);
+}
+
+function getCurrentUserName() {
+    const savedName = localStorage.getItem('nexus-user-name') || sessionStorage.getItem('nexus-user-name');
+    return savedName || 'Julian Vane';
+}
+
+function getRoleLabel(role) {
+    const labels = {
+        administrador: 'Administrador',
+        mecanico: 'Mecânico',
+        usuario: 'Usuário'
+    };
+
+    return labels[normalizeRole(role)] || 'Administrador';
+}
+
+function getAllowedPageKeysForRole(role) {
+    const permissions = {
+        administrador: ['home', 'menu', 'clientes', 'novo_atendimento', 'revisao', 'cadastro_servicos', 'cadastro_pecas', 'cadastro_veiculo', 'historico'],
+        mecanico: ['home', 'menu', 'novo_atendimento', 'revisao', 'historico'],
+        usuario: ['home', 'menu', 'clientes', 'historico']
+    };
+
+    return permissions[normalizeRole(role)] || permissions.administrador;
+}
+
+function getDefaultPageForRole(role) {
+    return normalizeRole(role) === 'mecanico' ? 'home.html' : 'home.html';
+}
+
+function setCurrentUserRole(role, name = '') {
+    const normalizedRole = normalizeRole(role);
+    localStorage.setItem('nexus-role', normalizedRole);
+    sessionStorage.setItem('nexus-role', normalizedRole);
+
+    if (name) {
+        localStorage.setItem('nexus-user-name', name);
+        sessionStorage.setItem('nexus-user-name', name);
+    }
+}
+
+function canAccessPage(pageKey) {
+    return getAllowedPageKeysForRole(getCurrentUserRole()).includes(pageKey);
+}
+
 function getSidebarHTML(activePage = 'home') {
     const menuItems = [
         { href: 'home.html', icon: 'bi-house-door', text: 'início', key: 'home' },
@@ -181,34 +267,48 @@ function getSidebarHTML(activePage = 'home') {
         { href: 'historico.html', icon: 'bi-clock-history', text: 'OS Aprovadas', key: 'historico' }
     ];
 
-    const menuHTML = menuItems.map(item => {
+    const role = getCurrentUserRole();
+    const allowed = new Set(getAllowedPageKeysForRole(role));
+    const filteredMenuItems = menuItems.filter(item => {
+        if (item.children) {
+            const children = item.children.filter(child => allowed.has(child.key));
+            if (!children.length) return false;
+            item.children = children;
+            return true;
+        }
+        return allowed.has(item.key);
+    });
+
+    const menuHTML = filteredMenuItems.map(item => {
         const isGroupActive = item.key === activePage || (item.children && item.children.some(child => child.key === activePage));
-        const groupClass = item.children ? ' menu-grupo' : '';
         const activeClass = isGroupActive ? ' class="item-ativo"' : '';
 
         if (item.children) {
             const submenuHTML = item.children.map(child => {
                 const isChildActive = child.key === activePage ? ' class="item-ativo"' : '';
-                return `<li${isChildActive}><a href="${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> ${child.text}</a></li>`;
+                return `<li${isChildActive}><a href="${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> <span>${child.text}</span></a></li>`;
             }).join('\n                        ');
 
             return `
                 <li class="menu-grupo${isGroupActive ? ' item-ativo' : ''}">
-                    <div class="menu-grupo-titulo"><i class="bi ${item.icon}"></i> ${item.text}</div>
+                    <div class="menu-grupo-titulo"><i class="bi ${item.icon}"></i> <span>${item.text}</span></div>
                     <ul class="submenu">
                         ${submenuHTML}
                     </ul>
                 </li>`;
         }
 
-        return `<li${activeClass}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> ${item.text}</a></li>`;
+        return `<li${activeClass}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> <span>${item.text}</span></a></li>`;
     }).join('\n                    ');
 
     return `
         <aside class="barra-lateral" id="barraLateral">
             <div class="barra-lateral-topo">
                 <div class="topo-lateral">
-                    <div class="logo-erp"><img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small"> Nexus HUB</div>
+                    <button type="button" class="logo-erp logo-toggle" onclick="toggleSidebarCollapse()" aria-label="Expandir menu lateral">
+                        <img src="../assets/images/icon-sistem.png" alt="Nexus" class="logo-icon-small">
+                        <span class="logo-texto">Nexus HUB</span>
+                    </button>
                     <div class="busca-global">
                         <i class="bi bi-search"></i>
                         <input type="text" placeholder="Buscar...">
@@ -225,7 +325,7 @@ function getSidebarHTML(activePage = 'home') {
             </div>
 
             <div class="barra-lateral-rodape">
-                <a href="../index.html" class="link-rodape"><i class="bi bi-box-arrow-right"></i> Sair</a>
+                <a href="../index.html" class="link-rodape"><i class="bi bi-box-arrow-right"></i> <span>Sair</span></a>
             </div>
         </aside>
         <div class="barra-lateral-overlay" id="barraLateralOverlay" onclick="closeSidebar()"></div>
@@ -233,6 +333,9 @@ function getSidebarHTML(activePage = 'home') {
 }
 
 function getHeaderHTML() {
+    const usuarioNome = getCurrentUserName();
+    const cargo = getRoleLabel(getCurrentUserRole());
+
     return `
         <header class="cabecalho-topo">
             <button class="botao-abre-menu-lateral" type="button" onclick="toggleSidebar()" aria-label="Abrir menu">
@@ -243,8 +346,8 @@ function getHeaderHTML() {
             </div>
             <div class="perfil-usuario">
                 <div class="info-usuario">
-                    <p class="usuario-nome">Julian Vane</p>
-                    <p class="usuario-cargo">Administrador</p>
+                    <p class="usuario-nome">${usuarioNome}</p>
+                    <p class="usuario-cargo">${cargo}</p>
                 </div>
                 <img src="../assets/images/manoel.jpeg" alt="Perfil" class="foto-perfil">
                 
@@ -282,7 +385,7 @@ function registrarAtividade(tipo, descricao, detalhes = '') {
         tipo: tipo,
         descricao: descricao,
         detalhes: detalhes,
-        usuario: "Julian Vane", // Pode ser obtido de sessão futura
+        usuario: getCurrentUserName(),
         data: new Date().toLocaleString('pt-BR')
     };
     

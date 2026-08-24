@@ -1,11 +1,13 @@
 <?php
+require_once __DIR__ . '/env.php';
+
 // ==========================================
 // CONFIGURAÇÕES DO BANCO DE DADOS
 // ==========================================
-$host = 'db_tolltech.mysql.dbaas.com.br';
-$dbname = 'db_tolltech';
-$user = 'db_tolltech';
-$pass = 'vffY#ibW3Nao7T';
+$host = getenv('DB_HOST') ?: ($_ENV['DB_HOST'] ?? 'localhost');
+$dbname = getenv('DB_NAME') ?: ($_ENV['DB_NAME'] ?? '');
+$user = getenv('DB_USER') ?: ($_ENV['DB_USER'] ?? '');
+$pass = getenv('DB_PASS') ?: ($_ENV['DB_PASS'] ?? '');
 
 $mensagem = '';
 

@@ -3,20 +3,42 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nexus HUB - Sistema de Gestão de Ordens</title>
+    <meta name="description" content="Nexus HUB - Sistema de gestão de ordens de serviço para operações, clientes e histórico de atendimentos.">
+    <title>Nexus HUB | Acesso ao Sistema</title>
     <link rel="icon" type="image/png" href="assets/images/icon-sistem.png">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="assets/css/pages.css">
+    <style>
+        .mensagem-login {
+            margin-top: 14px;
+            padding: 10px 12px;
+            border-radius: 10px;
+            background: rgba(239, 68, 68, 0.08);
+            color: #fca5a5;
+            border: 1px solid rgba(239, 68, 68, 0.22);
+            font-size: 0.82rem;
+            display: none;
+        }
+
+        .mensagem-login.visible {
+            display: block;
+        }
+    </style>
 </head>
 <body>
     <div class="container-principal">
         <div class="secao-apresentacao fundo-login">
             <div class="conteudo-apresentacao">
-                <div class="logotipo"><img src="assets/images/icon-sistem.png" alt="Nexus HUB" class="logo-icon"> Nexus HUB</div>
+                <div class="logotipo">
+                    <img src="assets/images/icon-sistem.png" alt="Logotipo do Nexus HUB" class="logo-icon">
+                    Nexus HUB
+                </div>
                 <p class="subtitulo-topo">Gestão Inteligente</p>
                 <h1>Sistema de <span>Ordens de Serviço</span></h1>
-                <p class="descricao-texto">Plataforma completa para gerenciamento de atendimentos, acompanhamento de serviços e histórico de trabalhos realizados.</p>
+                <p class="descricao-texto">
+                    Plataforma para gestão de atendimentos, acompanhamento de serviços e histórico completo de ordens executadas.
+                </p>
                 <div class="citacao-rodape">
                     <i class="bi bi-quote"></i> Qualidade, eficiência e rastreabilidade em cada serviço.
                 </div>
@@ -27,27 +49,37 @@
             <div class="caixa-formulario">
                 <h2><i class="bi bi-unlock-fill"></i> Acesso</h2>
                 <p class="subtitulo-formulario">Entre com suas credenciais para acessar o sistema.</p>
-                
-                <form id="formLogin">
+
+                <form id="formLogin" novalidate>
                     <div class="bloco-campo">
                         <label for="email"><i class="bi bi-envelope"></i> E-mail Corporativo</label>
-                        <input type="email" id="email" placeholder="nome@empresa.com.br" required>
+                        <input type="email" id="email" name="email" placeholder="nome@empresa.com.br" autocomplete="email" required>
                     </div>
-                    
+
                     <div class="bloco-campo">
                         <div class="alinhamento-etiqueta">
                             <label for="senha"><i class="bi bi-key"></i> Senha de Acesso</label>
                             <a href="pages/recuperar.html" class="link-esquecimento">Esqueceu?</a>
                         </div>
-                        <input type="password" id="senha" placeholder="••••••••" required>
+                        <input type="password" id="senha" name="senha" placeholder="••••••••" autocomplete="current-password" required>
+                    </div>
+
+                    <div class="bloco-campo">
+                        <label for="perfilAcesso"><i class="bi bi-person-badge"></i> Perfil de acesso</label>
+                        <select id="perfilAcesso" name="perfilAcesso">
+                            <option value="administrador">Administrador</option>
+                            <option value="mecanico">Mecânico</option>
+                            <option value="usuario">Usuário</option>
+                        </select>
                     </div>
 
                     <div class="opcao-sessao">
-                        <input type="checkbox" id="permanecer-logado">
+                        <input type="checkbox" id="permanecer-logado" name="permanecer-logado">
                         <label for="permanecer-logado">Manter sessão ativa</label>
                     </div>
 
                     <button type="submit" class="botao-acao"><i class="bi bi-box-arrow-in-right"></i> Acessar Sistema</button>
+                    <div id="mensagemLogin" class="mensagem-login" aria-live="polite"></div>
                 </form>
 
                 <div class="area-novo-cadastro">
@@ -65,16 +97,23 @@
     </div>
 
     <script>
-        document.getElementById('formLogin').addEventListener('submit', function(evento) {
-            evento.preventDefault();
-            const campoEmail = document.getElementById('email').value;
-            const campoSenha = document.getElementById('senha').value;
+        const formLogin = document.getElementById('formLogin');
+        const mensagemLogin = document.getElementById('mensagemLogin');
 
-            if (campoEmail.trim() !== "" && campoSenha.trim() !== "") {
-                window.location.href = "pages/home.html";
-            } else {
-                alert("Por favor, preencha todos os campos para acessar o sistema.");
+        formLogin.addEventListener('submit', function (evento) {
+            evento.preventDefault();
+
+            const campoEmail = document.getElementById('email').value.trim();
+            const campoSenha = document.getElementById('senha').value.trim();
+
+            if (!campoEmail || !campoSenha) {
+                mensagemLogin.textContent = 'Preencha e-mail e senha para continuar.';
+                mensagemLogin.classList.add('visible');
+                return;
             }
+
+            mensagemLogin.classList.remove('visible');
+            window.location.href = 'pages/home.html';
         });
     </script>
 </body>

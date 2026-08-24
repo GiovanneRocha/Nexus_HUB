@@ -58,37 +58,51 @@
                     <div class="card-metrica">
                         <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
                         <h3 id="os-abertas">0</h3>
-                        <span class="tendencia">Aguardando</span>
+                        <span class="tendencia">Pendentes</span>
                     </div>
                     <div class="card-metrica destaque-escuro">
-                        <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas (Mês)</p>
+                        <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas</p>
                         <h3 id="os-finalizadas">0</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Concluídas</span>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Mês atual</span>
                     </div>
                     <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-currency-dollar"></i> Receita (Mês)</p>
+                        <p class="rotulo-metrica"><i class="bi bi-currency-dollar"></i> Receita</p>
                         <h3 id="receita-mes">R$ 0,00</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Ticket médio</span>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Mês atual</span>
                     </div>
                     <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-people"></i> Total Clientes</p>
+                        <p class="rotulo-metrica"><i class="bi bi-wallet2"></i> Ticket Médio</p>
+                        <h3 id="ticket-medio">R$ 0,00</h3>
+                        <span class="tendencia">Por OS</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-people"></i> Clientes</p>
                         <h3 id="total-clientes">0</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Crescimento</span>
+                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Ativos</span>
+                    </div>
+                    <div class="card-metrica">
+                        <p class="rotulo-metrica"><i class="bi bi-percent"></i> Aprovação</p>
+                        <h3 id="taxa-aprovacao">0%</h3>
+                        <span class="tendencia">Taxa geral</span>
                     </div>
                 </div>
 
-                <!-- GRÁFICOS PRINCIPAIS -->
                 <div class="area-graficos-principal">
                     <div class="card-grafico-principal">
-                        <h4><i class="bi bi-bar-chart"></i> Atendimentos por Mês</h4>
+                        <div class="cabecalho-card-analitico">
+                            <div>
+                                <h4><i class="bi bi-bar-chart"></i> Atendimentos por mês</h4>
+                                <p>Volume de ordens no período recente</p>
+                            </div>
+                        </div>
                         <div id="grafico-mensal" class="simulador-grafico"></div>
-                        <div class="legenda-status" id="grafico-legend" style="margin-top: 20px; display:flex; gap: 12px; flex-wrap: wrap;"></div>
+                        <div class="legenda-status" id="grafico-legend"></div>
                     </div>
                     <div class="card-grafico-secundario">
                         <div class="atividade-topo">
                             <div>
-                                <h4><i class="bi bi-pie-chart"></i> Distribuição de Status</h4>
-                                <p class="texto-pequeno">OS por situação</p>
+                                <h4><i class="bi bi-pie-chart"></i> Status da operação</h4>
+                                <p class="texto-pequeno">Distribuição por situação</p>
                             </div>
                             <div class="status-legenda" id="status-legend-summary"></div>
                         </div>
@@ -99,9 +113,13 @@
                     </div>
                 </div>
 
-                <!-- GRÁFICO DE EVOLUÇÃO -->
                 <div class="card-grafico-evolucao">
-                    <h4><i class="bi bi-graph-up"></i> Evolução de Receita</h4>
+                    <div class="cabecalho-card-analitico">
+                        <div>
+                            <h4><i class="bi bi-graph-up"></i> Evolução de receita</h4>
+                            <p>Últimos 7 dias</p>
+                        </div>
+                    </div>
                     <div id="grafico-evolucao" class="simulador-grafico-linha"></div>
                 </div>
 
@@ -215,21 +233,23 @@
                 const os_abertas = atendimentos.filter(a => a.status === 'pendente_revisao').length;
                 const os_finalizadas_mes = atendimentos.filter(a => {
                     const data = new Date(a.data);
-                    return (a.status === 'finalizada' || a.status === 'reprovada') && 
-                           data.getMonth() === currentMonth && 
+                    return (a.status === 'finalizada' || a.status === 'reprovada') &&
+                           data.getMonth() === currentMonth &&
                            data.getFullYear() === currentYear;
                 }).length;
                 const clientes = empresas.length;
                 const totalPecas = pecas.length;
                 const totalVeiculos = veiculos.length;
-                
-                // Receita e ticket médio considerando apenas OS finalizadas (aprovadas)
+
                 const atendimentosMes = atendimentos.filter(a => {
                     const data = new Date(a.data);
                     return a.status === 'finalizada' && data.getMonth() === currentMonth && data.getFullYear() === currentYear;
                 });
                 const receitaMes = atendimentosMes.reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
                 const ticketMedio = atendimentosMes.length ? receitaMes / atendimentosMes.length : 0;
+                const aprovadas = atendimentos.filter(a => a.status === 'finalizada').length;
+                const totalAvaliadas = atendimentos.filter(a => a.status === 'finalizada' || a.status === 'reprovada').length || 1;
+                const taxaAprovacao = totalAvaliadas ? (aprovadas / totalAvaliadas) * 100 : 0;
 
                 const statusCounts = atendimentos.reduce((acc, item) => {
                     const status = item.status || 'outros';
@@ -241,12 +261,15 @@
                 document.getElementById('os-finalizadas').textContent = os_finalizadas_mes;
                 document.getElementById('total-clientes').textContent = clientes;
                 document.getElementById('receita-mes').textContent = `R$ ${receitaMes.toFixed(2)}`;
+                document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toFixed(2)}`;
+                document.getElementById('taxa-aprovacao').textContent = `${taxaAprovacao.toFixed(0)}%`;
 
                 document.getElementById('resumo-status').textContent = filtroStatus === 'todos' ? 'Todos' : document.querySelector(`#filtro-status option[value="${filtroStatus}"]`).textContent;
                 document.getElementById('resumo-periodo').textContent = document.querySelector(`#filtro-periodo option[value="${filtroPeriodo}"]`).textContent;
                 document.getElementById('resumo-atualizacao').textContent = agora.toLocaleTimeString('pt-BR');
 
                 renderGraficoMensal(atendimentos);
+                renderGraficoEvolucao(atendimentos);
                 renderStatusLegend(statusCounts);
                 renderDistribuicaoStatus(statusCounts);
                 renderUltimasOS(atendimentosFiltrados);
@@ -272,7 +295,9 @@
         function renderGraficoMensal(atendimentos) {
             const agora = new Date();
             const grafico = document.getElementById('grafico-mensal');
+            if (!grafico) return;
             grafico.innerHTML = '';
+
             const meses = [];
             const valores = [];
             for (let i = 5; i >= 0; i--) {
@@ -284,19 +309,82 @@
                 }).length;
                 valores.push(quantidade);
             }
+
             const maxVal = Math.max(...valores, 1);
             meses.forEach((mes, index) => {
                 const barra = document.createElement('div');
                 barra.className = `barra${index === meses.length - 1 ? ' destaque' : ''}`;
-                const altura = Math.max(16, (valores[index] / maxVal) * 100);
+                const altura = Math.max(18, (valores[index] / maxVal) * 100);
                 barra.style.height = `${altura}%`;
                 barra.title = `${mes}: ${valores[index]} atendimentos`;
+
                 const label = document.createElement('span');
                 label.className = 'barra-legenda';
                 label.textContent = mes;
                 barra.appendChild(label);
                 grafico.appendChild(barra);
             });
+        }
+
+        function renderGraficoEvolucao(atendimentos) {
+            const container = document.getElementById('grafico-evolucao');
+            if (!container) return;
+
+            const dias = Array.from({ length: 7 }, (_, index) => {
+                const data = new Date();
+                data.setDate(data.getDate() - (6 - index));
+                const valor = atendimentos.filter(item => {
+                    const itemDate = new Date(item.data);
+                    return itemDate.toDateString() === data.toDateString() && item.status === 'finalizada';
+                }).reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
+
+                return {
+                    label: data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
+                    valor
+                };
+            });
+
+            const maxValor = Math.max(...dias.map(d => d.valor), 1);
+            const width = 520;
+            const height = 170;
+            const padding = 18;
+
+            const pontos = dias.map((item, index) => {
+                const x = padding + (index * (width - padding * 2)) / (dias.length - 1 || 1);
+                const y = height - padding - (item.valor / maxValor) * (height - padding * 2);
+                return `${x},${y}`;
+            }).join(' ');
+
+            const area = `0,${height - padding} ${pontos} ${width},${height - padding}`;
+
+            container.innerHTML = `
+                <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Evolução de receita">
+                    <defs>
+                        <linearGradient id="linhaReceita" x1="0" x2="1">
+                            <stop offset="0%" stop-color="#34d399" />
+                            <stop offset="100%" stop-color="#10b981" />
+                        </linearGradient>
+                    </defs>
+                    <g>
+                        ${Array.from({ length: 4 }, (_, i) => {
+                            const y = padding + (i * (height - padding * 2)) / 3;
+                            return `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(148,163,184,0.18)" stroke-dasharray="4 6" />`;
+                        }).join('')}
+                    </g>
+                    <polygon points="${area}" fill="rgba(16,185,129,0.12)"></polygon>
+                    <polyline points="${pontos}" fill="none" stroke="url(#linhaReceita)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                    ${dias.map((item, index) => {
+                        const x = padding + (index * (width - padding * 2)) / (dias.length - 1 || 1);
+                        const y = height - padding - (item.valor / maxValor) * (height - padding * 2);
+                        return `
+                            <g>
+                                <circle cx="${x}" cy="${y}" r="5" fill="#10b981" stroke="#ecfdf5" stroke-width="3"></circle>
+                                <text x="${x}" y="${height - 4}" text-anchor="middle" fill="#94a3b8" font-size="10">${item.label.split('/')[0]}</text>
+                            </g>
+                        `;
+                    }).join('')}
+                </svg>
+            `;
         }
 
         function renderStatusLegend(counts) {
@@ -369,7 +457,7 @@
                     const tr = document.createElement('tr');
                     const statusLabel = getStatusLabel(a.status);
                     tr.innerHTML = `
-                        <td>#${index + 1}</td>
+                        <td>#${a.id || index + 1}</td>
                         <td>${a.cliente || 'Sem cliente'}</td>
                         <td><span class="status-pill status-${a.status}">${statusLabel}</span></td>
                         <td>${new Date(a.data).toLocaleDateString('pt-BR')}</td>

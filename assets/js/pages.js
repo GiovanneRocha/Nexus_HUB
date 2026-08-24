@@ -1,5 +1,6 @@
 (function () {
     function initPage() {
+        enforceRoleAccess();
         initLogin();
         initCadastroTipo();
         initCadastroServicos();
@@ -11,6 +12,33 @@
         initHistoricoPage();
         initCadastroEmpresa();
         insertCommonLayoutForPage();
+    }
+
+    function enforceRoleAccess() {
+        const role = (localStorage.getItem('nexus-role') || sessionStorage.getItem('nexus-role') || 'administrador').toLowerCase();
+        const currentPage = getActivePageFromURL();
+        const allowedPages = {
+            administrador: ['home', 'menu', 'clientes', 'novo_atendimento', 'revisao', 'cadastro_servicos', 'cadastro_pecas', 'cadastro_veiculo', 'historico'],
+            mecanico: ['home', 'menu', 'novo_atendimento', 'revisao', 'historico'],
+            usuario: ['home', 'menu', 'clientes', 'historico']
+        };
+
+        const normalizedRole = role === 'admin' || role === 'adm' ? 'administrador' : role === 'tecnico' || role === 'mecanico' ? 'mecanico' : role === 'usuario' || role === 'user' || role === 'cliente' ? 'usuario' : role;
+        const isAllowed = !currentPage || allowedPages[normalizedRole]?.includes(currentPage);
+
+        if (currentPage && !isAllowed) {
+            const safePage = normalizedRole === 'mecanico' ? 'home.html' : 'home.html';
+            window.location.href = safePage;
+            return;
+        }
+
+        const pageButtons = document.querySelectorAll('[data-role-restrict]');
+        pageButtons.forEach(button => {
+            const allowedRoles = button.getAttribute('data-role-restrict').split(',');
+            if (!allowedRoles.includes(normalizedRole)) {
+                button.style.display = 'none';
+            }
+        });
     }
 
     function getActivePageFromURL() {
@@ -89,14 +117,21 @@
 
         formLogin.addEventListener('submit', function (evento) {
             evento.preventDefault();
-            const email = document.getElementById('email').value;
-            const senha = document.getElementById('senha').value;
+            const email = document.getElementById('email').value.trim();
+            const senha = document.getElementById('senha').value.trim();
+            const perfilSelecionado = document.getElementById('perfilAcesso')?.value || 'administrador';
 
-            if (email.trim() !== '' && senha.trim() !== '') {
-                window.location.href = 'pages/home.html';
-            } else {
+            if (!email || !senha) {
                 alert('Por favor, preencha todos os campos para acessar o sistema.');
+                return;
             }
+
+            const role = perfilSelecionado || 'administrador';
+            const userName = email.includes('@') ? email.split('@')[0].replace(/[._-]/g, ' ') : 'Usuário';
+            const formattedName = userName.split(' ').map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+
+            setCurrentUserRole(role, formattedName);
+            window.location.href = 'pages/home.html';
         });
     }
 
