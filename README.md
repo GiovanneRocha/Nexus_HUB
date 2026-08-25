@@ -53,6 +53,7 @@ Nexus_HUB-main/
 ├── teste-inputs.html
 ├── desktop.ini
 ├── package-lock.json
+├── .env
 ├── assets/
 │   ├── css/
 │   │   ├── pages.css
@@ -66,28 +67,33 @@ Nexus_HUB-main/
 │   ├── GUIA_TESTE.md
 │   └── RESUMO.md
 ├── pages/
-│   ├── cadastrar_empresa.html
-│   ├── cadastro_detalhes.html
-│   ├── cadastro_pecas.html
-│   ├── cadastro_servicos.html
-│   ├── cadastro_tipo.html
-│   ├── cadastro_veiculo.html
-│   ├── clientes.html
-│   ├── demo.html
-│   ├── historico.html
-│   ├── home.html
-│   ├── menu.html
-│   ├── novo_atendimento.html
-│   ├── perfil_empresa.html
-│   ├── recuperar.html
-│   ├── revisao.html
-│   ├── signup.html
-│   ├── sobre.html
-│   └── suporte.html
+│   ├── auth/
+│   │   ├── cadastro_tipo.html
+│   │   ├── recuperar.html
+│   │   └── signup.html
+│   ├── cadastros/
+│   │   ├── cadastrar_empresa.html
+│   │   ├── cadastro_detalhes.html
+│   │   ├── cadastro_pecas.html
+│   │   ├── cadastro_servicos.html
+│   │   └── cadastro_veiculo.html
+│   ├── info/
+│   │   ├── demo.html
+│   │   ├── sobre.html
+│   │   └── suporte.html
+│   └── operacoes/
+│       ├── clientes.html
+│       ├── historico.html
+│       ├── home.html
+│       ├── menu.html
+│       ├── novo_atendimento.html
+│       ├── perfil_empresa.html
+│       └── revisao.html
 ├── php/
 │   ├── cadastro.php
+│   ├── env.php
 │   └── enviar_suporte.php
-└── README.md
+└── .gitignore
 ```
 
 ## Como executar

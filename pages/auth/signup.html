@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nexus HUB - Criar Conta</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
+</head>
+<body>
+    <div class="container-principal">
+        <div class="secao-apresentacao">
+            <div class="conteudo-apresentacao">
+                <div class="logotipo"><img src="../assets/images/icon-sistem.png" alt="Nexus HUB" class="logo-icon"> Nexus HUB</div>
+                <p class="subtitulo-topo">Acesso ao sistema</p>
+                <h1>Crie sua <span>conta</span></h1>
+                <p class="descricao-texto">Cadastre-se para acessar o Nexus HUB e começar a gerenciar atendimentos, clientes e ordens de serviço.</p>
+                <div class="citacao-rodape">
+                    <i class="bi bi-quote"></i> Organização e controle em um único lugar.
+                </div>
+            </div>
+        </div>
+
+        <div class="secao-formulario">
+            <div class="caixa-formulario">
+                <h2><i class="bi bi-person-plus"></i> Criar Conta</h2>
+                <p class="subtitulo-formulario">Preencha seus dados para finalizar o cadastro.</p>
+
+                <form id="signupForm">
+                    <div class="bloco-campo">
+                        <label for="nomeCompleto"><i class="bi bi-person"></i> Nome Completo</label>
+                        <input type="text" id="nomeCompleto" placeholder="João Silva Santos" required>
+                    </div>
+
+                    <div class="bloco-campo">
+                        <label for="email"><i class="bi bi-envelope"></i> E-mail</label>
+                        <input type="email" id="email" placeholder="nome@empresa.com.br" required>
+                    </div>
+
+                    <div class="bloco-campo">
+                        <label for="pass"><i class="bi bi-key"></i> Senha</label>
+                        <input type="password" id="pass" placeholder="Digite sua senha" required>
+                    </div>
+
+                    <div class="bloco-campo">
+                        <label for="confirmPass"><i class="bi bi-key"></i> Confirmar Senha</label>
+                        <input type="password" id="confirmPass" placeholder="Repita sua senha" required>
+                    </div>
+
+                    <button type="submit" class="botao-acao"><i class="bi bi-check-circle"></i> Cadastrar</button>
+                </form>
+
+                <div class="area-novo-cadastro">
+                    Já tem uma conta? <a href="../index.html">Faça Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('signupForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const nome = document.getElementById('nomeCompleto').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const p1 = document.getElementById('pass').value;
+            const p2 = document.getElementById('confirmPass').value;
+
+            if (!nome || !email || !p1 || !p2) {
+                alert('Preencha todos os campos antes de continuar.');
+                return;
+            }
+
+            if (p1 !== p2) {
+                alert('As senhas não conferem!');
+                return;
+            }
+
+            if (p1.length < 6) {
+                alert('A senha deve ter pelo menos 6 caracteres.');
+                return;
+            }
+
+            alert('Conta criada com sucesso!');
+            window.location.href = '../index.html';
+        });
+    </script>
+</body>
+</html>

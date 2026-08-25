@@ -151,8 +151,9 @@ a,
 .container-principal {
     display: flex;
     align-items: stretch;
+    justify-content: center;
     min-height: 100vh;
-    width: min(100%, 1400px);
+    width: min(100%, 1280px);
     margin: 0 auto;
     background: rgba(9, 14, 22, 0.22);
     backdrop-filter: blur(0.5px);
@@ -160,7 +161,7 @@ a,
 
 /* Lado Esquerdo */
 .secao-apresentacao {
-    flex: 1.28;
+    flex: 1 1 0;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -284,7 +285,8 @@ h1 span {
 
 /* Lado Direito: Formulário */
 .secao-formulario {
-    flex: 1;
+    flex: 1 1 0;
+    min-width: 0;
     background: linear-gradient(180deg, rgba(17,24,39,0.96), rgba(15,23,42,0.98));
     display: flex;
     flex-direction: column;
@@ -332,9 +334,9 @@ h2 {
 
 label {
     display: block;
-    font-size: 0.72rem;
+    font-size: 0.78rem;
     font-weight: 700;
-    margin-bottom: 8px;
+    margin-bottom: 9px;
     color: var(--destaque);
     text-transform: uppercase;
     letter-spacing: 0.06em;
@@ -351,15 +353,15 @@ input[type="url"],
 select,
 textarea {
     width: 100%;
-    min-height: 34px;
-    padding: 8px 10px;
+    min-height: 48px;
+    padding: 12px 14px;
     background: var(--fundo-input) !important;
     border: 1px solid rgba(148, 163, 184, 0.35);
-    border-radius: 9px;
+    border-radius: 12px;
     outline: none;
     color: var(--texto-input) !important;
     transition: var(--transicao-padrao);
-    font-size: 0.82rem;
+    font-size: 0.95rem;
     box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 
@@ -381,8 +383,26 @@ textarea:focus {
 }
 
 textarea {
-    min-height: 120px;
+    min-height: 140px;
     resize: vertical;
+}
+
+.tipo-usuario-info {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 12px;
+    margin-bottom: 18px;
+    border-radius: 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.18);
+    color: var(--texto-principal);
+    font-size: 0.85rem;
+}
+
+.tipo-usuario-info i {
+    color: var(--verde-esmeralda);
+    font-size: 1rem;
 }
 
 .link-esquecimento {

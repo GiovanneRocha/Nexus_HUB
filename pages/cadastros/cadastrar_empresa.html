@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Nova Empresa - Nexus HUB</title>
+
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+
+    <link rel="stylesheet" href="../assets/css/style.css">
+    <link rel="stylesheet" href="../assets/css/pages.css">
+
+    <script src="../assets/js/common.js"></script>
+
+    <script src="../assets/js/pages.js"></script>
+
+</head>
+
+<body class="corpo-dashboard">
+
+    <div class="layout-erp">
+
+        <!-- Sidebar and Header will be inserted here via JavaScript -->
+
+        <main class="conteudo-principal">
+
+            <!-- Header will be inserted here via JavaScript -->
+
+            <section class="titulo-pagina" style="display: flex; justify-content: space-between; align-items: center;">
+
+                <div>
+
+                    <h1>Nova Empresa</h1>
+
+                    <p>Cadastre os dados corporativos para gestão de frota.</p>
+
+                </div>
+
+                <button onclick="window.history.back()" class="botao-secundario" style="background: white; padding: 10px 25px; border-radius: 12px; font-weight: bold; border: 1px solid #ddd; cursor: pointer;">Voltar</button>
+
+            </section>
+
+            <form id="formNovaEmpresa" style="width: 100%;">
+
+                <div class="card-os" style="background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); width: 100%;">
+
+                    
+
+                    <div style="border: 2px dashed #eee; border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 40px; cursor: pointer;">
+
+                        <div style="font-size: 2.5rem; margin-bottom: 10px;"><i class="bi bi-building" style="font-size: 2.5rem; color: var(--azul-escuro);"></i></div>
+
+                        <p style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro);">CLIQUE PARA CARREGAR A LOGO DA EMPRESA</p>
+
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">NOME DA EMPRESA *</label>
+
+                            <input type="text" id="nome-empresa" placeholder="Ex: Transportadora Nexus" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">CNPJ *</label>
+
+                            <input type="text" id="cnpj-empresa" placeholder="00.000.000/0000-00" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">LINK DO SITE (PARA BUSCAR LOGO)</label>
+
+                            <input type="url" id="site-empresa" placeholder="https://www.empresa.com.br" style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">NOME DO CONTATO PRINCIPAL *</label>
+
+                            <input type="text" id="contato-principal" placeholder="Ex: Gestor de Frota / Responsável" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 25px;">
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">E-MAIL CORPORATIVO *</label>
+
+                            <input type="email" id="email-empresa" placeholder="contato@empresa.com.br" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                        <div class="bloco-campo-novo">
+
+                            <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">TELEFONE / WHATSAPP *</label>
+
+                            <input type="text" id="tel-empresa" placeholder="(00) 00000-0000" required style="width: 100%; padding: 18px; border-radius: 12px; border: 1px solid #f0f2f5;">
+
+                        </div>
+
+                    </div>
+
+                    <div class="bloco-campo-novo" style="margin-bottom: 40px;">
+
+                        <label style="font-weight: 800; font-size: 0.75rem; color: var(--azul-escuro); display: block; margin-bottom: 10px;">OBSERVAÇÕES INICIAIS</label>
+
+                        <textarea id="obs-empresa" placeholder="Informações relevantes sobre o contrato ou frota..." rows="4" style="width: 100%; padding: 18px; border-radius: 15px; border: 1px solid #f0f2f5; resize: none;"></textarea>
+
+                    </div>
+
+                    <button type="submit" class="botao-acao" style="width: 100%; padding: 22px; background: var(--azul-escuro); font-size: 1.1rem; border-radius: 15px;">Salvar Empresa</button>
+
+                </div>
+
+            </form>
+
+        </main>
+
+    </div>
+
+        </body>
+
+</html>
