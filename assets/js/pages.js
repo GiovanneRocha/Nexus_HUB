@@ -993,7 +993,7 @@
 
     function verPerfil(id) {
       localStorage.setItem("empresa_selecionada", id)
-      window.location.href = "perfil_empresa.html"
+      window.location.href = getPagesBasePath() + "perfil_empresa.html"
     }
 
     window._nexusPages = window._nexusPages || {}
@@ -1008,7 +1008,7 @@
     insertCommonLayout("home")
 
     window.abrirMenu = function () {
-      window.location.href = "menu.html"
+      window.location.href = getPagesBasePath() + "menu.html"
     }
   }
 

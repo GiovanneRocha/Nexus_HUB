@@ -376,7 +376,7 @@ function getSidebarHTML(activePage = "home") {
           .map((child) => {
             const isChildActive =
               child.key === activePage ? ' class="item-ativo"' : ""
-            return `<li${isChildActive}><a href="${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> <span>${child.text}</span></a></li>`
+            return `<li${isChildActive}><a href="${getPagesBasePath()}${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> <span>${child.text}</span></a></li>`
           })
           .join("\n                        ")
 
@@ -389,7 +389,7 @@ function getSidebarHTML(activePage = "home") {
                 </li>`
       }
 
-      return `<li${activeClass}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> <span>${item.text}</span></a></li>`
+      return `<li${activeClass}><a href="${getPagesBasePath()}${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> <span>${item.text}</span></a></li>`
     })
     .join("\n                    ")
 
