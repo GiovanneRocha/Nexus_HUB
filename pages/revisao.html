@@ -1,166 +1,214 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Revisão de OS - Nexus HUB</title>
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
-    
-</head>
-<body class="corpo-dashboard">
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
+  </head>
+  <body class="corpo-dashboard">
     <div class="layout-erp">
-        <main class="conteudo-principal">
+      <main class="conteudo-principal">
+        <section class="titulo-pagina-stack">
+          <h1><i class="bi bi-check-square"></i> Ordens de Serviço</h1>
+          <p>
+            Revise, aprove ou reprove as ordens de serviço registradas no
+            sistema.
+          </p>
+        </section>
 
-            <section class="titulo-pagina-stack">
-                <h1><i class="bi bi-check-square"></i> Ordens de Serviço</h1>
-                <p>Revise, aprove ou reprove as ordens de serviço registradas no sistema.</p>
-            </section>
+        <!-- ABAS -->
+        <div class="abas-gestao">
+          <button
+            type="button"
+            id="btn-aba-revisao"
+            class="botao-aba botao-aba-ativo"
+            onclick="mostrarTela('revisao')"
+          >
+            <i class="bi bi-hourglass-split"></i> Em Revisão
+          </button>
+          <button
+            type="button"
+            id="btn-aba-todas"
+            class="botao-aba"
+            onclick="mostrarTela('todas')"
+          >
+            <i class="bi bi-list-ul"></i> Todas as OS
+          </button>
+        </div>
 
-            <!-- ABAS -->
-            <div class="abas-gestao">
-                <button type="button" id="btn-aba-revisao" class="botao-aba botao-aba-ativo" onclick="mostrarTela('revisao')">
-                    <i class="bi bi-hourglass-split"></i> Em Revisão
-                </button>
-                <button type="button" id="btn-aba-todas" class="botao-aba" onclick="mostrarTela('todas')">
-                    <i class="bi bi-list-ul"></i> Todas as OS
-                </button>
-            </div>
+        <!-- TELA: EM REVISÃO -->
+        <div id="view-revisao">
+          <div class="card-tabela">
+            <table class="tabela-dados">
+              <thead>
+                <tr>
+                  <th>DATA</th>
+                  <th>CLIENTE</th>
+                  <th>FROTA</th>
+                  <th>TOTAL</th>
+                  <th>AÇÕES</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-revisao-corpo"></tbody>
+            </table>
+          </div>
+        </div>
 
-            <!-- TELA: EM REVISÃO -->
-            <div id="view-revisao">
-                <div class="card-tabela">
-                    <table class="tabela-dados">
-                        <thead>
-                            <tr>
-                                <th>DATA</th>
-                                <th>CLIENTE</th>
-                                <th>FROTA</th>
-                                <th>TOTAL</th>
-                                <th>AÇÕES</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-revisao-corpo"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- TELA: TODAS AS OS -->
-            <div id="view-todas" class="tela-oculta">
-                <div class="card-tabela">
-                    <table class="tabela-dados">
-                        <thead>
-                            <tr>
-                                <th>DATA</th>
-                                <th>CLIENTE</th>
-                                <th>FROTA</th>
-                                <th>TOTAL</th>
-                                <th>STATUS</th>
-                                <th>AÇÕES</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-todas-corpo"></tbody>
-                    </table>
-                </div>
-            </div>
-
-        </main>
+        <!-- TELA: TODAS AS OS -->
+        <div id="view-todas" class="tela-oculta">
+          <div class="card-tabela">
+            <table class="tabela-dados">
+              <thead>
+                <tr>
+                  <th>DATA</th>
+                  <th>CLIENTE</th>
+                  <th>FROTA</th>
+                  <th>TOTAL</th>
+                  <th>STATUS</th>
+                  <th>AÇÕES</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-todas-corpo"></tbody>
+            </table>
+          </div>
+        </div>
+      </main>
     </div>
 
     <!-- MODAL DE VERIFICAÇÃO -->
     <div id="modalVerificacao" class="modal-revisao">
-        <div class="modal-conteudo">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
-                <h2 style="color: var(--azul-escuro);">Verificação da OS</h2>
-                <button onclick="fecharModal()" style="background: none; border: none; font-size: 1.5rem; cursor: pointer;">&times;</button>
-            </div>
-            <div id="detalhes-os-modal"></div>
-            <div id="acoes-modal" style="margin-top: 30px; display: flex; gap: 15px;"></div>
+      <div class="modal-conteudo">
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+          "
+        >
+          <h2 style="color: var(--azul-escuro)">Verificação da OS</h2>
+          <button
+            onclick="fecharModal()"
+            style="
+              background: none;
+              border: none;
+              font-size: 1.5rem;
+              cursor: pointer;
+            "
+          >
+            &times;
+          </button>
         </div>
+        <div id="detalhes-os-modal"></div>
+        <div
+          id="acoes-modal"
+          style="margin-top: 30px; display: flex; gap: 15px"
+        ></div>
+      </div>
     </div>
 
     <script>
-        // ==========================================
-        // AVISO DE SUCESSO (vindo de nova OS)
-        // ==========================================
-        const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('success') === '1') {
-            const successDiv = document.createElement('div');
-            successDiv.style.cssText = `
+      // ==========================================
+      // AVISO DE SUCESSO (vindo de nova OS)
+      // ==========================================
+      const urlParams = new URLSearchParams(window.location.search)
+      if (urlParams.get("success") === "1") {
+        const successDiv = document.createElement("div")
+        successDiv.style.cssText = `
                 position: fixed; top: 20px; right: 20px;
                 background: #d4edda; color: #155724;
                 padding: 15px 20px; border: 1px solid #c3e6cb;
                 border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);
                 z-index: 1000; font-weight: 500;
                 animation: slideIn 0.3s ease-out;
-            `;
-            successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> Atendimento registrado com sucesso! Enviado para revisão.';
-            const style = document.createElement('style');
-            style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`;
-            document.head.appendChild(style);
-            document.body.appendChild(successDiv);
-            setTimeout(() => {
-                successDiv.style.animation = 'slideIn 0.3s ease-in reverse';
-                setTimeout(() => successDiv.remove(), 300);
-            }, 5000);
-            window.history.replaceState(null, null, window.location.pathname);
+            `
+        successDiv.innerHTML =
+          '<i class="bi bi-check-circle-fill"></i> Atendimento registrado com sucesso! Enviado para revisão.'
+        const style = document.createElement("style")
+        style.textContent = `@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }`
+        document.head.appendChild(style)
+        document.body.appendChild(successDiv)
+        setTimeout(() => {
+          successDiv.style.animation = "slideIn 0.3s ease-in reverse"
+          setTimeout(() => successDiv.remove(), 300)
+        }, 5000)
+        window.history.replaceState(null, null, window.location.pathname)
+      }
+
+      // ==========================================
+      // CONTROLE DE ABAS
+      // ==========================================
+      function mostrarTela(tela) {
+        document
+          .getElementById("view-revisao")
+          .classList.toggle("tela-oculta", tela !== "revisao")
+        document
+          .getElementById("view-todas")
+          .classList.toggle("tela-oculta", tela !== "todas")
+        document
+          .getElementById("btn-aba-revisao")
+          .classList.toggle("botao-aba-ativo", tela === "revisao")
+        document
+          .getElementById("btn-aba-todas")
+          .classList.toggle("botao-aba-ativo", tela === "todas")
+
+        if (tela === "revisao") renderizarRevisao()
+        if (tela === "todas") renderizarTodas()
+      }
+
+      // ==========================================
+      // SERVIÇOS PREDEFINIDOS
+      // ==========================================
+      const CONFIG_SERVICOS = {
+        Manutencao_Preventiva: { nome: "Manutenção Preventiva" },
+        Troca_Oleo: { nome: "Troca de Óleo" },
+        Suspensao: { nome: "Suspensão" },
+        Freios: { nome: "Freios" },
+        Eletrica: { nome: "Elétrica" },
+      }
+
+      function resolverNomeServico(s) {
+        if (s.tipo.startsWith("predefinido_")) {
+          const key = s.tipo.replace("predefinido_", "")
+          return (CONFIG_SERVICOS[key] && CONFIG_SERVICOS[key].nome) || key
+        }
+        if (s.tipo.startsWith("customizado_")) {
+          const idx = parseInt(s.tipo.replace("customizado_", ""))
+          const custom =
+            JSON.parse(localStorage.getItem("nexus_servicos_custom")) || []
+          return (custom[idx] && custom[idx].nome) || s.tipo
+        }
+        return s.tipo
+      }
+
+      // ==========================================
+      // RENDERIZAR: EM REVISÃO
+      // ==========================================
+      function renderizarRevisao() {
+        const atendimentos =
+          JSON.parse(localStorage.getItem("atendimentos")) || []
+        const emRevisao = atendimentos.filter(
+          (a) => a.status === "pendente_revisao",
+        )
+        const corpo = document.getElementById("tabela-revisao-corpo")
+
+        if (emRevisao.length === 0) {
+          corpo.innerHTML = `<tr><td colspan="5" class="sem-dados">Nenhuma OS pendente de revisão.</td></tr>`
+          return
         }
 
-        // ==========================================
-        // CONTROLE DE ABAS
-        // ==========================================
-        function mostrarTela(tela) {
-            document.getElementById('view-revisao').classList.toggle('tela-oculta', tela !== 'revisao');
-            document.getElementById('view-todas').classList.toggle('tela-oculta', tela !== 'todas');
-            document.getElementById('btn-aba-revisao').classList.toggle('botao-aba-ativo', tela === 'revisao');
-            document.getElementById('btn-aba-todas').classList.toggle('botao-aba-ativo', tela === 'todas');
-
-            if (tela === 'revisao') renderizarRevisao();
-            if (tela === 'todas')   renderizarTodas();
-        }
-
-        // ==========================================
-        // SERVIÇOS PREDEFINIDOS
-        // ==========================================
-        const CONFIG_SERVICOS = {
-            "Manutencao_Preventiva": { nome: "Manutenção Preventiva" },
-            "Troca_Oleo":            { nome: "Troca de Óleo" },
-            "Suspensao":             { nome: "Suspensão" },
-            "Freios":                { nome: "Freios" },
-            "Eletrica":              { nome: "Elétrica" }
-        };
-
-        function resolverNomeServico(s) {
-            if (s.tipo.startsWith('predefinido_')) {
-                const key = s.tipo.replace('predefinido_', '');
-                return (CONFIG_SERVICOS[key] && CONFIG_SERVICOS[key].nome) || key;
+        corpo.innerHTML = emRevisao
+          .map((os) => {
+            let dataFormatada = "Data não registrada"
+            if (os.data) {
+              try {
+                dataFormatada = new Date(os.data).toLocaleDateString("pt-BR")
+              } catch (e) {}
             }
-            if (s.tipo.startsWith('customizado_')) {
-                const idx = parseInt(s.tipo.replace('customizado_', ''));
-                const custom = JSON.parse(localStorage.getItem('nexus_servicos_custom')) || [];
-                return (custom[idx] && custom[idx].nome) || s.tipo;
-            }
-            return s.tipo;
-        }
-
-        // ==========================================
-        // RENDERIZAR: EM REVISÃO
-        // ==========================================
-        function renderizarRevisao() {
-            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const emRevisao = atendimentos.filter(a => a.status === 'pendente_revisao');
-            const corpo = document.getElementById('tabela-revisao-corpo');
-
-            if (emRevisao.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="5" class="sem-dados">Nenhuma OS pendente de revisão.</td></tr>`;
-                return;
-            }
-
-            corpo.innerHTML = emRevisao.map(os => {
-                let dataFormatada = 'Data não registrada';
-                if (os.data) { try { dataFormatada = new Date(os.data).toLocaleDateString('pt-BR'); } catch (e) {} }
-                return `
+            return `
                 <tr>
                     <td>${dataFormatada}</td>
                     <td><strong>${os.cliente}</strong></td>
@@ -171,38 +219,50 @@
                             <i class="bi bi-search"></i> Ver Detalhes
                         </button>
                     </td>
-                </tr>`;
-            }).join('');
+                </tr>`
+          })
+          .join("")
+      }
+
+      // ==========================================
+      // RENDERIZAR: TODAS AS OS
+      // ==========================================
+      function renderizarTodas() {
+        const atendimentos =
+          JSON.parse(localStorage.getItem("atendimentos")) || []
+        const corpo = document.getElementById("tabela-todas-corpo")
+
+        if (atendimentos.length === 0) {
+          corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma OS registrada no sistema.</td></tr>`
+          return
         }
 
-        // ==========================================
-        // RENDERIZAR: TODAS AS OS
-        // ==========================================
-        function renderizarTodas() {
-            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const corpo = document.getElementById('tabela-todas-corpo');
+        const ordenadas = [...atendimentos].sort((a, b) => b.id - a.id)
 
-            if (atendimentos.length === 0) {
-                corpo.innerHTML = `<tr><td colspan="6" class="sem-dados">Nenhuma OS registrada no sistema.</td></tr>`;
-                return;
+        const badgeMap = {
+          pendente_revisao:
+            '<span class="badge-status badge-pendente">Em Revisão</span>',
+          finalizada:
+            '<span class="badge-status badge-finalizada">Aprovada</span>',
+          reprovada:
+            '<span class="badge-status badge-reprovada">Reprovada</span>',
+        }
+
+        corpo.innerHTML = ordenadas
+          .map((os) => {
+            let dataFormatada = "Data não registrada"
+            if (os.data) {
+              try {
+                dataFormatada = new Date(os.data).toLocaleDateString("pt-BR")
+              } catch (e) {}
             }
 
-            const ordenadas = [...atendimentos].sort((a, b) => b.id - a.id);
+            const badge =
+              badgeMap[os.status] ||
+              `<span class="badge-status badge-pendente">${os.status}</span>`
+            const somenteLeitura = os.status !== "pendente_revisao"
 
-            const badgeMap = {
-                'pendente_revisao': '<span class="badge-status badge-pendente">Em Revisão</span>',
-                'finalizada':       '<span class="badge-status badge-finalizada">Aprovada</span>',
-                'reprovada':        '<span class="badge-status badge-reprovada">Reprovada</span>'
-            };
-
-            corpo.innerHTML = ordenadas.map(os => {
-                let dataFormatada = 'Data não registrada';
-                if (os.data) { try { dataFormatada = new Date(os.data).toLocaleDateString('pt-BR'); } catch (e) {} }
-
-                const badge = badgeMap[os.status] || `<span class="badge-status badge-pendente">${os.status}</span>`;
-                const somenteLeitura = os.status !== 'pendente_revisao';
-
-                return `
+            return `
                 <tr>
                     <td>${dataFormatada}</td>
                     <td><strong>${os.cliente}</strong></td>
@@ -214,44 +274,58 @@
                             <i class="bi bi-eye"></i> Visualizar
                         </button>
                     </td>
-                </tr>`;
-            }).join('');
-        }
+                </tr>`
+          })
+          .join("")
+      }
 
-        // ==========================================
-        // MODAL
-        // ==========================================
-        function abrirModal(id, somenteLeitura) {
-            const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const os = atendimentos.find(a => a.id == id);
-            const container = document.getElementById('detalhes-os-modal');
-            const acoesDiv  = document.getElementById('acoes-modal');
+      // ==========================================
+      // MODAL
+      // ==========================================
+      function abrirModal(id, somenteLeitura) {
+        const atendimentos =
+          JSON.parse(localStorage.getItem("atendimentos")) || []
+        const os = atendimentos.find((a) => a.id == id)
+        const container = document.getElementById("detalhes-os-modal")
+        const acoesDiv = document.getElementById("acoes-modal")
 
-            const htmlVeiculos = os.frota.map((item, index) => {
-                const servicosHTML = item.servicos.map(s => `
+        const htmlVeiculos = os.frota
+          .map((item, index) => {
+            const servicosHTML = item.servicos
+              .map(
+                (s) => `
                     <tr>
                         <td>${resolverNomeServico(s)}</td>
-                        <td style="color:#222;">${s.descricao || '-'}</td>
+                        <td style="color:#222;">${s.descricao || "-"}</td>
                         <td style="font-weight:bold;">R$ ${parseFloat(s.valor).toFixed(2)}</td>
-                    </tr>`).join('');
+                    </tr>`,
+              )
+              .join("")
 
-                const pecasHTML = (item.pecas && item.pecas.length > 0) ? `
+            const pecasHTML =
+              item.pecas && item.pecas.length > 0
+                ? `
                     <div style="margin-top:12px;">
                         <p style="font-size:0.8rem;font-weight:700;color:#3b82f6;margin-bottom:6px;"><i class="bi bi-box-seam"></i> Peças Utilizadas</p>
                         <table class="tabela-mini-servicos">
                             <thead><tr><th>Peça</th><th>Qtde</th><th>Vlr Unit.</th><th>Total</th></tr></thead>
-                            <tbody>${item.pecas.map(p => `
+                            <tbody>${item.pecas
+                              .map(
+                                (p) => `
                                 <tr>
                                     <td>${p.nome}</td>
                                     <td>${p.quantidade}</td>
                                     <td>R$ ${parseFloat(p.valorUnitario).toFixed(2)}</td>
                                     <td style="font-weight:bold;">R$ ${parseFloat(p.valorTotal).toFixed(2)}</td>
-                                </tr>`).join('')}
+                                </tr>`,
+                              )
+                              .join("")}
                             </tbody>
                         </table>
-                    </div>` : '';
+                    </div>`
+                : ""
 
-                return `
+            return `
                 <div class="bloco-detalhe-veiculo">
                     <div style="display:flex;justify-content:space-between;margin-bottom:10px;">
                         <strong>Veículo ${index + 1}: ${item.dadosVeiculo.modelo}</strong>
@@ -262,28 +336,32 @@
                         <tbody>${servicosHTML}</tbody>
                     </table>
                     ${pecasHTML}
-                </div>`;
-            }).join('');
+                </div>`
+          })
+          .join("")
 
-            const blocoReprovacao = (os.status === 'reprovada' && os.motivoReprovacao) ? `
+        const blocoReprovacao =
+          os.status === "reprovada" && os.motivoReprovacao
+            ? `
                 <div class="bloco-reprovacao">
                     <strong><i class="bi bi-x-circle"></i> Motivo da Reprovação:</strong>
                     <p style="margin-top:6px;margin-bottom:0;">${os.motivoReprovacao}</p>
-                </div>` : '';
+                </div>`
+            : ""
 
-            container.innerHTML = `
+        container.innerHTML = `
                 <div style="margin-bottom:20px;">
                     <p><strong>Cliente:</strong> ${os.cliente}</p>
                     <p><strong>Total da OS:</strong> <span style="color:var(--verde-agua);font-weight:800;">R$ ${parseFloat(os.valorTotalOS).toFixed(2)}</span></p>
                 </div>
                 ${blocoReprovacao}
-                ${htmlVeiculos}`;
+                ${htmlVeiculos}`
 
-            acoesDiv.innerHTML = somenteLeitura
-                ? `<button onclick="fecharModal()" class="botao-secundario" style="flex:1;padding:20px;border:1px solid #ddd;">
+        acoesDiv.innerHTML = somenteLeitura
+          ? `<button onclick="fecharModal()" class="botao-secundario" style="flex:1;padding:20px;border:1px solid #ddd;">
                        <i class="bi bi-arrow-left"></i> Fechar
                    </button>`
-                : `<button class="botao-acao" style="background:#2ecc71;flex:1;padding:20px;" onclick="aprovarOS(${id})">
+          : `<button class="botao-acao" style="background:#2ecc71;flex:1;padding:20px;" onclick="aprovarOS(${id})">
                        <i class="bi bi-check-circle"></i> Aprovar e Finalizar
                    </button>
                    <button class="botao-acao" style="background:#ef4444;flex:1;padding:20px;" onclick="reprovarOS(${id})">
@@ -291,104 +369,126 @@
                    </button>
                    <button onclick="fecharModal()" class="botao-secundario" style="flex:1;padding:20px;border:1px solid #ddd;">
                        <i class="bi bi-arrow-left"></i> Voltar
-                   </button>`;
+                   </button>`
 
-            document.getElementById('modalVerificacao').style.display = 'block';
+        document.getElementById("modalVerificacao").style.display = "block"
+      }
+
+      function fecharModal() {
+        document.getElementById("modalVerificacao").style.display = "none"
+      }
+
+      // ==========================================
+      // APROVAR OS
+      // ==========================================
+      function aprovarOS(id) {
+        let atendimentos =
+          JSON.parse(localStorage.getItem("atendimentos")) || []
+        const idx = atendimentos.findIndex((a) => a.id == id)
+        atendimentos[idx].status = "finalizada"
+        atendimentos[idx].dataRegistro = new Date().toLocaleDateString("pt-BR")
+        atendimentos[idx].dataAprovacao = new Date().toISOString()
+        localStorage.setItem("atendimentos", JSON.stringify(atendimentos))
+
+        // Desconta estoque das peças
+        const pecas = JSON.parse(localStorage.getItem("nexus_pecas")) || []
+        let estoqueAtualizado = false
+        ;(atendimentos[idx].frota || []).forEach((veiculo) => {
+          ;(veiculo.pecas || []).forEach((pecaOS) => {
+            if (!pecaOS.pecaId) return
+            const idxPeca = pecas.findIndex(
+              (p) => String(p.id) === String(pecaOS.pecaId),
+            )
+            if (idxPeca === -1) return
+            const novoEstoque = Math.max(
+              0,
+              (parseInt(pecas[idxPeca].estoque) || 0) - pecaOS.quantidade,
+            )
+            pecas[idxPeca].estoque = novoEstoque
+            if (novoEstoque === 0) pecas[idxPeca].status = "Em falta"
+            estoqueAtualizado = true
+          })
+        })
+        if (estoqueAtualizado)
+          localStorage.setItem("nexus_pecas", JSON.stringify(pecas))
+
+        // Histórico da empresa
+        const empresas =
+          JSON.parse(localStorage.getItem("nexus_empresas")) || []
+        const empresa = empresas.find(
+          (e) => e.nome === atendimentos[idx].cliente,
+        )
+        if (empresa) {
+          if (!empresa.historico_atividades) empresa.historico_atividades = []
+          empresa.historico_atividades.push({
+            descricao: `OS finalizada - ${atendimentos[idx].frota.length} veículo(s)`,
+            data: new Date().toLocaleString("pt-BR"),
+            usuario: "Sistema",
+          })
+          localStorage.setItem("nexus_empresas", JSON.stringify(empresas))
         }
 
-        function fecharModal() {
-            document.getElementById('modalVerificacao').style.display = 'none';
+        registrarAtividade(
+          "os_aprovada",
+          `OS aprovada - Cliente: ${atendimentos[idx].cliente}`,
+          `Total: R$ ${parseFloat(atendimentos[idx].valorTotalOS).toFixed(2)} | ${atendimentos[idx].frota.length} veículo(s)`,
+        )
+
+        alert("OS Aprovada e enviada para o Histórico!")
+        fecharModal()
+        renderizarRevisao()
+      }
+
+      // ==========================================
+      // REPROVAR OS
+      // ==========================================
+      function reprovarOS(id) {
+        const motivo = prompt("Informe o motivo da reprovação (opcional):")
+        if (motivo === null) return
+
+        let atendimentos =
+          JSON.parse(localStorage.getItem("atendimentos")) || []
+        const idx = atendimentos.findIndex((a) => a.id == id)
+        atendimentos[idx].status = "reprovada"
+        atendimentos[idx].motivoReprovacao = motivo || "Sem motivo informado"
+        atendimentos[idx].dataReprovacao = new Date().toISOString()
+        localStorage.setItem("atendimentos", JSON.stringify(atendimentos))
+
+        const empresas =
+          JSON.parse(localStorage.getItem("nexus_empresas")) || []
+        const empresa = empresas.find(
+          (e) => e.nome === atendimentos[idx].cliente,
+        )
+        if (empresa) {
+          if (!empresa.historico_atividades) empresa.historico_atividades = []
+          empresa.historico_atividades.push({
+            tipo: "os_reprovada",
+            mensagem: "OS reprovada" + (motivo ? ": " + motivo : ""),
+            data: new Date().toLocaleString("pt-BR"),
+            usuario: "Julian Vane",
+          })
+          localStorage.setItem("nexus_empresas", JSON.stringify(empresas))
         }
 
-        // ==========================================
-        // APROVAR OS
-        // ==========================================
-        function aprovarOS(id) {
-            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const idx = atendimentos.findIndex(a => a.id == id);
-            atendimentos[idx].status       = 'finalizada';
-            atendimentos[idx].dataRegistro = new Date().toLocaleDateString('pt-BR');
-            atendimentos[idx].dataAprovacao = new Date().toISOString();
-            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
+        alert("OS reprovada.")
+        fecharModal()
+        renderizarRevisao()
+      }
 
-            // Desconta estoque das peças
-            const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
-            let estoqueAtualizado = false;
-            (atendimentos[idx].frota || []).forEach(veiculo => {
-                (veiculo.pecas || []).forEach(pecaOS => {
-                    if (!pecaOS.pecaId) return;
-                    const idxPeca = pecas.findIndex(p => String(p.id) === String(pecaOS.pecaId));
-                    if (idxPeca === -1) return;
-                    const novoEstoque = Math.max(0, (parseInt(pecas[idxPeca].estoque) || 0) - pecaOS.quantidade);
-                    pecas[idxPeca].estoque = novoEstoque;
-                    if (novoEstoque === 0) pecas[idxPeca].status = 'Em falta';
-                    estoqueAtualizado = true;
-                });
-            });
-            if (estoqueAtualizado) localStorage.setItem('nexus_pecas', JSON.stringify(pecas));
-
-            // Histórico da empresa
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            const empresa = empresas.find(e => e.nome === atendimentos[idx].cliente);
-            if (empresa) {
-                if (!empresa.historico_atividades) empresa.historico_atividades = [];
-                empresa.historico_atividades.push({
-                    descricao: `OS finalizada - ${atendimentos[idx].frota.length} veículo(s)`,
-                    data: new Date().toLocaleString('pt-BR'),
-                    usuario: 'Sistema'
-                });
-                localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
-            }
-
-            registrarAtividade('os_aprovada', `OS aprovada - Cliente: ${atendimentos[idx].cliente}`, `Total: R$ ${parseFloat(atendimentos[idx].valorTotalOS).toFixed(2)} | ${atendimentos[idx].frota.length} veículo(s)`);
-
-            alert('OS Aprovada e enviada para o Histórico!');
-            fecharModal();
-            renderizarRevisao();
-        }
-
-        // ==========================================
-        // REPROVAR OS
-        // ==========================================
-        function reprovarOS(id) {
-            const motivo = prompt('Informe o motivo da reprovação (opcional):');
-            if (motivo === null) return;
-
-            let atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-            const idx = atendimentos.findIndex(a => a.id == id);
-            atendimentos[idx].status = 'reprovada';
-            atendimentos[idx].motivoReprovacao = motivo || 'Sem motivo informado';
-            atendimentos[idx].dataReprovacao   = new Date().toISOString();
-            localStorage.setItem('atendimentos', JSON.stringify(atendimentos));
-
-            const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-            const empresa = empresas.find(e => e.nome === atendimentos[idx].cliente);
-            if (empresa) {
-                if (!empresa.historico_atividades) empresa.historico_atividades = [];
-                empresa.historico_atividades.push({
-                    tipo: 'os_reprovada',
-                    mensagem: 'OS reprovada' + (motivo ? ': ' + motivo : ''),
-                    data: new Date().toLocaleString('pt-BR'),
-                    usuario: 'Julian Vane'
-                });
-                localStorage.setItem('nexus_empresas', JSON.stringify(empresas));
-            }
-
-            alert('OS reprovada.');
-            fecharModal();
-            renderizarRevisao();
-        }
-
-        window.onload = renderizarRevisao;
+      window.onload = renderizarRevisao
     </script>
 
     <script src="../assets/js/common.js"></script>
     <script src="../assets/js/pages.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('revisao'));
-            document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML());
-        });
+      document.addEventListener("DOMContentLoaded", function () {
+        document
+          .querySelector(".layout-erp")
+          .insertAdjacentHTML("afterbegin", getSidebarHTML("revisao"))
+        document
+          .querySelector("main")
+          .insertAdjacentHTML("afterbegin", getHeaderHTML())
+      })
     </script>
-</body>
+  </body>
 </html>

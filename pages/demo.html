@@ -1,107 +1,145 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Dados de Demonstração - Sistema OS</title>
 
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
 
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
 
     <script src="../assets/js/common.js"></script>
 
     <script src="../assets/js/pages.js"></script>
+  </head>
 
-</head>
-
-<body class="corpo-dashboard">
-
+  <body class="corpo-dashboard">
     <div class="layout-erp">
+      <!-- Sidebar and Header will be inserted here via JavaScript -->
 
-        <!-- Sidebar and Header will be inserted here via JavaScript -->
+      <main class="conteudo-principal">
+        <!-- Header will be inserted here via JavaScript -->
 
-        <main class="conteudo-principal">
+        <section class="sessao-metricas">
+          <div class="titulo-pagina">
+            <h1>Carregar Dados de Demonstração</h1>
 
-            <!-- Header will be inserted here via JavaScript -->
+            <p>
+              Popule o sistema com dados de exemplo para testar todas as
+              funcionalidades
+            </p>
+          </div>
 
-            <section class="sessao-metricas">
+          <div
+            class="container-demo"
+            style="
+              background: white;
+              border-radius: 12px;
+              padding: 30px;
+              box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+              max-width: 600px;
+              margin-top: 30px;
+            "
+          >
+            <div style="margin-bottom: 30px">
+              <h3 style="color: #0f1221; margin-bottom: 15px">
+                <i class="bi bi-bullseye"></i> Dados Disponíveis
+              </h3>
 
-                <div class="titulo-pagina">
+              <ul style="line-height: 2; color: #666; font-size: 0.95rem">
+                <li>
+                  <i
+                    class="bi bi-check-circle"
+                    style="color: #2ecc71; margin-right: 10px"
+                  ></i>
+                  5 clientes variados com múltiplos veículos
+                </li>
 
-                    <h1>Carregar Dados de Demonstração</h1>
+                <li>
+                  <i
+                    class="bi bi-check-circle"
+                    style="color: #2ecc71; margin-right: 10px"
+                  ></i>
+                  15 atendimentos com diferentes status
+                </li>
 
-                    <p>Popule o sistema com dados de exemplo para testar todas as funcionalidades</p>
+                <li>
+                  <i
+                    class="bi bi-check-circle"
+                    style="color: #2ecc71; margin-right: 10px"
+                  ></i>
+                  Serviços de diversos tipos
+                </li>
 
-                </div>
+                <li>
+                  <i
+                    class="bi bi-check-circle"
+                    style="color: #2ecc71; margin-right: 10px"
+                  ></i>
+                  Dados realistas para teste completo
+                </li>
+              </ul>
+            </div>
 
-                <div class="container-demo" style="background: white; border-radius: 12px; padding: 30px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); max-width: 600px; margin-top: 30px;">
+            <div
+              style="
+                background: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 15px;
+                border-radius: 6px;
+                margin-bottom: 20px;
+              "
+            >
+              <strong style="color: #856404"
+                ><i
+                  class="bi bi-exclamation-triangle"
+                  style="margin-right: 5px"
+                ></i>
+                Atenção:</strong
+              >
 
-                    <div style="margin-bottom: 30px;">
+              <p style="margin: 5px 0 0 0; color: #856404; font-size: 0.9rem">
+                Isso irá <strong>substituir</strong> todos os dados existentes
+                no localStorage. Certifique-se de exportar qualquer dado
+                importante primeiro!
+              </p>
+            </div>
 
-                        <h3 style="color: #0f1221; margin-bottom: 15px;"><i class="bi bi-bullseye"></i> Dados Disponíveis</h3>
+            <div style="display: flex; gap: 10px">
+              <button
+                id="btn-carregar-demo"
+                class="botao-acao"
+                style="flex: 1; padding: 15px"
+              >
+                <i class="bi bi-download"></i> Carregar Dados de Demonstração
+              </button>
 
-                        <ul style="line-height: 2; color: #666; font-size: 0.95rem;">
+              <button
+                id="btn-limpar"
+                class="botao-cancelar"
+                style="flex: 1; padding: 15px"
+              >
+                <i class="bi bi-trash"></i> Limpar Todos os Dados
+              </button>
+            </div>
 
-                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 5 clientes variados com múltiplos veículos</li>
-
-                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> 15 atendimentos com diferentes status</li>
-
-                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Serviços de diversos tipos</li>
-
-                            <li><i class="bi bi-check-circle" style="color: #2ecc71; margin-right: 10px;"></i> Dados realistas para teste completo</li>
-
-                        </ul>
-
-                    </div>
-
-                    <div style="background: #fff3cd; border-left: 4px solid #ffc107; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
-
-                        <strong style="color: #856404;"><i class="bi bi-exclamation-triangle" style="margin-right: 5px;"></i> Atenção:</strong>
-
-                        <p style="margin: 5px 0 0 0; color: #856404; font-size: 0.9rem;">
-
-                            Isso irá <strong>substituir</strong> todos os dados existentes no localStorage. 
-
-                            Certifique-se de exportar qualquer dado importante primeiro!
-
-                        </p>
-
-                    </div>
-
-                    <div style="display: flex; gap: 10px;">
-
-                        <button id="btn-carregar-demo" class="botao-acao" style="flex: 1; padding: 15px;">
-
-                            <i class="bi bi-download"></i> Carregar Dados de Demonstração
-
-                        </button>
-
-                        <button id="btn-limpar" class="botao-cancelar" style="flex: 1; padding: 15px;">
-
-                            <i class="bi bi-trash"></i> Limpar Todos os Dados
-
-                        </button>
-
-                    </div>
-
-                    <div id="resultado-demo" style="margin-top: 20px; padding: 15px; border-radius: 6px; display: none;"></div>
-
-                </div>
-
-            </section>
-
-        </main>
-
+            <div
+              id="resultado-demo"
+              style="
+                margin-top: 20px;
+                padding: 15px;
+                border-radius: 6px;
+                display: none;
+              "
+            ></div>
+          </div>
+        </section>
+      </main>
     </div>
-
-        </body>
-
+  </body>
 </html>
-

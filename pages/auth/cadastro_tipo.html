@@ -1,75 +1,97 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Nexus HUB - Criar Conta</title>
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
-</head>
-<body>
+    <link
+      rel="icon"
+      type="image/png"
+      href="../../assets/images/icon-sistem.png"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+    <link rel="stylesheet" href="../../assets/css/pages.css" />
+  </head>
+  <body>
     <div class="container-tipo-cadastro">
-        <div class="secao-tipo-esquerda">
-            <div class="conteudo-tipo">
-                <div class="logotipo-tipo"><img src="../assets/images/icon-sistem.png" alt="Nexus HUB" class="logo-icon"> Nexus HUB</div>
-                <p class="subtitulo-topo">Cadastro de Usuário</p>
-                <div class="titulo-tipo">
-                    <h1>Qual é o seu <span>Tipo de Acesso</span>?</h1>
-                </div>
-                <p class="descricao-tipo">Selecione o tipo de conta que melhor se adequa ao seu perfil. Você poderá alterar essas informações posteriormente nas configurações de perfil.</p>
-            </div>
+      <div class="secao-tipo-esquerda">
+        <div class="conteudo-tipo">
+          <div class="logotipo-tipo">
+            <img
+              src="../../assets/images/icon-sistem.png"
+              alt="Nexus HUB"
+              class="logo-icon"
+            />
+            Nexus HUB
+          </div>
+          <p class="subtitulo-topo">Cadastro de Usuário</p>
+          <div class="titulo-tipo">
+            <h1>Qual é o seu <span>Tipo de Acesso</span>?</h1>
+          </div>
+          <p class="descricao-tipo">
+            Selecione o tipo de conta que melhor se adequa ao seu perfil. Você
+            poderá alterar essas informações posteriormente nas configurações de
+            perfil.
+          </p>
         </div>
+      </div>
 
-        <div class="secao-tipo-direita">
-            <div class="caixa-tipo">
-                <div class="titulo-opcoes">
-                    <h2><i class="bi bi-person-badge"></i> Tipo de Acesso</h2>
-                    <p>Escolha uma opção para prosseguir</p>
+      <div class="secao-tipo-direita">
+        <div class="caixa-tipo">
+          <div class="titulo-opcoes">
+            <h2><i class="bi bi-person-badge"></i> Tipo de Acesso</h2>
+            <p>Escolha uma opção para prosseguir</p>
+          </div>
+
+          <div class="alerta" id="alertaMensagem"></div>
+
+          <div class="opcoes-tipo">
+            <div class="card-tipo" data-tipo="admin">
+              <div class="icone-tipo">
+                <i class="bi bi-shield-lock"></i>
+              </div>
+              <div class="info-tipo">
+                <div class="nome-tipo">Administrador</div>
+                <div class="desc-tipo">
+                  Acesso completo ao sistema e gerenciamento de usuários
                 </div>
-
-                <div class="alerta" id="alertaMensagem"></div>
-
-                <div class="opcoes-tipo">
-                    <div class="card-tipo" data-tipo="admin">
-                        <div class="icone-tipo">
-                            <i class="bi bi-shield-lock"></i>
-                        </div>
-                        <div class="info-tipo">
-                            <div class="nome-tipo">Administrador</div>
-                            <div class="desc-tipo">Acesso completo ao sistema e gerenciamento de usuários</div>
-                        </div>
-                        <div class="marcador-selecionado">
-                            <i class="bi bi-check-lg"></i>
-                        </div>
-                    </div>
-
-                    <div class="card-tipo" data-tipo="tecnico">
-                        <div class="icone-tipo">
-                            <i class="bi bi-tools"></i>
-                        </div>
-                        <div class="info-tipo">
-                            <div class="nome-tipo">Técnico</div>
-                            <div class="desc-tipo">Acesso para gestão de ordens de serviço e atendimentos</div>
-                        </div>
-                        <div class="marcador-selecionado">
-                            <i class="bi bi-check-lg"></i>
-                        </div>
-                    </div>
-                </div>
-
-                <button class="botao-continuar" id="botaoContinuar" disabled>
-                    <i class="bi bi-arrow-right"></i> Continuar Cadastro
-                </button>
-
-                <div class="link-voltarupag">
-                    Já tem uma conta? <a href="../index.html">Faça Login</a>
-                </div>
+              </div>
+              <div class="marcador-selecionado">
+                <i class="bi bi-check-lg"></i>
+              </div>
             </div>
+
+            <div class="card-tipo" data-tipo="tecnico">
+              <div class="icone-tipo">
+                <i class="bi bi-tools"></i>
+              </div>
+              <div class="info-tipo">
+                <div class="nome-tipo">Técnico</div>
+                <div class="desc-tipo">
+                  Acesso para gestão de ordens de serviço e atendimentos
+                </div>
+              </div>
+              <div class="marcador-selecionado">
+                <i class="bi bi-check-lg"></i>
+              </div>
+            </div>
+          </div>
+
+          <button class="botao-continuar" id="botaoContinuar" disabled>
+            <i class="bi bi-arrow-right"></i> Continuar Cadastro
+          </button>
+
+          <div class="link-voltarupag">
+            Já tem uma conta? <a href="../../index.html">Faça Login</a>
+          </div>
         </div>
+      </div>
     </div>
 
-    <script src="../assets/js/pages.js"></script>
-</body>
+    <script src="../../assets/js/pages.js"></script>
+  </body>
 </html>

@@ -1,363 +1,485 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-br">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Painel de Controle - Nexus HUB</title>
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
     <script src="../assets/js/common.js"></script>
     <script src="../assets/js/pages.js"></script>
-</head>
-<body class="corpo-dashboard">
+  </head>
+  <body class="corpo-dashboard">
     <div class="layout-erp">
-        <!-- Sidebar and Header will be inserted here via JavaScript -->
+      <!-- Sidebar and Header will be inserted here via JavaScript -->
 
-        <main class="conteudo-principal">
-            <!-- Header will be inserted here via JavaScript -->
+      <main class="conteudo-principal">
+        <!-- Header will be inserted here via JavaScript -->
 
-            <section class="sessao-metricas">
-                <div class="titulo-pagina-stack">
-                    <h1><i class="bi bi-speedometer2"></i> Painel de Controle</h1>
-                    <p>Acompanhe as métricas e informações do sistema em tempo real.</p>
+        <section class="sessao-metricas">
+          <div class="titulo-pagina-stack">
+            <h1><i class="bi bi-speedometer2"></i> Painel de Controle</h1>
+            <p>Acompanhe as métricas e informações do sistema em tempo real.</p>
+          </div>
+
+          <div class="painel-filtros card-grafico-principal">
+            <div class="painel-filtros-header">
+              <div>
+                <span class="painel-tag">FILTROS</span>
+                <h4>Refine a visualização</h4>
+                <p>
+                  Filtre por status ou período para ver o painel com os dados
+                  mais relevantes.
+                </p>
+              </div>
+              <button type="button" class="botao-acao" onclick="loadMetrics()">
+                Aplicar Filtros
+              </button>
+            </div>
+            <div class="filtros-dashboard">
+              <select id="filtro-status" class="filtro-select">
+                <option value="todos">Todos os Status</option>
+                <option value="pendente_revisao">Pendente de Revisão</option>
+                <option value="finalizada">Aprovada</option>
+                <option value="reprovada">Rejeitada</option>
+              </select>
+              <select id="filtro-periodo" class="filtro-select">
+                <option value="mes_atual">Mês Atual</option>
+                <option value="30_dias">Últimos 30 dias</option>
+                <option value="ano_atual">Ano Atual</option>
+                <option value="todos">Todo Período</option>
+              </select>
+            </div>
+            <div class="resumo-filtro" id="resumo-filtro">
+              <span>Filtrando: <strong id="resumo-status">Todos</strong></span>
+              <span
+                >Período: <strong id="resumo-periodo">Mês Atual</strong></span
+              >
+              <span
+                >Última atualização:
+                <strong id="resumo-atualizacao">Agora</strong></span
+              >
+            </div>
+          </div>
+
+          <div class="grade-cards">
+            <div class="card-metrica">
+              <p class="rotulo-metrica">
+                <i class="bi bi-exclamation-circle"></i> OS Abertas
+              </p>
+              <h3 id="os-abertas">0</h3>
+              <span class="tendencia">Pendentes</span>
+            </div>
+            <div class="card-metrica destaque-escuro">
+              <p class="rotulo-metrica">
+                <i class="bi bi-check-circle"></i> Finalizadas
+              </p>
+              <h3 id="os-finalizadas">0</h3>
+              <span class="tendencia positiva"
+                ><i class="bi bi-arrow-up"></i> Mês atual</span
+              >
+            </div>
+            <div class="card-metrica">
+              <p class="rotulo-metrica">
+                <i class="bi bi-currency-dollar"></i> Receita
+              </p>
+              <h3 id="receita-mes">R$ 0,00</h3>
+              <span class="tendencia positiva"
+                ><i class="bi bi-arrow-up"></i> Mês atual</span
+              >
+            </div>
+            <div class="card-metrica">
+              <p class="rotulo-metrica">
+                <i class="bi bi-wallet2"></i> Ticket Médio
+              </p>
+              <h3 id="ticket-medio">R$ 0,00</h3>
+              <span class="tendencia">Por OS</span>
+            </div>
+            <div class="card-metrica">
+              <p class="rotulo-metrica">
+                <i class="bi bi-people"></i> Clientes
+              </p>
+              <h3 id="total-clientes">0</h3>
+              <span class="tendencia positiva"
+                ><i class="bi bi-arrow-up"></i> Ativos</span
+              >
+            </div>
+            <div class="card-metrica">
+              <p class="rotulo-metrica">
+                <i class="bi bi-percent"></i> Aprovação
+              </p>
+              <h3 id="taxa-aprovacao">0%</h3>
+              <span class="tendencia">Taxa geral</span>
+            </div>
+          </div>
+
+          <div class="area-graficos-principal">
+            <div class="card-grafico-principal">
+              <div class="cabecalho-card-analitico">
+                <div>
+                  <h4><i class="bi bi-bar-chart"></i> Atendimentos por mês</h4>
+                  <p>Volume de ordens no período recente</p>
                 </div>
-
-                <div class="painel-filtros card-grafico-principal">
-                    <div class="painel-filtros-header">
-                        <div>
-                            <span class="painel-tag">FILTROS</span>
-                            <h4>Refine a visualização</h4>
-                            <p>Filtre por status ou período para ver o painel com os dados mais relevantes.</p>
-                        </div>
-                        <button type="button" class="botao-acao" onclick="loadMetrics()">Aplicar Filtros</button>
-                    </div>
-                    <div class="filtros-dashboard">
-                        <select id="filtro-status" class="filtro-select">
-                            <option value="todos">Todos os Status</option>
-                            <option value="pendente_revisao">Pendente de Revisão</option>
-                            <option value="finalizada">Aprovada</option>
-                            <option value="reprovada">Rejeitada</option>
-                        </select>
-                        <select id="filtro-periodo" class="filtro-select">
-                            <option value="mes_atual">Mês Atual</option>
-                            <option value="30_dias">Últimos 30 dias</option>
-                            <option value="ano_atual">Ano Atual</option>
-                            <option value="todos">Todo Período</option>
-                        </select>
-                    </div>
-                    <div class="resumo-filtro" id="resumo-filtro">
-                        <span>Filtrando: <strong id="resumo-status">Todos</strong></span>
-                        <span>Período: <strong id="resumo-periodo">Mês Atual</strong></span>
-                        <span>Última atualização: <strong id="resumo-atualizacao">Agora</strong></span>
-                    </div>
+              </div>
+              <div id="grafico-mensal" class="simulador-grafico"></div>
+              <div class="legenda-status" id="grafico-legend"></div>
+            </div>
+            <div class="card-grafico-secundario">
+              <div class="atividade-topo">
+                <div>
+                  <h4><i class="bi bi-pie-chart"></i> Status da operação</h4>
+                  <p class="texto-pequeno">Distribuição por situação</p>
                 </div>
-
-                <div class="grade-cards">
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-exclamation-circle"></i> OS Abertas</p>
-                        <h3 id="os-abertas">0</h3>
-                        <span class="tendencia">Pendentes</span>
-                    </div>
-                    <div class="card-metrica destaque-escuro">
-                        <p class="rotulo-metrica"><i class="bi bi-check-circle"></i> Finalizadas</p>
-                        <h3 id="os-finalizadas">0</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Mês atual</span>
-                    </div>
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-currency-dollar"></i> Receita</p>
-                        <h3 id="receita-mes">R$ 0,00</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Mês atual</span>
-                    </div>
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-wallet2"></i> Ticket Médio</p>
-                        <h3 id="ticket-medio">R$ 0,00</h3>
-                        <span class="tendencia">Por OS</span>
-                    </div>
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-people"></i> Clientes</p>
-                        <h3 id="total-clientes">0</h3>
-                        <span class="tendencia positiva"><i class="bi bi-arrow-up"></i> Ativos</span>
-                    </div>
-                    <div class="card-metrica">
-                        <p class="rotulo-metrica"><i class="bi bi-percent"></i> Aprovação</p>
-                        <h3 id="taxa-aprovacao">0%</h3>
-                        <span class="tendencia">Taxa geral</span>
-                    </div>
+                <div class="status-legenda" id="status-legend-summary"></div>
+              </div>
+              <div class="status-distribuicao">
+                <div class="grafico-donut" id="grafico-donut">
+                  <span class="grafico-donut-texto">0 OS</span>
                 </div>
+                <div
+                  class="legenda-distribuicao"
+                  id="legenda-distribuicao"
+                ></div>
+              </div>
+            </div>
+          </div>
 
-                <div class="area-graficos-principal">
-                    <div class="card-grafico-principal">
-                        <div class="cabecalho-card-analitico">
-                            <div>
-                                <h4><i class="bi bi-bar-chart"></i> Atendimentos por mês</h4>
-                                <p>Volume de ordens no período recente</p>
-                            </div>
-                        </div>
-                        <div id="grafico-mensal" class="simulador-grafico"></div>
-                        <div class="legenda-status" id="grafico-legend"></div>
-                    </div>
-                    <div class="card-grafico-secundario">
-                        <div class="atividade-topo">
-                            <div>
-                                <h4><i class="bi bi-pie-chart"></i> Status da operação</h4>
-                                <p class="texto-pequeno">Distribuição por situação</p>
-                            </div>
-                            <div class="status-legenda" id="status-legend-summary"></div>
-                        </div>
-                        <div class="status-distribuicao">
-                            <div class="grafico-donut" id="grafico-donut"><span class="grafico-donut-texto">0 OS</span></div>
-                            <div class="legenda-distribuicao" id="legenda-distribuicao"></div>
-                        </div>
-                    </div>
-                </div>
+          <div class="card-grafico-evolucao">
+            <div class="cabecalho-card-analitico">
+              <div>
+                <h4><i class="bi bi-graph-up"></i> Evolução de receita</h4>
+                <p>Últimos 7 dias</p>
+              </div>
+            </div>
+            <div id="grafico-evolucao" class="simulador-grafico-linha"></div>
+          </div>
 
-                <div class="card-grafico-evolucao">
-                    <div class="cabecalho-card-analitico">
-                        <div>
-                            <h4><i class="bi bi-graph-up"></i> Evolução de receita</h4>
-                            <p>Últimos 7 dias</p>
-                        </div>
-                    </div>
-                    <div id="grafico-evolucao" class="simulador-grafico-linha"></div>
-                </div>
-
-                <!-- ÚLTIMAS OS -->
-                <div class="card-ultimas-os">
-                    <div class="titulo-card-secundario-top">
-                        <h5><i class="bi bi-clock-history"></i> Últimas OS</h5>
-                        <a href="./historico.html" class="link-ver-mais">Ver todas</a>
-                    </div>
-                    <table class="tabela-historico">
-                        <thead>
-                            <tr>
-                                <th>OS</th>
-                                <th>Empresa</th>
-                                <th>Status</th>
-                                <th>Data</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabela-ultimas-os">
-                            <tr><td colspan="5" style="padding: 18px; color: var(--texto-secundario);">Carregando histórico...</td></tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-        </main>
+          <!-- ÚLTIMAS OS -->
+          <div class="card-ultimas-os">
+            <div class="titulo-card-secundario-top">
+              <h5><i class="bi bi-clock-history"></i> Últimas OS</h5>
+              <a href="./historico.html" class="link-ver-mais">Ver todas</a>
+            </div>
+            <table class="tabela-historico">
+              <thead>
+                <tr>
+                  <th>OS</th>
+                  <th>Empresa</th>
+                  <th>Status</th>
+                  <th>Data</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody id="tabela-ultimas-os">
+                <tr>
+                  <td
+                    colspan="5"
+                    style="padding: 18px; color: var(--texto-secundario)"
+                  >
+                    Carregando histórico...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
     </div>
 
     <script>
-        function alternarMenu() {
-            const menu = document.getElementById('menuSuspenso');
-            menu.classList.toggle('visivel');
-        }
+      function alternarMenu() {
+        const menu = document.getElementById("menuSuspenso")
+        menu.classList.toggle("visivel")
+      }
 
-        function toggleTheme() {
-            const isLight = document.documentElement.classList.toggle('light-mode');
-            localStorage.setItem('nexus-theme', isLight ? 'light' : 'dark');
-            updateThemeButtonText();
-        }
+      function toggleTheme() {
+        const isLight = document.documentElement.classList.toggle("light-mode")
+        localStorage.setItem("nexus-theme", isLight ? "light" : "dark")
+        updateThemeButtonText()
+      }
 
-        function updateThemeButtonText() {
-            const button = document.getElementById('themeToggleButton');
-            if (!button) return;
-            if (document.documentElement.classList.contains('light-mode')) {
-                button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro';
-            } else {
-                button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro';
+      function updateThemeButtonText() {
+        const button = document.getElementById("themeToggleButton")
+        if (!button) return
+        if (document.documentElement.classList.contains("light-mode")) {
+          button.innerHTML = '<i class="bi bi-moon-fill"></i> Modo Escuro'
+        } else {
+          button.innerHTML = '<i class="bi bi-sun-fill"></i> Modo Claro'
+        }
+      }
+
+      function initTheme() {
+        if (localStorage.getItem("nexus-theme") === "light") {
+          document.documentElement.classList.add("light-mode")
+        } else {
+          document.documentElement.classList.remove("light-mode")
+        }
+        updateThemeButtonText()
+      }
+
+      window.addEventListener("DOMContentLoaded", initTheme)
+
+      window.onclick = function (event) {
+        if (
+          !event.target.matches(".botao-menu-trigger") &&
+          !event.target.closest(".botao-menu-trigger")
+        ) {
+          const menus = document.getElementsByClassName("menu-suspenso")
+          for (let i = 0; i < menus.length; i++) {
+            if (menus[i].classList.contains("visivel")) {
+              menus[i].classList.remove("visivel")
             }
+          }
         }
-
-        function initTheme() {
-            if (localStorage.getItem('nexus-theme') === 'light') {
-                document.documentElement.classList.add('light-mode');
-            } else {
-                document.documentElement.classList.remove('light-mode');
-            }
-            updateThemeButtonText();
-        }
-
-        window.addEventListener('DOMContentLoaded', initTheme);
-
-        window.onclick = function(event) {
-            if (!event.target.matches('.botao-menu-trigger') && !event.target.closest('.botao-menu-trigger')) {
-                const menus = document.getElementsByClassName("menu-suspenso");
-                for (let i = 0; i < menus.length; i++) {
-                    if (menus[i].classList.contains('visivel')) {
-                        menus[i].classList.remove('visivel');
-                    }
-                }
-            }
-        }
+      }
     </script>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Insert sidebar with active page 'menu'
-            document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('menu'));
-            
-            // Insert header
-            document.querySelector('.conteudo-principal').insertAdjacentHTML('afterbegin', getHeaderHTML());
+      document.addEventListener("DOMContentLoaded", function () {
+        // Insert sidebar with active page 'menu'
+        document
+          .querySelector(".layout-erp")
+          .insertAdjacentHTML("afterbegin", getSidebarHTML("menu"))
 
-            // Load metrics on page load
-            loadMetrics();
+        // Insert header
+        document
+          .querySelector(".conteudo-principal")
+          .insertAdjacentHTML("afterbegin", getHeaderHTML())
 
-            // Update metrics every 30 seconds
-            setInterval(loadMetrics, 30000);
-        });
+        // Load metrics on page load
+        loadMetrics()
 
-        async function loadMetrics() {
-            try {
-                const atendimentos = JSON.parse(localStorage.getItem('atendimentos')) || [];
-                const empresas = JSON.parse(localStorage.getItem('nexus_empresas')) || [];
-                const pecas = JSON.parse(localStorage.getItem('nexus_pecas')) || [];
-                const veiculos = JSON.parse(localStorage.getItem('nexus_veiculos')) || [];
+        // Update metrics every 30 seconds
+        setInterval(loadMetrics, 30000)
+      })
 
-                const filtroStatus = document.getElementById('filtro-status').value;
-                const filtroPeriodo = document.getElementById('filtro-periodo').value;
-                const agora = new Date();
-                const periodo = getPeriodoFiltro(filtroPeriodo, agora);
+      async function loadMetrics() {
+        try {
+          const atendimentos =
+            JSON.parse(localStorage.getItem("atendimentos")) || []
+          const empresas =
+            JSON.parse(localStorage.getItem("nexus_empresas")) || []
+          const pecas = JSON.parse(localStorage.getItem("nexus_pecas")) || []
+          const veiculos =
+            JSON.parse(localStorage.getItem("nexus_veiculos")) || []
 
-                const atendimentosFiltrados = atendimentos.filter(a => {
-                    const data = new Date(a.data);
-                    const dentroPeriodo = !periodo || (data >= periodo.inicio && data <= periodo.fim);
-                    const statusValido = filtroStatus === 'todos' || a.status === filtroStatus;
-                    return dentroPeriodo && statusValido;
-                });
+          const filtroStatus = document.getElementById("filtro-status").value
+          const filtroPeriodo = document.getElementById("filtro-periodo").value
+          const agora = new Date()
+          const periodo = getPeriodoFiltro(filtroPeriodo, agora)
 
-                const currentMonth = agora.getMonth();
-                const currentYear = agora.getFullYear();
+          const atendimentosFiltrados = atendimentos.filter((a) => {
+            const data = new Date(a.data)
+            const dentroPeriodo =
+              !periodo || (data >= periodo.inicio && data <= periodo.fim)
+            const statusValido =
+              filtroStatus === "todos" || a.status === filtroStatus
+            return dentroPeriodo && statusValido
+          })
 
-                const os_abertas = atendimentos.filter(a => a.status === 'pendente_revisao').length;
-                const os_finalizadas_mes = atendimentos.filter(a => {
-                    const data = new Date(a.data);
-                    return (a.status === 'finalizada' || a.status === 'reprovada') &&
-                           data.getMonth() === currentMonth &&
-                           data.getFullYear() === currentYear;
-                }).length;
-                const clientes = empresas.length;
-                const totalPecas = pecas.length;
-                const totalVeiculos = veiculos.length;
+          const currentMonth = agora.getMonth()
+          const currentYear = agora.getFullYear()
 
-                const atendimentosMes = atendimentos.filter(a => {
-                    const data = new Date(a.data);
-                    return a.status === 'finalizada' && data.getMonth() === currentMonth && data.getFullYear() === currentYear;
-                });
-                const receitaMes = atendimentosMes.reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
-                const ticketMedio = atendimentosMes.length ? receitaMes / atendimentosMes.length : 0;
-                const aprovadas = atendimentos.filter(a => a.status === 'finalizada').length;
-                const totalAvaliadas = atendimentos.filter(a => a.status === 'finalizada' || a.status === 'reprovada').length || 1;
-                const taxaAprovacao = totalAvaliadas ? (aprovadas / totalAvaliadas) * 100 : 0;
+          const os_abertas = atendimentos.filter(
+            (a) => a.status === "pendente_revisao",
+          ).length
+          const os_finalizadas_mes = atendimentos.filter((a) => {
+            const data = new Date(a.data)
+            return (
+              (a.status === "finalizada" || a.status === "reprovada") &&
+              data.getMonth() === currentMonth &&
+              data.getFullYear() === currentYear
+            )
+          }).length
+          const clientes = empresas.length
+          const totalPecas = pecas.length
+          const totalVeiculos = veiculos.length
 
-                const statusCounts = atendimentos.reduce((acc, item) => {
-                    const status = item.status || 'outros';
-                    acc[status] = (acc[status] || 0) + 1;
-                    return acc;
-                }, {});
+          const atendimentosMes = atendimentos.filter((a) => {
+            const data = new Date(a.data)
+            return (
+              a.status === "finalizada" &&
+              data.getMonth() === currentMonth &&
+              data.getFullYear() === currentYear
+            )
+          })
+          const receitaMes = atendimentosMes.reduce(
+            (sum, item) => sum + (parseFloat(item.valorTotalOS) || 0),
+            0,
+          )
+          const ticketMedio = atendimentosMes.length
+            ? receitaMes / atendimentosMes.length
+            : 0
+          const aprovadas = atendimentos.filter(
+            (a) => a.status === "finalizada",
+          ).length
+          const totalAvaliadas =
+            atendimentos.filter(
+              (a) => a.status === "finalizada" || a.status === "reprovada",
+            ).length || 1
+          const taxaAprovacao = totalAvaliadas
+            ? (aprovadas / totalAvaliadas) * 100
+            : 0
 
-                document.getElementById('os-abertas').textContent = os_abertas;
-                document.getElementById('os-finalizadas').textContent = os_finalizadas_mes;
-                document.getElementById('total-clientes').textContent = clientes;
-                document.getElementById('receita-mes').textContent = `R$ ${receitaMes.toFixed(2)}`;
-                document.getElementById('ticket-medio').textContent = `R$ ${ticketMedio.toFixed(2)}`;
-                document.getElementById('taxa-aprovacao').textContent = `${taxaAprovacao.toFixed(0)}%`;
+          const statusCounts = atendimentos.reduce((acc, item) => {
+            const status = item.status || "outros"
+            acc[status] = (acc[status] || 0) + 1
+            return acc
+          }, {})
 
-                document.getElementById('resumo-status').textContent = filtroStatus === 'todos' ? 'Todos' : document.querySelector(`#filtro-status option[value="${filtroStatus}"]`).textContent;
-                document.getElementById('resumo-periodo').textContent = document.querySelector(`#filtro-periodo option[value="${filtroPeriodo}"]`).textContent;
-                document.getElementById('resumo-atualizacao').textContent = agora.toLocaleTimeString('pt-BR');
+          document.getElementById("os-abertas").textContent = os_abertas
+          document.getElementById("os-finalizadas").textContent =
+            os_finalizadas_mes
+          document.getElementById("total-clientes").textContent = clientes
+          document.getElementById("receita-mes").textContent =
+            `R$ ${receitaMes.toFixed(2)}`
+          document.getElementById("ticket-medio").textContent =
+            `R$ ${ticketMedio.toFixed(2)}`
+          document.getElementById("taxa-aprovacao").textContent =
+            `${taxaAprovacao.toFixed(0)}%`
 
-                renderGraficoMensal(atendimentos);
-                renderGraficoEvolucao(atendimentos);
-                renderStatusLegend(statusCounts);
-                renderDistribuicaoStatus(statusCounts);
-                renderUltimasOS(atendimentosFiltrados);
-            } catch (error) {
-                console.error('Erro ao carregar métricas:', error);
+          document.getElementById("resumo-status").textContent =
+            filtroStatus === "todos"
+              ? "Todos"
+              : document.querySelector(
+                  `#filtro-status option[value="${filtroStatus}"]`,
+                ).textContent
+          document.getElementById("resumo-periodo").textContent =
+            document.querySelector(
+              `#filtro-periodo option[value="${filtroPeriodo}"]`,
+            ).textContent
+          document.getElementById("resumo-atualizacao").textContent =
+            agora.toLocaleTimeString("pt-BR")
+
+          renderGraficoMensal(atendimentos)
+          renderGraficoEvolucao(atendimentos)
+          renderStatusLegend(statusCounts)
+          renderDistribuicaoStatus(statusCounts)
+          renderUltimasOS(atendimentosFiltrados)
+        } catch (error) {
+          console.error("Erro ao carregar métricas:", error)
+        }
+      }
+
+      function getPeriodoFiltro(chave, agora) {
+        const fim = new Date(
+          agora.getFullYear(),
+          agora.getMonth(),
+          agora.getDate(),
+          23,
+          59,
+          59,
+          999,
+        )
+        switch (chave) {
+          case "mes_atual":
+            return {
+              inicio: new Date(agora.getFullYear(), agora.getMonth(), 1),
+              fim,
             }
+          case "30_dias":
+            return {
+              inicio: new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000),
+              fim,
+            }
+          case "ano_atual":
+            return { inicio: new Date(agora.getFullYear(), 0, 1), fim }
+          default:
+            return null
+        }
+      }
+
+      function renderGraficoMensal(atendimentos) {
+        const agora = new Date()
+        const grafico = document.getElementById("grafico-mensal")
+        if (!grafico) return
+        grafico.innerHTML = ""
+
+        const meses = []
+        const valores = []
+        for (let i = 5; i >= 0; i--) {
+          const data = new Date(agora.getFullYear(), agora.getMonth() - i, 1)
+          meses.push(data.toLocaleString("pt-BR", { month: "short" }))
+          const quantidade = atendimentos.filter((a) => {
+            const d = new Date(a.data)
+            return (
+              d.getMonth() === data.getMonth() &&
+              d.getFullYear() === data.getFullYear()
+            )
+          }).length
+          valores.push(quantidade)
         }
 
-        function getPeriodoFiltro(chave, agora) {
-            const fim = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate(), 23, 59, 59, 999);
-            switch (chave) {
-                case 'mes_atual':
-                    return { inicio: new Date(agora.getFullYear(), agora.getMonth(), 1), fim };
-                case '30_dias':
-                    return { inicio: new Date(agora.getTime() - 30 * 24 * 60 * 60 * 1000), fim };
-                case 'ano_atual':
-                    return { inicio: new Date(agora.getFullYear(), 0, 1), fim };
-                default:
-                    return null;
-            }
-        }
+        const maxVal = Math.max(...valores, 1)
+        meses.forEach((mes, index) => {
+          const barra = document.createElement("div")
+          barra.className = `barra${index === meses.length - 1 ? " destaque" : ""}`
+          const altura = Math.max(18, (valores[index] / maxVal) * 100)
+          barra.style.height = `${altura}%`
+          barra.title = `${mes}: ${valores[index]} atendimentos`
 
-        function renderGraficoMensal(atendimentos) {
-            const agora = new Date();
-            const grafico = document.getElementById('grafico-mensal');
-            if (!grafico) return;
-            grafico.innerHTML = '';
+          const label = document.createElement("span")
+          label.className = "barra-legenda"
+          label.textContent = mes
+          barra.appendChild(label)
+          grafico.appendChild(barra)
+        })
+      }
 
-            const meses = [];
-            const valores = [];
-            for (let i = 5; i >= 0; i--) {
-                const data = new Date(agora.getFullYear(), agora.getMonth() - i, 1);
-                meses.push(data.toLocaleString('pt-BR', { month: 'short' }));
-                const quantidade = atendimentos.filter(a => {
-                    const d = new Date(a.data);
-                    return d.getMonth() === data.getMonth() && d.getFullYear() === data.getFullYear();
-                }).length;
-                valores.push(quantidade);
-            }
+      function renderGraficoEvolucao(atendimentos) {
+        const container = document.getElementById("grafico-evolucao")
+        if (!container) return
 
-            const maxVal = Math.max(...valores, 1);
-            meses.forEach((mes, index) => {
-                const barra = document.createElement('div');
-                barra.className = `barra${index === meses.length - 1 ? ' destaque' : ''}`;
-                const altura = Math.max(18, (valores[index] / maxVal) * 100);
-                barra.style.height = `${altura}%`;
-                barra.title = `${mes}: ${valores[index]} atendimentos`;
+        const dias = Array.from({ length: 7 }, (_, index) => {
+          const data = new Date()
+          data.setDate(data.getDate() - (6 - index))
+          const valor = atendimentos
+            .filter((item) => {
+              const itemDate = new Date(item.data)
+              return (
+                itemDate.toDateString() === data.toDateString() &&
+                item.status === "finalizada"
+              )
+            })
+            .reduce(
+              (sum, item) => sum + (parseFloat(item.valorTotalOS) || 0),
+              0,
+            )
 
-                const label = document.createElement('span');
-                label.className = 'barra-legenda';
-                label.textContent = mes;
-                barra.appendChild(label);
-                grafico.appendChild(barra);
-            });
-        }
+          return {
+            label: data.toLocaleDateString("pt-BR", {
+              day: "2-digit",
+              month: "short",
+            }),
+            valor,
+          }
+        })
 
-        function renderGraficoEvolucao(atendimentos) {
-            const container = document.getElementById('grafico-evolucao');
-            if (!container) return;
+        const maxValor = Math.max(...dias.map((d) => d.valor), 1)
+        const width = 520
+        const height = 170
+        const padding = 18
 
-            const dias = Array.from({ length: 7 }, (_, index) => {
-                const data = new Date();
-                data.setDate(data.getDate() - (6 - index));
-                const valor = atendimentos.filter(item => {
-                    const itemDate = new Date(item.data);
-                    return itemDate.toDateString() === data.toDateString() && item.status === 'finalizada';
-                }).reduce((sum, item) => sum + (parseFloat(item.valorTotalOS) || 0), 0);
+        const pontos = dias
+          .map((item, index) => {
+            const x =
+              padding + (index * (width - padding * 2)) / (dias.length - 1 || 1)
+            const y =
+              height -
+              padding -
+              (item.valor / maxValor) * (height - padding * 2)
+            return `${x},${y}`
+          })
+          .join(" ")
 
-                return {
-                    label: data.toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }),
-                    valor
-                };
-            });
+        const area = `0,${height - padding} ${pontos} ${width},${height - padding}`
 
-            const maxValor = Math.max(...dias.map(d => d.valor), 1);
-            const width = 520;
-            const height = 170;
-            const padding = 18;
-
-            const pontos = dias.map((item, index) => {
-                const x = padding + (index * (width - padding * 2)) / (dias.length - 1 || 1);
-                const y = height - padding - (item.valor / maxValor) * (height - padding * 2);
-                return `${x},${y}`;
-            }).join(' ');
-
-            const area = `0,${height - padding} ${pontos} ${width},${height - padding}`;
-
-            container.innerHTML = `
+        container.innerHTML = `
                 <svg viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" aria-label="Evolução de receita">
                     <defs>
                         <linearGradient id="linhaReceita" x1="0" x2="1">
@@ -367,116 +489,136 @@
                     </defs>
                     <g>
                         ${Array.from({ length: 4 }, (_, i) => {
-                            const y = padding + (i * (height - padding * 2)) / 3;
-                            return `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(148,163,184,0.18)" stroke-dasharray="4 6" />`;
-                        }).join('')}
+                          const y = padding + (i * (height - padding * 2)) / 3
+                          return `<line x1="${padding}" y1="${y}" x2="${width - padding}" y2="${y}" stroke="rgba(148,163,184,0.18)" stroke-dasharray="4 6" />`
+                        }).join("")}
                     </g>
                     <polygon points="${area}" fill="rgba(16,185,129,0.12)"></polygon>
                     <polyline points="${pontos}" fill="none" stroke="url(#linhaReceita)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"></polyline>
-                    ${dias.map((item, index) => {
-                        const x = padding + (index * (width - padding * 2)) / (dias.length - 1 || 1);
-                        const y = height - padding - (item.valor / maxValor) * (height - padding * 2);
+                    ${dias
+                      .map((item, index) => {
+                        const x =
+                          padding +
+                          (index * (width - padding * 2)) /
+                            (dias.length - 1 || 1)
+                        const y =
+                          height -
+                          padding -
+                          (item.valor / maxValor) * (height - padding * 2)
                         return `
                             <g>
                                 <circle cx="${x}" cy="${y}" r="5" fill="#10b981" stroke="#ecfdf5" stroke-width="3"></circle>
-                                <text x="${x}" y="${height - 4}" text-anchor="middle" fill="#94a3b8" font-size="10">${item.label.split('/')[0]}</text>
+                                <text x="${x}" y="${height - 4}" text-anchor="middle" fill="#94a3b8" font-size="10">${item.label.split("/")[0]}</text>
                             </g>
-                        `;
-                    }).join('')}
+                        `
+                      })
+                      .join("")}
                 </svg>
-            `;
+            `
+      }
+
+      function renderStatusLegend(counts) {
+        const container = document.getElementById("grafico-legend")
+        const summary = document.getElementById("status-legend-summary")
+        container.innerHTML = ""
+        if (summary) summary.innerHTML = ""
+
+        const legendas = [
+          { status: "pendente_revisao", label: "Pendente", color: "#f6ad55" },
+          { status: "finalizada", label: "Aprovada", color: "#38a169" },
+          { status: "reprovada", label: "Rejeitada", color: "#e53e3e" },
+        ]
+        legendas.forEach((item) => {
+          const badge = document.createElement("span")
+          badge.className = "status-pill"
+          badge.style.background = item.color + "20"
+          badge.style.color = item.color
+          badge.textContent = `${item.label}: ${counts[item.status] || 0}`
+          container.appendChild(badge)
+
+          if (summary) {
+            const summaryItem = badge.cloneNode(true)
+            summary.appendChild(summaryItem)
+          }
+        })
+      }
+
+      function renderDistribuicaoStatus(counts) {
+        const total =
+          (counts.pendente_revisao || 0) +
+          (counts.finalizada || 0) +
+          (counts.reprovada || 0)
+        const donut = document.getElementById("grafico-donut")
+        const legend = document.getElementById("legenda-distribuicao")
+        if (!donut || !legend) return
+
+        const pendente = counts.pendente_revisao || 0
+        const aprovadas = counts.finalizada || 0
+        const rejeitadas = counts.reprovada || 0
+        const slice1 = total ? Math.round((pendente / total) * 100) : 0
+        const slice2 = total
+          ? Math.round(((pendente + aprovadas) / total) * 100)
+          : 0
+        donut.style.background = total
+          ? `conic-gradient(#f6ad55 0% ${slice1}%, #38a169 ${slice1}% ${slice2}%, #e53e3e ${slice2}% 100%)`
+          : "radial-gradient(circle at center, rgba(148,163,184,0.2) 0%, rgba(148,163,184,0.1) 100%)"
+        donut.querySelector(".grafico-donut-texto").textContent = `${total} OS`
+
+        legend.innerHTML = ""
+        const statusItems = [
+          { label: "Pendente", value: pendente, color: "#f6ad55" },
+          { label: "Aprovada", value: aprovadas, color: "#38a169" },
+          { label: "Rejeitada", value: rejeitadas, color: "#e53e3e" },
+        ]
+        statusItems.forEach((item) => {
+          const row = document.createElement("div")
+          row.className = "legenda-distribuicao-item"
+          row.innerHTML = `<span class="status-pill" style="background:${item.color}20; color:${item.color};">${item.label}</span> <strong>${item.value}</strong>`
+          legend.appendChild(row)
+        })
+      }
+
+      function renderUltimasOS(atendimentos) {
+        const tabela = document.getElementById("tabela-ultimas-os")
+        tabela.innerHTML = ""
+        if (atendimentos.length === 0) {
+          tabela.innerHTML =
+            '<tr><td colspan="5" style="padding: 18px; color: var(--texto-secundario);">Nenhuma OS encontrada para o filtro selecionado.</td></tr>'
+          return
         }
-
-        function renderStatusLegend(counts) {
-            const container = document.getElementById('grafico-legend');
-            const summary = document.getElementById('status-legend-summary');
-            container.innerHTML = '';
-            if (summary) summary.innerHTML = '';
-
-            const legendas = [
-                { status: 'pendente_revisao', label: 'Pendente', color: '#f6ad55' },
-                { status: 'finalizada', label: 'Aprovada', color: '#38a169' },
-                { status: 'reprovada', label: 'Rejeitada', color: '#e53e3e' }
-            ];
-            legendas.forEach(item => {
-                const badge = document.createElement('span');
-                badge.className = 'status-pill';
-                badge.style.background = item.color + '20';
-                badge.style.color = item.color;
-                badge.textContent = `${item.label}: ${counts[item.status] || 0}`;
-                container.appendChild(badge);
-
-                if (summary) {
-                    const summaryItem = badge.cloneNode(true);
-                    summary.appendChild(summaryItem);
-                }
-            });
-        }
-
-        function renderDistribuicaoStatus(counts) {
-            const total = (counts.pendente_revisao || 0) + (counts.finalizada || 0) + (counts.reprovada || 0);
-            const donut = document.getElementById('grafico-donut');
-            const legend = document.getElementById('legenda-distribuicao');
-            if (!donut || !legend) return;
-
-            const pendente = counts.pendente_revisao || 0;
-            const aprovadas = counts.finalizada || 0;
-            const rejeitadas = counts.reprovada || 0;
-            const slice1 = total ? Math.round((pendente / total) * 100) : 0;
-            const slice2 = total ? Math.round(((pendente + aprovadas) / total) * 100) : 0;
-            donut.style.background = total
-                ? `conic-gradient(#f6ad55 0% ${slice1}%, #38a169 ${slice1}% ${slice2}%, #e53e3e ${slice2}% 100%)`
-                : 'radial-gradient(circle at center, rgba(148,163,184,0.2) 0%, rgba(148,163,184,0.1) 100%)';
-            donut.querySelector('.grafico-donut-texto').textContent = `${total} OS`;
-
-            legend.innerHTML = '';
-            const statusItems = [
-                { label: 'Pendente', value: pendente, color: '#f6ad55' },
-                { label: 'Aprovada', value: aprovadas, color: '#38a169' },
-                { label: 'Rejeitada', value: rejeitadas, color: '#e53e3e' }
-            ];
-            statusItems.forEach(item => {
-                const row = document.createElement('div');
-                row.className = 'legenda-distribuicao-item';
-                row.innerHTML = `<span class="status-pill" style="background:${item.color}20; color:${item.color};">${item.label}</span> <strong>${item.value}</strong>`;
-                legend.appendChild(row);
-            });
-        }
-
-        function renderUltimasOS(atendimentos) {
-            const tabela = document.getElementById('tabela-ultimas-os');
-            tabela.innerHTML = '';
-            if (atendimentos.length === 0) {
-                tabela.innerHTML = '<tr><td colspan="5" style="padding: 18px; color: var(--texto-secundario);">Nenhuma OS encontrada para o filtro selecionado.</td></tr>';
-                return;
-            }
-            atendimentos
-                .sort((a, b) => new Date(b.data) - new Date(a.data))
-                .slice(0, 6)
-                .forEach((a, index) => {
-                    const tr = document.createElement('tr');
-                    const statusLabel = getStatusLabel(a.status);
-                    tr.innerHTML = `
+        atendimentos
+          .sort((a, b) => new Date(b.data) - new Date(a.data))
+          .slice(0, 6)
+          .forEach((a, index) => {
+            const tr = document.createElement("tr")
+            const statusLabel = getStatusLabel(a.status)
+            tr.innerHTML = `
                         <td>#${a.id || index + 1}</td>
-                        <td>${a.cliente || 'Sem cliente'}</td>
+                        <td>${a.cliente || "Sem cliente"}</td>
                         <td><span class="status-pill status-${a.status}">${statusLabel}</span></td>
-                        <td>${new Date(a.data).toLocaleDateString('pt-BR')}</td>
+                        <td>${new Date(a.data).toLocaleDateString("pt-BR")}</td>
                         <td>R$ ${(parseFloat(a.valorTotalOS) || 0).toFixed(2)}</td>
-                    `;
-                    tabela.appendChild(tr);
-                });
-        }
+                    `
+            tabela.appendChild(tr)
+          })
+      }
 
-        function getStatusLabel(status) {
-            switch (status) {
-                case 'pendente_revisao': return 'Pendente';
-                case 'finalizada': return 'Aprovada';
-                case 'reprovada': return 'Rejeitada';
-                default: return 'Outro';
-            }
+      function getStatusLabel(status) {
+        switch (status) {
+          case "pendente_revisao":
+            return "Pendente"
+          case "finalizada":
+            return "Aprovada"
+          case "reprovada":
+            return "Rejeitada"
+          default:
+            return "Outro"
         }
+      }
 
-        document.querySelector('.painel-filtros .botao-acao').addEventListener('click', loadMetrics);
+      document
+        .querySelector(".painel-filtros .botao-acao")
+        .addEventListener("click", loadMetrics)
     </script>
-</body>
+  </body>
 </html>

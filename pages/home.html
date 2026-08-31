@@ -1,288 +1,309 @@
-<!DOCTYPE html>
+<!doctype html>
 
 <html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
 
-<head>
-
-    <meta charset="UTF-8">
-
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
     <title>Bem-vindo - Nexus HUB</title>
 
-    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png">
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
 
-    <link rel="stylesheet" href="../assets/css/style.css">
-    <link rel="stylesheet" href="../assets/css/pages.css">
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
 
     <script src="../assets/js/common.js"></script>
 
     <script src="../assets/js/pages.js"></script>
+  </head>
 
-</head>
-
-<body class="corpo-dashboard">
-
+  <body class="corpo-dashboard">
     <div class="layout-erp">
+      <!-- Sidebar and Header will be inserted here via JavaScript -->
 
-        <!-- Sidebar and Header will be inserted here via JavaScript -->
+      <main class="conteudo-principal">
+        <!-- Header will be inserted here via JavaScript -->
 
-        <main class="conteudo-principal">
+        <section class="titulo-pagina-stack">
+          <h1><i class="bi bi-hand-thumbs-up"></i> Bem-vindo ao Nexus HUB!</h1>
 
-            <!-- Header will be inserted here via JavaScript -->
+          <p>
+            Seu sistema de gestão de ordens de serviço. Conheça todas as
+            funcionalidades abaixo:
+          </p>
+        </section>
 
-            <section class="titulo-pagina-stack">
+        <!-- CARDS DE ONBOARDING -->
 
-                <h1><i class="bi bi-hand-thumbs-up"></i> Bem-vindo ao Nexus HUB!</h1>
+        <div class="grid-onboarding">
+          <!-- Card 1: Painel de Controle -->
 
-                <p>Seu sistema de gestão de ordens de serviço. Conheça todas as funcionalidades abaixo:</p>
-
-            </section>
-
-            <!-- CARDS DE ONBOARDING -->
-
-            <div class="grid-onboarding">
-
-                <!-- Card 1: Painel de Controle -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding">
-
-                        <i class="bi bi-speedometer2"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-speedometer2"></i> Painel de Controle</h3>
-
-                    <p>Visualize suas métricas e informações em tempo real. Acompanhe:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> OS abertas</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Atendimentos em análise</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Serviços finalizados</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Total de clientes</li>
-
-                    </ul>
-
-                    <a href="menu.html" class="botao-card-onboarding">Acessar Painel <i class="bi bi-arrow-right"></i></a>
-
-                </div>
-
-                <!-- Card 2: Novo Atendimento -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);">
-
-                        <i class="bi bi-plus-circle"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-plus-circle"></i> Nova OS</h3>
-
-                    <p>Registre um novo atendimento ou ordem de serviço com:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> Dados da empresa</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Informações do veículo</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Serviços realizados</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Cálculo automático</li>
-
-                    </ul>
-
-                    <a href="novo_atendimento.html" class="botao-card-onboarding">Registrar Atendimento <i class="bi bi-arrow-right"></i></a>
-
-                </div>
-
-                <!-- Card 3: Gestão de Clientes -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">
-
-                        <i class="bi bi-people"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-people"></i> Gestão de Clientes</h3>
-
-                    <p>Gerencie todos os clientes cadastrados no sistema:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> Visualizar cliente</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Histórico de atendimentos</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Veículos associados</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Total de serviços</li>
-
-                    </ul>
-
-                    <a href="clientes.html" class="botao-card-onboarding">Ver Clientes <i class="bi bi-arrow-right"></i></a>
-
-                </div>
-
-                <!-- Card 4: Revisão de Ordens -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">
-
-                        <i class="bi bi-check-square"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-check-square"></i> Revisão de Ordens</h3>
-
-                    <p>Revise e valide as ordens de serviço antes da aprovação:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> Filtrar por status</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Editar dados</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Aprovar/Rejeitar</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Observações admin</li>
-
-                    </ul>
-
-                    <a href="revisao.html" class="botao-card-onboarding">Revisar Ordens <i class="bi bi-arrow-right"></i></a>
-
-                </div>
-
-                <!-- Card 5: Histórico e Arquivos -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding" style="background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);">
-
-                        <i class="bi bi-clock-history"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-clock-history"></i> Histórico & Arquivos</h3>
-
-                    <p>Consulte o histórico completo de todas as ordens finalizadas:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> Buscar por cliente</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Filtrar por período</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Exportar PDF</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Relatórios</li>
-
-                    </ul>
-
-                    <a href="historico.html" class="botao-card-onboarding">Ver Histórico <i class="bi bi-arrow-right"></i></a>
-
-                </div>
-
-                <!-- Card 6: Dicas & Atalhos -->
-
-                <div class="card-onboarding">
-
-                    <div class="card-header-onboarding" style="background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);">
-
-                        <i class="bi bi-lightbulb"></i>
-
-                    </div>
-
-                    <h3><i class="bi bi-lightbulb"></i> Dicas Rápidas</h3>
-
-                    <p>Conheça alguns atalhos e funcionalidades importantes:</p>
-
-                    <ul class="lista-features">
-
-                        <li><i class="bi bi-check-circle-fill"></i> Sistema com darkmode</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Navegação intuitiva</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Suporte ao usuário</li>
-
-                        <li><i class="bi bi-check-circle-fill"></i> Interface responsiva</li>
-
-                    </ul>
-
-                    <button onclick="abrirMenu()" class="botao-card-onboarding" style="background: linear-gradient(135deg, var(--verde-esmeralda) 0%, var(--verde-escuro) 100%); border: none;">
-
-                        Explorar Sistema <i class="bi bi-arrow-right"></i>
-
-                    </button>
-
-                </div>
-
+          <div class="card-onboarding">
+            <div class="card-header-onboarding">
+              <i class="bi bi-speedometer2"></i>
             </div>
 
-            <!-- SEÇÃO DE GUIA RÁPIDO -->
+            <h3><i class="bi bi-speedometer2"></i> Painel de Controle</h3>
 
-            <section class="secao-guia-rapido">
+            <p>
+              Visualize suas métricas e informações em tempo real. Acompanhe:
+            </p>
 
-                <h2><i class="bi bi-info-circle"></i> Guia Rápido - Fluxo Padrão</h2>
+            <ul class="lista-features">
+              <li><i class="bi bi-check-circle-fill"></i> OS abertas</li>
 
-                <div class="fluxo-container">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Atendimentos em análise
+              </li>
 
-                    <div class="etapa-fluxo">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Serviços finalizados
+              </li>
 
-                        <div class="numero-etapa">1</div>
+              <li><i class="bi bi-check-circle-fill"></i> Total de clientes</li>
+            </ul>
 
-                        <h4><i class="bi bi-plus-lg"></i> Registrar</h4>
+            <a href="menu.html" class="botao-card-onboarding"
+              >Acessar Painel <i class="bi bi-arrow-right"></i
+            ></a>
+          </div>
 
-                        <p>Crie um novo atendimento com os dados do cliente e serviço</p>
+          <!-- Card 2: Novo Atendimento -->
 
-                    </div>
+          <div class="card-onboarding">
+            <div
+              class="card-header-onboarding"
+              style="
+                background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+              "
+            >
+              <i class="bi bi-plus-circle"></i>
+            </div>
 
-                    <div class="seta-fluxo"><i class="bi bi-arrow-right"></i></div>
+            <h3><i class="bi bi-plus-circle"></i> Nova OS</h3>
 
-                    <div class="etapa-fluxo">
+            <p>Registre um novo atendimento ou ordem de serviço com:</p>
 
-                        <div class="numero-etapa">2</div>
+            <ul class="lista-features">
+              <li><i class="bi bi-check-circle-fill"></i> Dados da empresa</li>
 
-                        <h4><i class="bi bi-pencil"></i> Revisar</h4>
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Informações do veículo
+              </li>
 
-                        <p>Valide os dados e altere o status da ordem</p>
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Serviços realizados
+              </li>
 
-                    </div>
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Cálculo automático
+              </li>
+            </ul>
 
-                    <div class="seta-fluxo"><i class="bi bi-arrow-right"></i></div>
+            <a href="novo_atendimento.html" class="botao-card-onboarding"
+              >Registrar Atendimento <i class="bi bi-arrow-right"></i
+            ></a>
+          </div>
 
-                    <div class="etapa-fluxo">
+          <!-- Card 3: Gestão de Clientes -->
 
-                        <div class="numero-etapa">3</div>
+          <div class="card-onboarding">
+            <div
+              class="card-header-onboarding"
+              style="
+                background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+              "
+            >
+              <i class="bi bi-people"></i>
+            </div>
 
-                        <h4><i class="bi bi-file-pdf"></i> Exportar</h4>
+            <h3><i class="bi bi-people"></i> Gestão de Clientes</h3>
 
-                        <p>Exporte para PDF ou visualize no histórico</p>
+            <p>Gerencie todos os clientes cadastrados no sistema:</p>
 
-                    </div>
+            <ul class="lista-features">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Visualizar cliente
+              </li>
 
-                </div>
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Histórico de
+                atendimentos
+              </li>
 
-            </section>
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Veículos associados
+              </li>
 
-        </main>
+              <li><i class="bi bi-check-circle-fill"></i> Total de serviços</li>
+            </ul>
 
+            <a href="clientes.html" class="botao-card-onboarding"
+              >Ver Clientes <i class="bi bi-arrow-right"></i
+            ></a>
+          </div>
+
+          <!-- Card 4: Revisão de Ordens -->
+
+          <div class="card-onboarding">
+            <div
+              class="card-header-onboarding"
+              style="
+                background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+              "
+            >
+              <i class="bi bi-check-square"></i>
+            </div>
+
+            <h3><i class="bi bi-check-square"></i> Revisão de Ordens</h3>
+
+            <p>Revise e valide as ordens de serviço antes da aprovação:</p>
+
+            <ul class="lista-features">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Filtrar por status
+              </li>
+
+              <li><i class="bi bi-check-circle-fill"></i> Editar dados</li>
+
+              <li><i class="bi bi-check-circle-fill"></i> Aprovar/Rejeitar</li>
+
+              <li><i class="bi bi-check-circle-fill"></i> Observações admin</li>
+            </ul>
+
+            <a href="revisao.html" class="botao-card-onboarding"
+              >Revisar Ordens <i class="bi bi-arrow-right"></i
+            ></a>
+          </div>
+
+          <!-- Card 5: Histórico e Arquivos -->
+
+          <div class="card-onboarding">
+            <div
+              class="card-header-onboarding"
+              style="
+                background: linear-gradient(135deg, #ec4899 0%, #be185d 100%);
+              "
+            >
+              <i class="bi bi-clock-history"></i>
+            </div>
+
+            <h3><i class="bi bi-clock-history"></i> Histórico & Arquivos</h3>
+
+            <p>Consulte o histórico completo de todas as ordens finalizadas:</p>
+
+            <ul class="lista-features">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Buscar por cliente
+              </li>
+
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Filtrar por período
+              </li>
+
+              <li><i class="bi bi-check-circle-fill"></i> Exportar PDF</li>
+
+              <li><i class="bi bi-check-circle-fill"></i> Relatórios</li>
+            </ul>
+
+            <a href="historico.html" class="botao-card-onboarding"
+              >Ver Histórico <i class="bi bi-arrow-right"></i
+            ></a>
+          </div>
+
+          <!-- Card 6: Dicas & Atalhos -->
+
+          <div class="card-onboarding">
+            <div
+              class="card-header-onboarding"
+              style="
+                background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+              "
+            >
+              <i class="bi bi-lightbulb"></i>
+            </div>
+
+            <h3><i class="bi bi-lightbulb"></i> Dicas Rápidas</h3>
+
+            <p>Conheça alguns atalhos e funcionalidades importantes:</p>
+
+            <ul class="lista-features">
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Sistema com darkmode
+              </li>
+
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Navegação intuitiva
+              </li>
+
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Suporte ao usuário
+              </li>
+
+              <li>
+                <i class="bi bi-check-circle-fill"></i> Interface responsiva
+              </li>
+            </ul>
+
+            <button
+              onclick="abrirMenu()"
+              class="botao-card-onboarding"
+              style="
+                background: linear-gradient(
+                  135deg,
+                  var(--verde-esmeralda) 0%,
+                  var(--verde-escuro) 100%
+                );
+                border: none;
+              "
+            >
+              Explorar Sistema <i class="bi bi-arrow-right"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- SEÇÃO DE GUIA RÁPIDO -->
+
+        <section class="secao-guia-rapido">
+          <h2><i class="bi bi-info-circle"></i> Guia Rápido - Fluxo Padrão</h2>
+
+          <div class="fluxo-container">
+            <div class="etapa-fluxo">
+              <div class="numero-etapa">1</div>
+
+              <h4><i class="bi bi-plus-lg"></i> Registrar</h4>
+
+              <p>Crie um novo atendimento com os dados do cliente e serviço</p>
+            </div>
+
+            <div class="seta-fluxo"><i class="bi bi-arrow-right"></i></div>
+
+            <div class="etapa-fluxo">
+              <div class="numero-etapa">2</div>
+
+              <h4><i class="bi bi-pencil"></i> Revisar</h4>
+
+              <p>Valide os dados e altere o status da ordem</p>
+            </div>
+
+            <div class="seta-fluxo"><i class="bi bi-arrow-right"></i></div>
+
+            <div class="etapa-fluxo">
+              <div class="numero-etapa">3</div>
+
+              <h4><i class="bi bi-file-pdf"></i> Exportar</h4>
+
+              <p>Exporte para PDF ou visualize no histórico</p>
+            </div>
+          </div>
+        </section>
+      </main>
     </div>
-
-    
-
-    </body>
-
+  </body>
 </html>
