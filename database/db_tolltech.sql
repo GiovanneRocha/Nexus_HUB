@@ -30,9 +30,12 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `caminhoes` (
   `id` int(11) NOT NULL,
+  `empresa_id` int(11) DEFAULT NULL,
   `nome_caminhao` varchar(100) COLLATE latin1_general_ci DEFAULT NULL,
   `modelo` varchar(100) COLLATE latin1_general_ci DEFAULT NULL,
-  `placa` varchar(10) COLLATE latin1_general_ci NOT NULL
+  `placa` varchar(10) COLLATE latin1_general_ci NOT NULL,
+  `ano` int(11) DEFAULT NULL,
+  `cor` varchar(50) COLLATE latin1_general_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_general_ci;
 
 -- --------------------------------------------------------
@@ -197,7 +200,8 @@ INSERT INTO `usuarios` (`id`, `nome`, `email`, `senha_hash`, `data_criacao`, `at
 -- Indexes for table `caminhoes`
 --
 ALTER TABLE `caminhoes`
-  ADD PRIMARY KEY (`id`);
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_caminhoes_empresa` (`empresa_id`);
 
 --
 -- Indexes for table `cargos`
@@ -311,6 +315,12 @@ ALTER TABLE `usuarios`
 --
 ALTER TABLE `historico_atividades_empresas`
   ADD CONSTRAINT `historico_atividades_empresas_ibfk_1` FOREIGN KEY (`empresa_id`) REFERENCES `empresas_cadastradas` (`id`) ON DELETE CASCADE;
+
+--
+-- Limitadores para a tabela `caminhoes`
+--
+ALTER TABLE `caminhoes`
+  ADD CONSTRAINT `fk_caminhoes_empresa` FOREIGN KEY (`empresa_id`) REFERENCES `empresas_cadastradas` (`id`);
 
 --
 -- Limitadores para a tabela `relatorio`

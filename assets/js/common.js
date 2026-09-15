@@ -285,16 +285,34 @@ function resolveAssetPath(assetPath) {
   return `${getProjectRootBasePath()}${assetPath.replace(/^\.?\//, "")}`
 }
 
+function getProjectRootPath() {
+  const pathname = window.location.pathname || "/"
+  const pagesIndex = pathname.indexOf("/pages/")
+  if (pagesIndex >= 0) return pathname.slice(0, pagesIndex + 1)
+  return pathname.slice(0, pathname.lastIndexOf("/") + 1)
+}
+
 function resolveRootLink(pagePath) {
-  return `${getProjectRootBasePath()}${pagePath.replace(/^\.?\//, "")}`
+  return `${getProjectRootPath()}${pagePath.replace(/^\.?\//, "")}`
 }
 
 function getSidebarHTML(activePage = "home") {
+  const caminhoOperacoes = "pages/operacoes/"
   const menuItems = [
-    { href: "home.html", icon: "bi-house-door", text: "início", key: "home" },
-    { href: "menu.html", icon: "bi-speedometer2", text: "Painel", key: "menu" },
     {
-      href: "clientes.html",
+      href: resolveRootLink(`${caminhoOperacoes}home.html`),
+      icon: "bi-house-door",
+      text: "início",
+      key: "home",
+    },
+    {
+      href: resolveRootLink(`${caminhoOperacoes}menu.html`),
+      icon: "bi-speedometer2",
+      text: "Painel",
+      key: "menu",
+    },
+    {
+      href: resolveRootLink(`${caminhoOperacoes}clientes.html`),
       icon: "bi-people",
       text: "Clientes",
       key: "clientes",
@@ -305,13 +323,13 @@ function getSidebarHTML(activePage = "home") {
       key: "ordem_servico",
       children: [
         {
-          href: "novo_atendimento.html",
+          href: resolveRootLink(`${caminhoOperacoes}novo_atendimento.php`),
           icon: "bi-plus-circle",
           text: "Nova OS",
           key: "novo_atendimento",
         },
         {
-          href: "revisao.html",
+          href: resolveRootLink(`${caminhoOperacoes}revisao.php`),
           icon: "bi-check-square",
           text: "Revisão de OS",
           key: "revisao",
@@ -324,19 +342,19 @@ function getSidebarHTML(activePage = "home") {
       key: "cadastro",
       children: [
         {
-          href: "cadastros/cadastro_servicos.php",
+          href: resolveRootLink("pages/cadastros/cadastro_servicos.php"),
           icon: "bi-gear",
           text: "Gestão de Serviços",
           key: "cadastro_servicos",
         },
         {
-          href: "cadastros/cadastro_pecas.php",
+          href: resolveRootLink("pages/cadastros/cadastro_pecas.php"),
           icon: "bi-box-seam",
           text: "Gestão de Peças",
           key: "cadastro_pecas",
         },
         {
-          href: "cadastros/cadastro_veiculo.php",
+          href: resolveRootLink("pages/cadastros/cadastro_veiculo.php"),
           icon: "bi-truck",
           text: "Gestão de Veículos",
           key: "cadastro_veiculo",
@@ -344,7 +362,7 @@ function getSidebarHTML(activePage = "home") {
       ],
     },
     {
-      href: "historico.html",
+      href: resolveRootLink(`${caminhoOperacoes}historico.php`),
       icon: "bi-clock-history",
       text: "OS Aprovadas",
       key: "historico",
@@ -376,7 +394,7 @@ function getSidebarHTML(activePage = "home") {
           .map((child) => {
             const isChildActive =
               child.key === activePage ? ' class="item-ativo"' : ""
-            return `<li${isChildActive}><a href="${getPagesBasePath()}${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> <span>${child.text}</span></a></li>`
+            return `<li${isChildActive}><a href="${child.href}" class="link-menu"><i class="bi ${child.icon}"></i> <span>${child.text}</span></a></li>`
           })
           .join("\n                        ")
 
@@ -389,7 +407,7 @@ function getSidebarHTML(activePage = "home") {
                 </li>`
       }
 
-      return `<li${activeClass}><a href="${getPagesBasePath()}${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> <span>${item.text}</span></a></li>`
+      return `<li${activeClass}><a href="${item.href}" class="link-menu"><i class="bi ${item.icon}"></i> <span>${item.text}</span></a></li>`
     })
     .join("\n                    ")
 

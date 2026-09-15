@@ -14,9 +14,12 @@ $pdo = nexusDb();
 
 $pdo->exec("CREATE TABLE IF NOT EXISTS caminhoes (
     id INT NOT NULL AUTO_INCREMENT,
+    empresa_id INT DEFAULT NULL,
     nome_caminhao VARCHAR(100) DEFAULT NULL,
     modelo VARCHAR(100) DEFAULT NULL,
     placa VARCHAR(10) NOT NULL,
+    ano INT DEFAULT NULL,
+    cor VARCHAR(50) DEFAULT NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
@@ -42,12 +45,18 @@ if ($action === 'delete') {
     nexusJson(['success' => true, 'message' => 'Veículo removido com sucesso.']);
 }
 
-$nomeCaminhao = trim((string) ($_POST['nome_caminhao'] ?? $_POST['empresa'] ?? ''));
+$empresaId = (int) ($_POST['empresa_id'] ?? 0);
 $modelo = trim((string) ($_POST['modelo'] ?? ''));
 $placa = trim(strtoupper((string) ($_POST['placa'] ?? '')));
+$ano = (int) ($_POST['ano'] ?? 0);
+$cor = trim((string) ($_POST['cor'] ?? ''));
+$stmtEmpresa = $pdo->prepare('SELECT id, nome FROM empresas_cadastradas WHERE id = :id LIMIT 1');
+$stmtEmpresa->execute([':id' => $empresaId]);
+$empresa = $stmtEmpresa->fetch();
+$nomeCaminhao = $empresa['nome'] ?? '';
 
-if ($nomeCaminhao === '' || $modelo === '' || $placa === '') {
-    nexusJson(['success' => false, 'message' => 'Empresa, modelo e placa são obrigatórios.'], 400);
+if (!$empresa || $modelo === '' || $placa === '' || $ano < 1900 || $ano > (int) date('Y') || $cor === '') {
+    nexusJson(['success' => false, 'message' => 'Empresa, modelo, placa, ano e cor são obrigatórios.'], 400);
 }
 
 if ($action === 'update') {
@@ -56,22 +65,28 @@ if ($action === 'update') {
         nexusJson(['success' => false, 'message' => 'ID inválido para atualização.'], 400);
     }
 
-    $stmt = $pdo->prepare('UPDATE caminhoes SET nome_caminhao = :nome_caminhao, modelo = :modelo, placa = :placa WHERE id = :id');
+    $stmt = $pdo->prepare('UPDATE caminhoes SET empresa_id = :empresa_id, nome_caminhao = :nome_caminhao, modelo = :modelo, placa = :placa, ano = :ano, cor = :cor WHERE id = :id');
     $stmt->execute([
+        ':empresa_id' => $empresaId,
         ':nome_caminhao' => $nomeCaminhao,
         ':modelo' => $modelo,
         ':placa' => $placa,
+        ':ano' => $ano,
+        ':cor' => $cor,
         ':id' => $id,
     ]);
 
     nexusJson(['success' => true, 'message' => 'Veículo atualizado com sucesso.']);
 }
 
-$stmt = $pdo->prepare('INSERT INTO caminhoes (nome_caminhao, modelo, placa) VALUES (:nome_caminhao, :modelo, :placa)');
+$stmt = $pdo->prepare('INSERT INTO caminhoes (empresa_id, nome_caminhao, modelo, placa, ano, cor) VALUES (:empresa_id, :nome_caminhao, :modelo, :placa, :ano, :cor)');
 $stmt->execute([
+    ':empresa_id' => $empresaId,
     ':nome_caminhao' => $nomeCaminhao,
     ':modelo' => $modelo,
     ':placa' => $placa,
+    ':ano' => $ano,
+    ':cor' => $cor,
 ]);
 
 nexusJson(['success' => true, 'message' => 'Veículo cadastrado com sucesso.']);

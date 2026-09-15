@@ -62,8 +62,7 @@
       !currentPage || allowedPages[normalizedRole]?.includes(currentPage)
 
     if (currentPage && !isAllowed) {
-      const safePage = normalizedRole === "mecanico" ? "home.html" : "home.html"
-      window.location.href = safePage
+      window.location.href = resolveRootLink("pages/operacoes/home.html")
       return
     }
 
@@ -85,17 +84,11 @@
       "menu.php": "menu",
       "clientes.html": "clientes",
       "clientes.php": "clientes",
-      "novo_atendimento.html": "novo_atendimento",
       "novo_atendimento.php": "novo_atendimento",
-      "revisao.html": "revisao",
       "revisao.php": "revisao",
-      "cadastro_servicos.html": "cadastro_servicos",
       "cadastro_servicos.php": "cadastro_servicos",
-      "cadastro_pecas.html": "cadastro_pecas",
       "cadastro_pecas.php": "cadastro_pecas",
-      "cadastro_veiculo.html": "cadastro_veiculo",
       "cadastro_veiculo.php": "cadastro_veiculo",
-      "historico.html": "historico",
       "historico.php": "historico",
       "perfil_empresa.html": "clientes",
       "perfil_empresa.php": "clientes",
@@ -210,7 +203,7 @@
     botaoContinuar.addEventListener("click", function () {
       if (!tipoSelecionado) return
       sessionStorage.setItem("tipoUsuario", tipoSelecionado)
-      window.location.href = "cadastro_detalhes.html"
+      window.location.href = `../../php/cadastro.php?tipo=${encodeURIComponent(tipoSelecionado)}`
     })
   }
 
@@ -993,7 +986,7 @@
 
     function verPerfil(id) {
       localStorage.setItem("empresa_selecionada", id)
-      window.location.href = getPagesBasePath() + "perfil_empresa.html"
+      window.location.href = resolveRootLink("pages/perfil_empresa.html")
     }
 
     window._nexusPages = window._nexusPages || {}
@@ -1008,7 +1001,7 @@
     insertCommonLayout("home")
 
     window.abrirMenu = function () {
-      window.location.href = getPagesBasePath() + "menu.html"
+      window.location.href = resolveRootLink("pages/operacoes/menu.html")
     }
   }
 

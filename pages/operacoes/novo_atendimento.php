@@ -16,6 +16,17 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS ordens_servico (
     FOREIGN KEY (empresa_id) REFERENCES empresas_cadastradas(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
+$pdo->exec("CREATE TABLE IF NOT EXISTS caminhoes (
+    id INT NOT NULL AUTO_INCREMENT,
+    empresa_id INT DEFAULT NULL,
+    nome_caminhao VARCHAR(100) DEFAULT NULL,
+    modelo VARCHAR(100) DEFAULT NULL,
+    placa VARCHAR(10) NOT NULL,
+    ano INT DEFAULT NULL,
+    cor VARCHAR(50) DEFAULT NULL,
+    PRIMARY KEY (id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
 $pdo->exec("CREATE TABLE IF NOT EXISTS itens_os (
     id INT NOT NULL AUTO_INCREMENT,
     os_id INT NOT NULL,
@@ -27,9 +38,56 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS itens_os (
     descricao TEXT DEFAULT NULL,
     valor DECIMAL(12,2) DEFAULT 0.00,
     quantidade INT DEFAULT 1,
+    valor_unitario DECIMAL(12,2) DEFAULT 0.00,
+    empresa_id INT DEFAULT NULL,
+    veiculo_id INT DEFAULT NULL,
+    servico_id INT DEFAULT NULL,
+    peca_id INT DEFAULT NULL,
+    data_execucao DATE DEFAULT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (os_id) REFERENCES ordens_servico(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+// Atualiza instalações que já possuem as tabelas sem apagar dados existentes.
+$colunas = [
+    'caminhoes' => [
+        'empresa_id' => 'INT DEFAULT NULL',
+        'ano' => 'INT DEFAULT NULL',
+        'cor' => 'VARCHAR(50) DEFAULT NULL',
+    ],
+    'itens_os' => [
+        'valor_unitario' => 'DECIMAL(12,2) DEFAULT 0.00',
+        'empresa_id' => 'INT DEFAULT NULL',
+        'veiculo_id' => 'INT DEFAULT NULL',
+        'servico_id' => 'INT DEFAULT NULL',
+        'peca_id' => 'INT DEFAULT NULL',
+        'data_execucao' => 'DATE DEFAULT NULL',
+    ],
+];
+$stmtColuna = $pdo->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = :tabela AND COLUMN_NAME = :coluna');
+foreach ($colunas as $tabela => $campos) {
+    foreach ($campos as $coluna => $definicao) {
+        $stmtColuna->execute(['tabela' => $tabela, 'coluna' => $coluna]);
+        if (!(int) $stmtColuna->fetchColumn()) {
+            $pdo->exec("ALTER TABLE `{$tabela}` ADD COLUMN `{$coluna}` {$definicao}");
+        }
+    }
+}
+
+$relacoes = [
+    ['itens_os', 'fk_itens_os_empresa', 'empresa_id', 'empresas_cadastradas', 'id'],
+    ['itens_os', 'fk_itens_os_veiculo', 'veiculo_id', 'caminhoes', 'id'],
+    ['itens_os', 'fk_itens_os_servico', 'servico_id', 'cod_servicos', 'id'],
+    ['itens_os', 'fk_itens_os_peca', 'peca_id', 'pecas', 'id'],
+    ['caminhoes', 'fk_caminhoes_empresa', 'empresa_id', 'empresas_cadastradas', 'id'],
+];
+$stmtRelacao = $pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = :tabela AND CONSTRAINT_NAME = :relacao');
+foreach ($relacoes as [$tabela, $relacao, $coluna, $tabelaReferenciada, $colunaReferenciada]) {
+    $stmtRelacao->execute(['tabela' => $tabela, 'relacao' => $relacao]);
+    if (!(int) $stmtRelacao->fetchColumn()) {
+        $pdo->exec("ALTER TABLE `{$tabela}` ADD CONSTRAINT `{$relacao}` FOREIGN KEY (`{$coluna}`) REFERENCES `{$tabelaReferenciada}` (`{$colunaReferenciada}`)");
+    }
+}
 
 // Processar submissão do formulário
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'salvar_os') {
@@ -38,73 +96,152 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $valorTotal = (float) ($_POST['valor_total'] ?? 0);
         $descricaoGeral = trim((string) ($_POST['descricao_geral'] ?? ''));
 
-        if ($empresaId <= 0 || $valorTotal < 0) {
-            throw new Exception('Dados inválidos');
+        if ($empresaId <= 0) {
+            throw new Exception('Selecione uma empresa válida.');
         }
 
         // Iniciar transação
         $pdo->beginTransaction();
 
-        // Salvar OS principal
-        $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, status) VALUES (:empresa_id, :valor_total, :descricao_geral, "pendente_revisao")');
+        $stmtEmpresa = $pdo->prepare('SELECT id, nome FROM empresas_cadastradas WHERE id = :id LIMIT 1');
+        $stmtEmpresa->execute(['id' => $empresaId]);
+        $empresa = $stmtEmpresa->fetch();
+        if (!$empresa) {
+            throw new Exception('A empresa selecionada não foi encontrada.');
+        }
+
+        $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, status) VALUES (:empresa_id, 0, :descricao_geral, "pendente_revisao")');
         $stmtOS->execute([
             ':empresa_id' => $empresaId,
-            ':valor_total' => $valorTotal,
             ':descricao_geral' => $descricaoGeral,
         ]);
-
         $osId = $pdo->lastInsertId();
 
         // Processar veículos (enviados como JSON)
-        $frotaJSON = $_POST['frota_json'] ?? '[]';
-        $frota = json_decode($frotaJSON, true) ?? [];
+        $frota = json_decode($_POST['frota_json'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
+        if (!is_array($frota) || count($frota) === 0) {
+            throw new Exception('Adicione ao menos um veículo.');
+        }
 
-        $stmtItem = $pdo->prepare('INSERT INTO itens_os (os_id, tipo, placa, modelo, ano, cor, descricao, valor, quantidade) VALUES (:os_id, :tipo, :placa, :modelo, :ano, :cor, :descricao, :valor, :quantidade)');
+        $stmtVeiculo = $pdo->prepare('SELECT id, placa, modelo, ano, cor FROM caminhoes WHERE id = :id AND (empresa_id = :empresa_id OR (empresa_id IS NULL AND nome_caminhao = :nome_empresa)) LIMIT 1');
+        $stmtNovoVeiculo = $pdo->prepare('INSERT INTO caminhoes (empresa_id, nome_caminhao, modelo, placa, ano, cor) VALUES (:empresa_id, :nome_caminhao, :modelo, :placa, :ano, :cor)');
+        $stmtItem = $pdo->prepare('INSERT INTO itens_os (os_id, tipo, empresa_id, veiculo_id, servico_id, peca_id, placa, modelo, ano, cor, data_execucao, descricao, valor, valor_unitario, quantidade) VALUES (:os_id, :tipo, :empresa_id, :veiculo_id, :servico_id, :peca_id, :placa, :modelo, :ano, :cor, :data_execucao, :descricao, :valor, :valor_unitario, :quantidade)');
+        $totalCalculado = 0.0;
 
         foreach ($frota as $veiculo) {
-            // Salvar dados do veículo
+            $dadosVeiculo = $veiculo['dadosVeiculo'] ?? [];
+            $veiculoId = (int) ($dadosVeiculo['id'] ?? 0);
+            $stmtVeiculo->execute(['id' => $veiculoId, 'empresa_id' => $empresaId, 'nome_empresa' => $empresa['nome']]);
+            $veiculoBanco = $veiculoId > 0 ? $stmtVeiculo->fetch() : false;
+            if ($veiculoId > 0 && !$veiculoBanco) {
+                throw new Exception('O veículo selecionado não pertence à empresa informada.');
+            }
+            if (!$veiculoBanco) {
+                $stmtNovoVeiculo->execute([
+                    'empresa_id' => $empresaId,
+                    'nome_caminhao' => $empresa['nome'],
+                    'modelo' => trim((string) ($dadosVeiculo['modelo'] ?? '')),
+                    'placa' => strtoupper(trim((string) ($dadosVeiculo['placa'] ?? ''))),
+                    'ano' => (int) ($dadosVeiculo['ano'] ?? 0) ?: null,
+                    'cor' => trim((string) ($dadosVeiculo['cor'] ?? '')),
+                ]);
+                $veiculoId = (int) $pdo->lastInsertId();
+                $veiculoBanco = [
+                    'id' => $veiculoId,
+                    'placa' => strtoupper(trim((string) ($dadosVeiculo['placa'] ?? ''))),
+                    'modelo' => trim((string) ($dadosVeiculo['modelo'] ?? '')),
+                    'ano' => (int) ($dadosVeiculo['ano'] ?? 0) ?: null,
+                    'cor' => trim((string) ($dadosVeiculo['cor'] ?? '')),
+                ];
+            }
+
             $stmtItem->execute([
                 ':os_id' => $osId,
                 ':tipo' => 'veiculo',
-                ':placa' => $veiculo['dadosVeiculo']['placa'] ?? null,
-                ':modelo' => $veiculo['dadosVeiculo']['modelo'] ?? null,
-                ':ano' => $veiculo['dadosVeiculo']['ano'] ?? null,
-                ':cor' => $veiculo['dadosVeiculo']['cor'] ?? null,
+                ':empresa_id' => $empresaId,
+                ':veiculo_id' => $veiculoId,
+                ':servico_id' => null,
+                ':peca_id' => null,
+                ':placa' => $veiculoBanco['placa'],
+                ':modelo' => $veiculoBanco['modelo'],
+                ':ano' => $veiculoBanco['ano'],
+                ':cor' => $veiculoBanco['cor'],
+                ':data_execucao' => null,
                 ':descricao' => null,
                 ':valor' => 0,
+                ':valor_unitario' => 0,
                 ':quantidade' => 1,
             ]);
 
             // Salvar serviços do veículo
             foreach ($veiculo['servicos'] ?? [] as $servico) {
+                $servicoId = (int) str_replace('banco_', '', (string) ($servico['tipo'] ?? ''));
+                $stmtServico = $pdo->prepare('SELECT id, nome_servico, descricao, preco FROM cod_servicos WHERE id = :id LIMIT 1');
+                $stmtServico->execute(['id' => $servicoId]);
+                $servicoBanco = $stmtServico->fetch();
+                if (!$servicoBanco) {
+                    throw new Exception('Um dos serviços selecionados não foi encontrado.');
+                }
+                $valorServico = (float) ($servicoBanco['preco'] ?? 0);
+                $totalCalculado += $valorServico;
                 $stmtItem->execute([
                     ':os_id' => $osId,
                     ':tipo' => 'servico',
-                    ':placa' => $veiculo['dadosVeiculo']['placa'] ?? null,
+                    ':empresa_id' => $empresaId,
+                    ':veiculo_id' => $veiculoId,
+                    ':servico_id' => $servicoBanco['id'],
+                    ':peca_id' => null,
+                    ':placa' => $veiculoBanco['placa'],
                     ':modelo' => null,
                     ':ano' => null,
                     ':cor' => null,
-                    ':descricao' => $servico['descricao'] ?? null,
-                    ':valor' => (float) ($servico['valor'] ?? 0),
+                    ':data_execucao' => $servico['data'] ?? null,
+                    ':descricao' => $servicoBanco['descricao'],
+                    ':valor' => $valorServico,
+                    ':valor_unitario' => $valorServico,
                     ':quantidade' => 1,
                 ]);
             }
 
             // Salvar peças do veículo
             foreach ($veiculo['pecas'] ?? [] as $peca) {
+                $pecaId = (int) ($peca['pecaId'] ?? 0);
+                $quantidade = (int) ($peca['quantidade'] ?? 0);
+                $stmtPeca = $pdo->prepare('SELECT id, nome, valor, estoque FROM pecas WHERE id = :id AND status = "Ativa" LIMIT 1');
+                $stmtPeca->execute(['id' => $pecaId]);
+                $pecaBanco = $stmtPeca->fetch();
+                if (!$pecaBanco || $quantidade < 1 || $quantidade > (int) $pecaBanco['estoque']) {
+                    throw new Exception('Peça inválida ou quantidade maior que o estoque disponível.');
+                }
+                $valorUnitario = (float) $pecaBanco['valor'];
+                $valorPeca = $valorUnitario * $quantidade;
+                $totalCalculado += $valorPeca;
                 $stmtItem->execute([
                     ':os_id' => $osId,
                     ':tipo' => 'peca',
-                    ':placa' => $veiculo['dadosVeiculo']['placa'] ?? null,
+                    ':empresa_id' => $empresaId,
+                    ':veiculo_id' => $veiculoId,
+                    ':servico_id' => null,
+                    ':peca_id' => $pecaBanco['id'],
+                    ':placa' => $veiculoBanco['placa'],
                     ':modelo' => null,
                     ':ano' => null,
                     ':cor' => null,
-                    ':descricao' => $peca['nome'] ?? null,
-                    ':valor' => (float) ($peca['valorTotal'] ?? 0),
-                    ':quantidade' => (int) ($peca['quantidade'] ?? 1),
+                    ':data_execucao' => null,
+                    ':descricao' => $pecaBanco['nome'],
+                    ':valor' => $valorPeca,
+                    ':valor_unitario' => $valorUnitario,
+                    ':quantidade' => $quantidade,
                 ]);
+                $pdo->prepare('UPDATE pecas SET estoque = estoque - :quantidade WHERE id = :id')->execute(['quantidade' => $quantidade, 'id' => $pecaBanco['id']]);
             }
         }
+
+        $stmtOS = $pdo->prepare('UPDATE ordens_servico SET valor_total = :valor_total WHERE id = :id');
+        $stmtOS->execute([
+            ':valor_total' => $totalCalculado,
+            ':id' => $osId,
+        ]);
 
         $pdo->commit();
 
@@ -140,7 +277,7 @@ $servicos = $pdo->query('SELECT id, nome_servico as nome, preco as valor, descri
 $pecas = $pdo->query('SELECT id, nome, valor, unidade, estoque FROM pecas WHERE status = "Ativa" ORDER BY nome ASC')->fetchAll();
 
 // Buscar veículos cadastrados para referência
-$veiculos = $pdo->query('SELECT id, nome_caminhao as empresa, placa, modelo FROM caminhoes ORDER BY nome_caminhao ASC')->fetchAll();
+$veiculos = $pdo->query('SELECT id, empresa_id, nome_caminhao as empresa, placa, modelo, ano, cor FROM caminhoes ORDER BY nome_caminhao ASC')->fetchAll();
 
 // Converter para JSON para JavaScript
 $empresasJSON = json_encode($empresas, JSON_UNESCAPED_UNICODE);
@@ -167,7 +304,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
         <main class="conteudo-principal">
             <!-- Success Message -->
             <div id="successMessage" style="display: none; position: fixed; top: 20px; right: 20px; background: #d4edda; color: #155724; padding: 15px 20px; border: 1px solid #c3e6cb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; font-weight: 500; animation: slideIn 0.3s ease-out; max-width: 300px;">
-                <i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href='revisao.html'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>
+                <i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href='revisao.php'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>
             </div>
 
             <section class="titulo-pagina-stack">
@@ -253,16 +390,22 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
             const container = document.getElementById('container-veiculos');
             const div = document.createElement('div');
             div.className = 'bloco-veiculo';
-            div.style = 'margin-bottom: 24px;';
             
             div.innerHTML = `
-                <div class="secao-formulario-novo" style="position: relative;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
-                        <h3 style="margin: 0;"><i class="bi bi-car-front"></i> Veículo ${contagemVeiculos}</h3>
-                        <button type="button" class="botao-secundario" onclick="mostrarVeiculosCadastrados(this)" style="padding: 10px 16px; font-size: 0.95rem; white-space: nowrap;">Buscar veículo cadastrado</button>
+                <div class="secao-formulario-novo painel-veiculo" style="position: relative;">
+                    <div class="cabecalho-veiculo">
+                        <div class="identificacao-veiculo">
+                            <span class="numero-veiculo">CAMINHÃO ${contagemVeiculos}</span>
+                            <h3><i class="bi bi-truck-front"></i> Dados do veículo</h3>
+                        </div>
+                        <div class="acoes-veiculo">
+                            <button type="button" class="botao-secundario" onclick="mostrarVeiculosCadastrados(this)" style="padding: 10px 16px; font-size: 0.95rem; white-space: nowrap;"><i class="bi bi-search"></i> Buscar veículo</button>
+                            <button type="button" class="botao-remover-veiculo" onclick="removerCamposVeiculo(this)" title="Remover este caminhão"><i class="bi bi-trash3"></i> Remover</button>
+                        </div>
                     </div>
                     <div class="painel-veiculos-existentes" style="display: none; margin-top: 16px;"></div>
                     <div class="linha-campos">
+                        <input type="hidden" class="v-veiculo-id" value="">
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-tag"></i> Placa</label>
                             <input type="text" class="v-placa" placeholder="ABC-1234" required>
@@ -298,6 +441,14 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
             adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
         }
 
+        function removerCamposVeiculo(botao) {
+            const blocoVeiculo = botao.closest('.bloco-veiculo');
+            if (!blocoVeiculo) return;
+
+            blocoVeiculo.remove();
+            calcularTotalGeral();
+        }
+
         function mostrarVeiculosCadastrados(botao) {
             const empresaSelecionada = document.getElementById('selecao-empresa').value;
             if (!empresaSelecionada) {
@@ -305,8 +456,12 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 return;
             }
 
-            // Filtrar veículos da empresa selecionada
-            const veiculosDaEmpresa = VEICULOS_BANCO.filter(v => v.empresa === EMPRESAS_BANCO.find(e => e.id == empresaSelecionada)?.nome);
+            // Prioriza a relação por empresa_id e mantém compatibilidade com veículos antigos.
+            const nomeEmpresa = EMPRESAS_BANCO.find(e => e.id == empresaSelecionada)?.nome;
+            const veiculosDaEmpresa = VEICULOS_BANCO.filter(v =>
+                String(v.empresa_id || '') === String(empresaSelecionada) ||
+                (!v.empresa_id && v.empresa === nomeEmpresa)
+            );
             
             if (veiculosDaEmpresa.length === 0) {
                 alert('Nenhum veículo cadastrado encontrado para esta empresa.');
@@ -358,6 +513,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 return;
             }
 
+            blocoVeiculo.querySelector('.v-veiculo-id').value = veiculo.id || '';
             blocoVeiculo.querySelector('.v-placa').value = veiculo.placa || '';
             blocoVeiculo.querySelector('.v-modelo').value = veiculo.modelo || '';
             blocoVeiculo.querySelector('.v-ano').value = veiculo.ano || '';
@@ -685,6 +841,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
 
                 frotaCompleta.push({
                     dadosVeiculo: {
+                        id: bloco.querySelector('.v-veiculo-id')?.value || '',
                         placa: bloco.querySelector('.v-placa').value,
                         modelo: bloco.querySelector('.v-modelo').value,
                         ano: bloco.querySelector('.v-ano').value,
@@ -710,7 +867,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
             .then(data => {
                 if (data.sucesso) {
                     const successDiv = document.getElementById('successMessage');
-                    successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href=\'revisao.html\'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>';
+                    successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href=\'revisao.php\'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>';
                     successDiv.style.display = 'block';
                     limparFormularioCompleto();
                 } else {

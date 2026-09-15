@@ -34,10 +34,15 @@ ON DUPLICATE KEY UPDATE nome = VALUES(nome), cnpj = VALUES(cnpj), site = VALUES(
 
 CREATE TABLE IF NOT EXISTS caminhoes (
   id INT NOT NULL AUTO_INCREMENT,
+  empresa_id INT DEFAULT NULL,
   nome_caminhao VARCHAR(100) DEFAULT NULL,
   modelo VARCHAR(100) DEFAULT NULL,
   placa VARCHAR(10) NOT NULL,
-  PRIMARY KEY (id)
+  ano INT DEFAULT NULL,
+  cor VARCHAR(50) DEFAULT NULL,
+  PRIMARY KEY (id),
+  KEY fk_caminhoes_empresa (empresa_id),
+  CONSTRAINT fk_caminhoes_empresa FOREIGN KEY (empresa_id) REFERENCES empresas_cadastradas (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
 CREATE TABLE IF NOT EXISTS cod_servicos (

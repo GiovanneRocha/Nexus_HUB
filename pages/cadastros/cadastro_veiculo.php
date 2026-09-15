@@ -4,11 +4,35 @@ require_once __DIR__ . '/../../php/db.php';
 $pdo = nexusDb();
 $pdo->exec("CREATE TABLE IF NOT EXISTS caminhoes (
     id INT NOT NULL AUTO_INCREMENT,
+    empresa_id INT DEFAULT NULL,
     nome_caminhao VARCHAR(100) DEFAULT NULL,
     modelo VARCHAR(100) DEFAULT NULL,
     placa VARCHAR(10) NOT NULL,
+    ano INT DEFAULT NULL,
+    cor VARCHAR(50) DEFAULT NULL,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
+$colunasVeiculo = [
+    'empresa_id' => 'INT DEFAULT NULL',
+    'ano' => 'INT DEFAULT NULL',
+    'cor' => 'VARCHAR(50) DEFAULT NULL',
+];
+$stmtColuna = $pdo->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "caminhoes" AND COLUMN_NAME = :coluna');
+foreach ($colunasVeiculo as $coluna => $definicao) {
+    $stmtColuna->execute(['coluna' => $coluna]);
+    if (!(int) $stmtColuna->fetchColumn()) {
+        $pdo->exec("ALTER TABLE caminhoes ADD COLUMN `{$coluna}` {$definicao}");
+    }
+}
+
+$stmtRelacao = $pdo->prepare('SELECT COUNT(*) FROM information_schema.TABLE_CONSTRAINTS WHERE CONSTRAINT_SCHEMA = DATABASE() AND TABLE_NAME = "caminhoes" AND CONSTRAINT_NAME = "fk_caminhoes_empresa"');
+$stmtRelacao->execute();
+if (!(int) $stmtRelacao->fetchColumn()) {
+    $pdo->exec('ALTER TABLE caminhoes ADD CONSTRAINT fk_caminhoes_empresa FOREIGN KEY (empresa_id) REFERENCES empresas_cadastradas (id)');
+}
+
+$empresas = $pdo->query('SELECT id, nome, cnpj FROM empresas_cadastradas ORDER BY nome ASC')->fetchAll();
 $mensagem = '';
 $registro = null;
 
@@ -22,31 +46,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensagem = '<div class="alerta sucesso">Veículo removido com sucesso.</div>';
         }
     } else {
-        $nome_caminhao = trim((string) ($_POST['nome_caminhao'] ?? ''));
+        $empresa_id = (int) ($_POST['empresa_id'] ?? 0);
         $modelo = trim((string) ($_POST['modelo'] ?? ''));
         $placa = trim(strtoupper((string) ($_POST['placa'] ?? '')));
+        $ano = (int) ($_POST['ano'] ?? 0);
+        $cor = trim((string) ($_POST['cor'] ?? ''));
+        $empresaSelecionada = $pdo->prepare('SELECT id, nome FROM empresas_cadastradas WHERE id = :id LIMIT 1');
+        $empresaSelecionada->execute([':id' => $empresa_id]);
+        $empresa = $empresaSelecionada->fetch();
+        $nome_caminhao = $empresa['nome'] ?? '';
 
-        if ($nome_caminhao === '' || $modelo === '' || $placa === '') {
-            $mensagem = '<div class="alerta erro">Empresa, modelo e placa são obrigatórios.</div>';
+        if (!$empresa || $modelo === '' || $placa === '' || $ano < 1900 || $ano > (int) date('Y') || $cor === '') {
+            $mensagem = '<div class="alerta erro">Selecione uma empresa e preencha modelo, placa, ano e cor válidos.</div>';
         } else {
             if ($action === 'update') {
                 $id = (int) ($_POST['id'] ?? 0);
                 if ($id > 0) {
-                    $stmt = $pdo->prepare('UPDATE caminhoes SET nome_caminhao = :nome_caminhao, modelo = :modelo, placa = :placa WHERE id = :id');
+                    $stmt = $pdo->prepare('UPDATE caminhoes SET empresa_id = :empresa_id, nome_caminhao = :nome_caminhao, modelo = :modelo, placa = :placa, ano = :ano, cor = :cor WHERE id = :id');
                     $stmt->execute([
+                        ':empresa_id' => $empresa_id,
                         ':nome_caminhao' => $nome_caminhao,
                         ':modelo' => $modelo,
                         ':placa' => $placa,
+                        ':ano' => $ano,
+                        ':cor' => $cor,
                         ':id' => $id,
                     ]);
                     $mensagem = '<div class="alerta sucesso">Veículo atualizado com sucesso.</div>';
                 }
             } else {
-                $stmt = $pdo->prepare('INSERT INTO caminhoes (nome_caminhao, modelo, placa) VALUES (:nome_caminhao, :modelo, :placa)');
+                $stmt = $pdo->prepare('INSERT INTO caminhoes (empresa_id, nome_caminhao, modelo, placa, ano, cor) VALUES (:empresa_id, :nome_caminhao, :modelo, :placa, :ano, :cor)');
                 $stmt->execute([
+                    ':empresa_id' => $empresa_id,
                     ':nome_caminhao' => $nome_caminhao,
                     ':modelo' => $modelo,
                     ':placa' => $placa,
+                    ':ano' => $ano,
+                    ':cor' => $cor,
                 ]);
                 $mensagem = '<div class="alerta sucesso">Veículo cadastrado com sucesso.</div>';
             }
@@ -61,7 +97,7 @@ if (isset($_GET['edit'])) {
     $registro = $registro->fetch();
 }
 
-$lista = $pdo->query('SELECT * FROM caminhoes ORDER BY id DESC')->fetchAll();
+$lista = $pdo->query('SELECT caminhoes.*, empresas_cadastradas.nome AS empresa_nome FROM caminhoes LEFT JOIN empresas_cadastradas ON empresas_cadastradas.id = caminhoes.empresa_id ORDER BY caminhoes.id DESC')->fetchAll();
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -95,8 +131,15 @@ $lista = $pdo->query('SELECT * FROM caminhoes ORDER BY id DESC')->fetchAll();
                 <div class="form-card">
                     <div class="form-grid">
                         <div class="form-group">
-                            <label>Empresa / Nome do caminhão *</label>
-                            <input type="text" name="nome_caminhao" value="<?= htmlspecialchars($registro['nome_caminhao'] ?? '') ?>" required>
+                            <label for="empresa_id">Empresa *</label>
+                            <select id="empresa_id" name="empresa_id" required>
+                                <option value="">Selecione uma empresa cadastrada...</option>
+                                <?php foreach ($empresas as $empresa): ?>
+                                    <option value="<?= (int) $empresa['id'] ?>" <?= ((int) ($registro['empresa_id'] ?? 0) === (int) $empresa['id']) ? 'selected' : '' ?>>
+                                        <?= htmlspecialchars($empresa['nome']) ?><?= $empresa['cnpj'] ? ' - ' . htmlspecialchars($empresa['cnpj']) : '' ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label>Placa *</label>
@@ -105,6 +148,14 @@ $lista = $pdo->query('SELECT * FROM caminhoes ORDER BY id DESC')->fetchAll();
                         <div class="form-group form-grid-full">
                             <label>Modelo *</label>
                             <input type="text" name="modelo" value="<?= htmlspecialchars($registro['modelo'] ?? '') ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="ano">Ano *</label>
+                            <input type="number" id="ano" name="ano" value="<?= htmlspecialchars($registro['ano'] ?? '') ?>" min="1900" max="<?= (int) date('Y') ?>" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cor">Cor *</label>
+                            <input type="text" id="cor" name="cor" value="<?= htmlspecialchars($registro['cor'] ?? '') ?>" maxlength="50" required>
                         </div>
                     </div>
                     <div class="form-actions">
@@ -124,18 +175,22 @@ $lista = $pdo->query('SELECT * FROM caminhoes ORDER BY id DESC')->fetchAll();
                             <th>Empresa</th>
                             <th>Modelo</th>
                             <th>Placa</th>
+                            <th>Ano</th>
+                            <th>Cor</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody>
                         <?php if (empty($lista)): ?>
-                            <tr><td colspan="4" class="table-empty"><i class="bi bi-inbox"></i> Nenhum veículo cadastrado.</td></tr>
+                            <tr><td colspan="6" class="table-empty"><i class="bi bi-inbox"></i> Nenhum veículo cadastrado.</td></tr>
                         <?php else: ?>
                             <?php foreach ($lista as $veiculo): ?>
                                 <tr>
-                                    <td><?= htmlspecialchars($veiculo['nome_caminhao']) ?></td>
+                                    <td><?= htmlspecialchars($veiculo['empresa_nome'] ?: $veiculo['nome_caminhao']) ?></td>
                                     <td><?= htmlspecialchars($veiculo['modelo']) ?></td>
                                     <td><?= htmlspecialchars($veiculo['placa']) ?></td>
+                                    <td><?= htmlspecialchars($veiculo['ano'] ?? '-') ?></td>
+                                    <td><?= htmlspecialchars($veiculo['cor'] ?? '-') ?></td>
                                     <td>
                                         <div class="table-actions">
                                             <a href="?edit=<?= (int) $veiculo['id'] ?>" class="btn-table btn-table-edit"><i class="bi bi-pencil"></i> Editar</a>
