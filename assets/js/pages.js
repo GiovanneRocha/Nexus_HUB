@@ -80,9 +80,7 @@
     const pageMap = {
       "home.html": "home",
       "home.php": "home",
-      "menu.html": "menu",
       "menu.php": "menu",
-      "clientes.html": "clientes",
       "clientes.php": "clientes",
       "novo_atendimento.php": "novo_atendimento",
       "revisao.php": "revisao",
@@ -1001,7 +999,7 @@
     insertCommonLayout("home")
 
     window.abrirMenu = function () {
-      window.location.href = resolveRootLink("pages/operacoes/menu.html")
+      window.location.href = resolveRootLink("pages/operacoes/menu.php")
     }
   }
 
@@ -1291,7 +1289,7 @@
         }
 
         alert("Empresa cadastrada com sucesso!")
-        window.location.href = "../../pages/clientes.html"
+        window.location.href = "../../pages/clientes.php"
       } catch (erro) {
         alert(erro.message || "Erro ao cadastrar empresa.")
       }

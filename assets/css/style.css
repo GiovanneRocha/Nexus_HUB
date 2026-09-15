@@ -2205,8 +2205,8 @@ select option.placeholder {
 }
 
 body.light-mode {
-  background: linear-gradient(135deg, #e2e8f0 0%, #f8fafc 100%);
-  color: #111827;
+  background: linear-gradient(135deg, #eef2f7 0%, #f8fafc 100%);
+  color: #172033;
 }
 
 body.light-mode .secao-apresentacao,
@@ -2297,6 +2297,186 @@ body.light-mode .menu-suspenso button {
 body.light-mode .menu-suspenso:hover,
 body.light-mode .menu-suspenso button:hover {
   background: #eef2ff;
+}
+
+/* Contraste e superfícies consistentes no tema claro. */
+body.light-mode .conteudo-principal,
+body.light-mode .container-formulario-novo-atendimento {
+  background: #f8fafc;
+}
+
+body.light-mode .secao-formulario-novo,
+body.light-mode .card-tabela,
+body.light-mode .card-os-revisao,
+body.light-mode .historico-card,
+body.light-mode .bloco-veiculo,
+body.light-mode .painel-veiculo,
+body.light-mode .revisao-filtros,
+body.light-mode .historico-filtros,
+body.light-mode .filtro-card {
+  background: #ffffff;
+  border-color: #cbd5e1;
+  color: #172033;
+}
+
+body.light-mode .secao-formulario-novo h3,
+body.light-mode .secao-formulario-novo h4,
+body.light-mode .titulo-pagina-stack h1,
+body.light-mode .card-tabela h2,
+body.light-mode .cabecalho-os-revisao h2,
+body.light-mode .historico-cabecalho h2,
+body.light-mode .identificacao-veiculo h3 {
+  color: #172033;
+}
+
+body.light-mode .titulo-pagina-stack p,
+body.light-mode .subtitulo-formulario,
+body.light-mode .cabecalho-os-revisao p,
+body.light-mode .historico-cabecalho p,
+body.light-mode .os-resumo,
+body.light-mode .historico-resumo,
+body.light-mode .texto-secundario,
+body.light-mode .sem-dados,
+body.light-mode .sem-historico,
+body.light-mode .sem-resultados-revisao {
+  color: #475569;
+}
+
+body.light-mode .tabela-dados,
+body.light-mode .tabela-historico,
+body.light-mode .tabela-custom {
+  color: #172033;
+}
+
+body.light-mode .tabela-dados thead,
+body.light-mode .tabela-historico thead {
+  background: #e8eef5;
+}
+
+body.light-mode .tabela-dados th,
+body.light-mode .tabela-historico th,
+body.light-mode .tabela-custom th {
+  color: #14532d;
+  border-color: #cbd5e1;
+}
+
+body.light-mode .tabela-dados td,
+body.light-mode .tabela-historico td,
+body.light-mode .tabela-custom td {
+  color: #334155;
+  border-color: #e2e8f0;
+}
+
+body.light-mode .tabela-dados tbody tr:hover,
+body.light-mode .tabela-historico tbody tr:hover,
+body.light-mode .tabela-custom tbody tr:hover {
+  background: #f1f5f9;
+}
+
+body.light-mode .bloco-caminhao-revisao,
+body.light-mode .historico-caminhao,
+body.light-mode .painel-veiculos-existentes {
+  background: #f8fafc;
+  border-color: #cbd5e1;
+}
+
+body.light-mode .bloco-caminhao-revisao h3,
+body.light-mode .historico-caminhao h3,
+body.light-mode .bloco-caminhao-revisao p,
+body.light-mode .historico-caminhao p,
+body.light-mode .historico-caminhao li,
+body.light-mode .lista-itens-revisao {
+  color: #334155;
+}
+
+body.light-mode .botao-acao,
+body.light-mode .botao-continuar,
+body.light-mode .botao-aba-ativo {
+  color: #ffffff;
+  background: #047857;
+  border-color: #047857;
+}
+
+body.light-mode .botao-acao:hover,
+body.light-mode .botao-continuar:hover,
+body.light-mode .botao-aba-ativo:hover {
+  background: #065f46;
+  border-color: #065f46;
+}
+
+body.light-mode .botao-pequeno,
+body.light-mode .botao-pequeno-info {
+  background: #dbeafe;
+  color: #1e3a8a;
+  border-color: #93c5fd;
+}
+
+body.light-mode .botao-remover-veiculo {
+  color: #b91c1c;
+  border-color: #fca5a5;
+}
+
+body.light-mode .status-revisao.pendente_revisao,
+body.light-mode .status-pendente_revisao {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+body.light-mode .status-revisao.finalizada,
+body.light-mode .status-finalizada {
+  background: #dcfce7;
+  color: #166534;
+}
+
+body.light-mode .status-revisao.reprovada,
+body.light-mode .status-reprovada {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+body.light-mode .modal-historico,
+body.light-mode .modal-revisao {
+  background: rgba(15, 23, 42, 0.48);
+}
+
+/* Evita que tabelas e barras de ações estourem em telas estreitas. */
+.card-tabela,
+.tabela-historico-container {
+  overflow-x: auto;
+}
+
+.tabela-dados,
+.tabela-historico,
+.tabela-custom {
+  min-width: 640px;
+}
+
+@media (max-width: 680px) {
+  .conteudo-principal {
+    padding: 18px 16px 28px;
+  }
+  .titulo-pagina-stack h1 {
+    font-size: 1.25rem;
+  }
+  .card-tabela,
+  .card-os-revisao,
+  .historico-card {
+    border-radius: 8px;
+  }
+  .area-botoes,
+  .acoes-revisao,
+  .historico-acoes {
+    flex-direction: column;
+  }
+  .area-botoes > *,
+  .acoes-revisao button,
+  .historico-acoes button {
+    width: 100%;
+  }
+  .modal-conteudo {
+    width: calc(100% - 24px);
+    margin: 12px auto;
+  }
 }
 
 /* Responsividade */

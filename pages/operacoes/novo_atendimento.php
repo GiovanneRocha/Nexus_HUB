@@ -356,7 +356,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                             <button type="button" onclick="limparFormulario()" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="bi bi-trash"></i> Limpar
                             </button>
-                            <button type="button" onclick="window.location.href='menu.html'" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <button type="button" onclick="window.location.href='menu.php'" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="bi bi-arrow-left"></i> Voltar
                             </button>
                         </div>

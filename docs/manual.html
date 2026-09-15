@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manual Técnico - Nexus HUB</title>
+    <link rel="icon" type="image/png" href="../assets/images/icon-sistem.png" />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css"
+    />
+    <link rel="stylesheet" href="../assets/css/style.css" />
+    <link rel="stylesheet" href="../assets/css/pages.css" />
+    <style>
+      .manual-shell {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 28px;
+      }
+      .manual-topo {
+        display: flex;
+        justify-content: space-between;
+        gap: 20px;
+        align-items: flex-start;
+        padding: 24px;
+        margin-bottom: 18px;
+        border: 1px solid var(--bordar);
+        border-radius: 12px;
+        background: var(--surface);
+      }
+      .manual-topo h1 {
+        margin: 0 0 8px;
+        color: var(--texto-principal);
+      }
+      .manual-topo p {
+        margin: 0;
+        color: var(--texto-secundario);
+      }
+      .manual-grid {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 18px;
+        align-items: start;
+      }
+      .manual-nav,
+      .manual-section {
+        padding: 20px;
+        border: 1px solid var(--bordar);
+        border-radius: 10px;
+        background: var(--surface);
+      }
+      .manual-nav {
+        position: sticky;
+        top: 20px;
+      }
+      .manual-nav h2 {
+        margin: 0 0 12px;
+        color: var(--texto-principal);
+        font-size: 1rem;
+      }
+      .manual-nav a {
+        display: block;
+        padding: 8px 0;
+        color: var(--texto-secundario);
+        text-decoration: none;
+      }
+      .manual-nav a:hover {
+        color: var(--verde-esmeralda);
+      }
+      .manual-section {
+        margin-bottom: 16px;
+        scroll-margin-top: 20px;
+      }
+      .manual-section h2 {
+        margin: 0 0 8px;
+        color: var(--texto-principal);
+        font-size: 1.15rem;
+      }
+      .manual-section h3 {
+        margin: 18px 0 6px;
+        color: var(--destaque);
+        font-size: 0.95rem;
+      }
+      .manual-section p,
+      .manual-section li {
+        color: var(--texto-secundario);
+        line-height: 1.6;
+      }
+      .manual-section ul,
+      .manual-section ol {
+        padding-left: 20px;
+      }
+      .manual-shortcuts {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-top: 14px;
+      }
+      .manual-link {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px;
+        border: 1px solid var(--bordar);
+        border-radius: 8px;
+        color: var(--texto-principal);
+        text-decoration: none;
+        background: rgba(16, 185, 129, 0.05);
+      }
+      .manual-link i {
+        color: var(--verde-esmeralda);
+        font-size: 1.15rem;
+      }
+      .manual-link:hover {
+        border-color: var(--verde-esmeralda);
+      }
+      .manual-note {
+        padding: 12px 14px;
+        margin-top: 14px;
+        border-left: 3px solid var(--verde-esmeralda);
+        background: rgba(16, 185, 129, 0.08);
+        color: var(--texto-secundario);
+      }
+      @media (max-width: 760px) {
+        .manual-shell {
+          padding: 18px 14px;
+        }
+        .manual-topo {
+          flex-direction: column;
+        }
+        .manual-grid {
+          grid-template-columns: 1fr;
+        }
+        .manual-nav {
+          position: static;
+        }
+        .manual-shortcuts {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body class="corpo-dashboard">
+    <main class="manual-shell">
+      <header class="manual-topo">
+        <div>
+          <h1><i class="bi bi-lightbulb"></i> Manual Técnico Nexus HUB</h1>
+          <p>
+            Atalhos e procedimentos para operar o sistema com segurança e
+            agilidade.
+          </p>
+        </div>
+        <a class="botao-secundario" href="../pages/operacoes/home.html"
+          ><i class="bi bi-arrow-left"></i> Voltar ao sistema</a
+        >
+      </header>
+      <div class="manual-grid">
+        <nav class="manual-nav" aria-label="Índice do manual">
+          <h2>Índice rápido</h2>
+          <a href="#fluxo">Fluxo da OS</a><a href="#cadastros">Cadastros</a
+          ><a href="#revisao">Revisão</a><a href="#historico">Histórico e PDF</a
+          ><a href="#atalhos">Atalhos do sistema</a>
+        </nav>
+        <div>
+          <section class="manual-section" id="fluxo">
+            <h2><i class="bi bi-diagram-3"></i> Fluxo recomendado</h2>
+            <ol>
+              <li>Cadastre a empresa em <strong>Clientes</strong>.</li>
+              <li>Cadastre o caminhão e associe-o à empresa.</li>
+              <li>Cadastre serviços e peças disponíveis.</li>
+              <li>
+                Abra uma Nova OS, escolha a empresa e adicione os caminhões.
+              </li>
+              <li>
+                Inclua serviços e peças. O sistema valida estoque e calcula o
+                total.
+              </li>
+              <li>Envie a OS para Revisão e aguarde a aprovação.</li>
+              <li>Consulte a OS aprovada no Histórico e gere o PDF.</li>
+            </ol>
+            <div class="manual-note">
+              <i class="bi bi-info-circle"></i> Os valores e relações são
+              carregados do banco de dados; evite duplicar registros
+              manualmente.
+            </div>
+          </section>
+          <section class="manual-section" id="cadastros">
+            <h2><i class="bi bi-database-check"></i> Cadastros e relações</h2>
+            <p>
+              O sistema trabalha com relações para manter os dados consistentes:
+            </p>
+            <ul>
+              <li>
+                <strong>Empresa x Caminhão:</strong> todo caminhão deve possuir
+                uma empresa associada.
+              </li>
+              <li>
+                <strong>OS x Empresa:</strong> cada ordem pertence a uma
+                empresa.
+              </li>
+              <li>
+                <strong>OS x Caminhão:</strong> os itens da OS preservam placa,
+                modelo, ano e cor.
+              </li>
+              <li>
+                <strong>OS x Serviço/Peça:</strong> os itens usam os IDs do
+                cadastro e os valores oficiais.
+              </li>
+            </ul>
+            <div class="manual-shortcuts">
+              <a
+                class="manual-link"
+                href="../pages/cadastros/cadastrar_empresa.php"
+                ><i class="bi bi-building"></i> Empresas</a
+              ><a
+                class="manual-link"
+                href="../pages/cadastros/cadastro_veiculo.php"
+                ><i class="bi bi-truck"></i> Caminhões</a
+              ><a
+                class="manual-link"
+                href="../pages/cadastros/cadastro_servicos.php"
+                ><i class="bi bi-tools"></i> Serviços</a
+              ><a
+                class="manual-link"
+                href="../pages/cadastros/cadastro_pecas.php"
+                ><i class="bi bi-box-seam"></i> Peças e estoque</a
+              >
+            </div>
+          </section>
+          <section class="manual-section" id="revisao">
+            <h2><i class="bi bi-check-square"></i> Revisão de OS</h2>
+            <p>
+              Use as abas para alternar entre OS em revisão, aprovadas,
+              reprovadas e todas. Os filtros permitem buscar por número,
+              empresa, placa ou modelo.
+            </p>
+            <ul>
+              <li>Abra os detalhes para conferir cada caminhão.</li>
+              <li>Confira serviços, peças, quantidade, data e valores.</li>
+              <li>Aprove somente quando os dados estiverem corretos.</li>
+              <li>
+                Reprove quando houver inconsistência e registre a correção no
+                fluxo operacional.
+              </li>
+            </ul>
+            <a class="manual-link" href="../pages/operacoes/revisao.php"
+              ><i class="bi bi-arrow-right-circle"></i> Abrir revisão de OS</a
+            >
+          </section>
+          <section class="manual-section" id="historico">
+            <h2><i class="bi bi-file-earmark-pdf"></i> Histórico e PDF</h2>
+            <p>
+              O Histórico mostra as OS aprovadas. Use a busca ou o filtro de
+              empresa para encontrar um registro.
+            </p>
+            <ol>
+              <li>Abra os detalhes da OS.</li>
+              <li>Clique em <strong>Visualizar relatório completo</strong>.</li>
+              <li>
+                Confira empresa, caminhões, serviços, peças, quantidades e
+                total.
+              </li>
+              <li>
+                Clique em <strong>Baixar PDF</strong>. Relatórios longos são
+                divididos automaticamente em páginas.
+              </li>
+            </ol>
+            <a class="manual-link" href="../pages/operacoes/historico.php"
+              ><i class="bi bi-arrow-right-circle"></i> Abrir histórico</a
+            >
+          </section>
+          <section class="manual-section" id="atalhos">
+            <h2><i class="bi bi-command"></i> Atalhos do sistema</h2>
+            <div class="manual-shortcuts">
+              <a class="manual-link" href="../pages/operacoes/menu.php"
+                ><i class="bi bi-speedometer2"></i> Painel de controle</a
+              ><a
+                class="manual-link"
+                href="../pages/operacoes/novo_atendimento.php"
+                ><i class="bi bi-plus-circle"></i> Nova OS</a
+              ><a class="manual-link" href="../pages/operacoes/revisao.php"
+                ><i class="bi bi-check-square"></i> Revisão</a
+              ><a class="manual-link" href="../pages/operacoes/historico.php"
+                ><i class="bi bi-clock-history"></i> Histórico</a
+              >
+            </div>
+            <div class="manual-note">
+              <i class="bi bi-palette"></i> Use o controle de tema no cabeçalho
+              para alternar entre modo claro e escuro. A interface se adapta a
+              telas menores.
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
+  </body>
+</html>

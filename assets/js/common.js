@@ -306,13 +306,13 @@ function getSidebarHTML(activePage = "home") {
       key: "home",
     },
     {
-      href: resolveRootLink(`${caminhoOperacoes}menu.html`),
+      href: resolveRootLink(`${caminhoOperacoes}menu.php`),
       icon: "bi-speedometer2",
       text: "Painel",
       key: "menu",
     },
     {
-      href: resolveRootLink(`${caminhoOperacoes}clientes.html`),
+      href: resolveRootLink("pages/clientes.php"),
       icon: "bi-people",
       text: "Clientes",
       key: "clientes",
