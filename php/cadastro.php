@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/db.php';
+require_once __DIR__ . '/validacoes.php';
 
 $mensagem = '';
 $nome = '';
@@ -24,11 +25,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     
     if ($nome === '' || $email === '' || $senha === '' || $confirmarSenha === '') {
         $mensagem = "<div class='alerta-form erro'><i class='bi bi-exclamation-triangle'></i> Todos os campos são obrigatórios.</div>";
-    } elseif (mb_strlen($nome) > 100) {
+    } elseif (!nexusTextoValido($nome, 3)) {
+        $mensagem = "<div class='alerta-form erro'><i class='bi bi-person-x'></i> Informe seu nome completo (mínimo 3 caracteres).</div>";
+    } elseif (nexusTamanhoTexto($nome) > 100) {
         $mensagem = "<div class='alerta-form erro'><i class='bi bi-person-x'></i> O nome deve ter no máximo 100 caracteres.</div>";
     } elseif (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
         $mensagem = "<div class='alerta-form erro'><i class='bi bi-envelope-x'></i> Formato de e-mail inválido.</div>";
-    } elseif (mb_strlen($senha) < 6) {
+    } elseif (nexusTamanhoTexto($senha) < 6) {
         $mensagem = "<div class='alerta-form erro'><i class='bi bi-key'></i> A senha deve ter pelo menos 6 caracteres.</div>";
     } elseif ($senha !== $confirmarSenha) {
         $mensagem = "<div class='alerta-form erro'><i class='bi bi-key-fill'></i> As senhas não conferem.</div>";

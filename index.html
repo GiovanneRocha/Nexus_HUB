@@ -163,6 +163,13 @@
           return
         }
 
+        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campoEmail)
+        if (!emailValido) {
+          mensagemLogin.textContent = "Informe um e-mail válido (ex: nome@empresa.com.br)."
+          mensagemLogin.classList.add("visible")
+          return
+        }
+
         mensagemLogin.classList.remove("visible")
         window.location.href = "pages/operacoes/home.html"
       })

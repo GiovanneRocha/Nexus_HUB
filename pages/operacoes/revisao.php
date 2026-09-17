@@ -1,7 +1,16 @@
 <?php
 require_once __DIR__ . '/../../php/db.php';
+require_once __DIR__ . '/../../php/historico_helper.php';
 
 $pdo = nexusDb();
+
+// Migração: garante a coluna de motivo de reprovação sem apagar dados existentes.
+$colunaMotivo = $pdo->prepare('SELECT COUNT(*) FROM information_schema.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = "ordens_servico" AND COLUMN_NAME = "motivo_reprovacao"');
+$colunaMotivo->execute();
+if (!(int) $colunaMotivo->fetchColumn()) {
+    $pdo->exec('ALTER TABLE ordens_servico ADD COLUMN motivo_reprovacao TEXT DEFAULT NULL');
+}
+
 $statusFiltro = $_GET['status'] ?? 'pendente_revisao';
 $busca = trim((string) ($_GET['busca'] ?? ''));
 $empresaFiltro = (int) ($_GET['empresa_id'] ?? 0);
@@ -10,16 +19,40 @@ if (!in_array($statusFiltro, $statusPermitidos, true)) {
     $statusFiltro = 'pendente_revisao';
 }
 
+$erroAcao = '';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $osId = (int) ($_POST['os_id'] ?? 0);
     $acao = $_POST['acao'] ?? '';
     $novoStatus = $acao === 'aprovar' ? 'finalizada' : ($acao === 'reprovar' ? 'reprovada' : '');
-    if ($osId > 0 && $novoStatus !== '') {
+    $usuarioAtual = nexusUsuarioAtual($_POST);
+
+    $stmtEmpresaOS = $pdo->prepare('SELECT empresa_id FROM ordens_servico WHERE id = :id LIMIT 1');
+    $stmtEmpresaOS->execute(['id' => $osId]);
+    $empresaIdOS = (int) ($stmtEmpresaOS->fetchColumn() ?: 0);
+
+    if ($acao === 'reprovar') {
+        $motivo = trim((string) ($_POST['motivo'] ?? ''));
+        if ($motivo === '') {
+            $erroAcao = 'Informe o motivo da reprovação.';
+        } elseif ($osId > 0) {
+            $stmt = $pdo->prepare('UPDATE ordens_servico SET status = "reprovada", motivo_reprovacao = :motivo WHERE id = :id AND status = "pendente_revisao"');
+            $stmt->execute(['motivo' => $motivo, 'id' => $osId]);
+            if ($stmt->rowCount() > 0) {
+                nexusRegistrarHistoricoEmpresa($pdo, $empresaIdOS, 'reprovacao', "OS #{$osId} reprovada. Motivo: {$motivo}", $usuarioAtual);
+            }
+        }
+    } elseif ($osId > 0 && $novoStatus !== '') {
         $stmt = $pdo->prepare('UPDATE ordens_servico SET status = :status WHERE id = :id AND status = "pendente_revisao"');
         $stmt->execute(['status' => $novoStatus, 'id' => $osId]);
+        if ($stmt->rowCount() > 0) {
+            nexusRegistrarHistoricoEmpresa($pdo, $empresaIdOS, 'aprovacao', "OS #{$osId} aprovada.", $usuarioAtual);
+        }
     }
-    header('Location: revisao.php?' . http_build_query(['status' => $statusFiltro, 'busca' => $busca, 'empresa_id' => $empresaFiltro, 'atualizado' => 1]));
-    exit;
+
+    if ($erroAcao === '') {
+        header('Location: revisao.php?' . http_build_query(['status' => $statusFiltro, 'busca' => $busca, 'empresa_id' => $empresaFiltro, 'atualizado' => 1]));
+        exit;
+    }
 }
 
 $empresas = $pdo->query('SELECT id, nome FROM empresas_cadastradas ORDER BY nome ASC')->fetchAll();
@@ -42,7 +75,7 @@ if ($busca !== '') {
     $params['busca_modelo'] = $termoBusca;
 }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-$stmtOS = $pdo->prepare('SELECT os.id, os.data_criacao, os.status, os.valor_total, os.descricao_geral, empresas_cadastradas.nome AS empresa_nome FROM ordens_servico AS os INNER JOIN empresas_cadastradas ON empresas_cadastradas.id = os.empresa_id ' . $whereSql . ' ORDER BY os.data_criacao DESC, os.id DESC');
+$stmtOS = $pdo->prepare('SELECT os.id, os.data_criacao, os.status, os.valor_total, os.descricao_geral, os.motivo_reprovacao, empresas_cadastradas.nome AS empresa_nome FROM ordens_servico AS os INNER JOIN empresas_cadastradas ON empresas_cadastradas.id = os.empresa_id ' . $whereSql . ' ORDER BY os.data_criacao DESC, os.id DESC');
 $stmtOS->execute($params);
 $ordens = $stmtOS->fetchAll();
 
@@ -125,9 +158,44 @@ function itensPorCaminhao($itens): array
         .lista-itens-revisao { margin: 9px 0 0; padding-left: 18px; color: var(--texto-secundario); font-size: .84rem; }
         .acoes-revisao { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--bordar); }
         .acoes-revisao form { margin: 0; }
-        .acoes-revisao button { min-height: 40px; padding: 0 14px; }
+
+        /* Botões de ação da OS: mesmo formato, cores diferentes por ação. */
+        .btn-os {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
+            padding: 0 20px;
+            border: none;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: .9rem;
+            font-weight: 600;
+            line-height: 1;
+            color: #fff;
+            text-decoration: none;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: filter .2s ease, transform .2s ease, box-shadow .2s ease;
+        }
+        .btn-os:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 4px 12px rgba(0, 0, 0, .18); }
+        .btn-os:active { transform: translateY(0); }
+        .btn-os:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+        .btn-os-aprovar  { background: linear-gradient(135deg, #10b981 0%, #059669 100%); }
+        .btn-os-editar   { background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); }
+        .btn-os-reprovar { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); }
+
         .sem-resultados-revisao { padding: 34px 20px; text-align: center; color: var(--texto-secundario); border: 1px dashed var(--bordar); border-radius: 10px; }
-        @media (max-width: 680px) { .revisao-filtros { grid-template-columns: 1fr; } .cabecalho-os-revisao { flex-direction: column; } .abas-revisao { display: grid; grid-template-columns: 1fr 1fr; } .aba-revisao { justify-content: center; } }
+        @media (max-width: 680px) {
+            .revisao-filtros { grid-template-columns: 1fr; }
+            .cabecalho-os-revisao { flex-direction: column; }
+            .abas-revisao { display: grid; grid-template-columns: 1fr 1fr; }
+            .aba-revisao { justify-content: center; }
+            .acoes-revisao { flex-direction: column; }
+            .acoes-revisao form, .acoes-revisao .btn-os { width: 100%; }
+        }
     </style>
 </head>
 <body class="corpo-dashboard">
@@ -138,6 +206,7 @@ function itensPorCaminhao($itens): array
                 <p>Confira os dados relacionados antes de aprovar ou reprovar cada OS.</p>
             </section>
             <?php if (isset($_GET['atualizado'])): ?><div class="alerta sucesso"><i class="bi bi-check-circle"></i> Ação realizada com sucesso.</div><?php endif; ?>
+            <?php if ($erroAcao !== ''): ?><div class="alerta erro"><i class="bi bi-exclamation-triangle"></i> <?= escaparRevisao($erroAcao) ?></div><?php endif; ?>
             <div class="abas-revisao">
                 <?php foreach (['pendente_revisao' => 'Em revisão', 'todas' => 'Todas as OS', 'finalizada' => 'Aprovadas', 'reprovada' => 'Reprovadas'] as $valor => $label): ?>
                     <a class="aba-revisao <?= $statusFiltro === $valor ? 'ativa' : '' ?>" href="?<?= http_build_query(['status' => $valor, 'busca' => $busca, 'empresa_id' => $empresaFiltro]) ?>"><i class="bi <?= $valor === 'pendente_revisao' ? 'bi-hourglass-split' : ($valor === 'todas' ? 'bi-list-ul' : ($valor === 'finalizada' ? 'bi-check-circle' : 'bi-x-circle')) ?>"></i> <?= escaparRevisao($label) ?></a>
@@ -162,7 +231,25 @@ function itensPorCaminhao($itens): array
                             <div class="blocos-caminhoes-revisao">
                             <?php foreach ($caminhoes as $indice => $caminhao): $veiculo = $caminhao['veiculo']; ?><div class="bloco-caminhao-revisao"><h3><i class="bi bi-truck-front"></i> Caminhão <?= $indice + 1 ?> · <?= escaparRevisao($veiculo['placa'] ?: 'Sem placa') ?></h3><p><?= escaparRevisao($veiculo['modelo'] ?: 'Modelo não informado') ?><?= $veiculo['ano'] ? ' · ' . (int) $veiculo['ano'] : '' ?><?= $veiculo['cor'] ? ' · ' . escaparRevisao($veiculo['cor']) : '' ?></p><?php if ($caminhao['itens']): ?><ul class="lista-itens-revisao"><?php foreach ($caminhao['itens'] as $item): ?><li><strong><?= escaparRevisao($item['tipo'] === 'servico' ? 'Serviço' : 'Peça') ?>:</strong> <?= escaparRevisao($item['nome_servico'] ?: $item['nome_peca'] ?: $item['descricao']) ?><?php if ((int) $item['quantidade'] > 1): ?> · Qtd. <?= (int) $item['quantidade'] ?><?php endif; ?> · R$ <?= number_format((float) $item['valor'], 2, ',', '.') ?></li><?php endforeach; ?></ul><?php else: ?><p>Nenhum serviço ou peça informado.</p><?php endif; ?></div><?php endforeach; ?>
                             </div>
-                            <?php if ($os['status'] === 'pendente_revisao'): ?><div class="acoes-revisao"><form method="POST" onsubmit="return confirm('Aprovar esta OS?');"><input type="hidden" name="os_id" value="<?= (int) $os['id'] ?>"><input type="hidden" name="acao" value="aprovar"><button type="submit" class="botao-acao"><i class="bi bi-check-circle"></i> Aprovar OS</button></form><form method="POST" onsubmit="return confirm('Reprovar esta OS?');"><input type="hidden" name="os_id" value="<?= (int) $os['id'] ?>"><input type="hidden" name="acao" value="reprovar"><button type="submit" class="botao-cancelar"><i class="bi bi-x-circle"></i> Reprovar OS</button></form></div><?php endif; ?>
+                            <?php if ($os['status'] === 'reprovada' && $os['motivo_reprovacao']): ?><p style="margin-top:10px; padding:10px 12px; background: rgba(239, 68, 68, .08); border-left: 3px solid var(--erro); border-radius: 6px; color: var(--texto-principal);"><strong>Motivo da reprovação:</strong> <?= nl2br(escaparRevisao($os['motivo_reprovacao'])) ?></p><?php endif; ?>
+                            <?php if ($os['status'] === 'pendente_revisao'): ?>
+                                <div class="acoes-revisao">
+                                    <form method="POST" onsubmit="this.usuario.value = getCurrentUserName(); return confirm('Aprovar esta OS?');">
+                                        <input type="hidden" name="os_id" value="<?= (int) $os['id'] ?>">
+                                        <input type="hidden" name="acao" value="aprovar">
+                                        <input type="hidden" name="usuario" value="">
+                                        <button type="submit" class="btn-os btn-os-aprovar"><i class="bi bi-check-circle"></i> Aprovar OS</button>
+                                    </form>
+                                    <a href="novo_atendimento.php?editar_os=<?= (int) $os['id'] ?>" class="btn-os btn-os-editar"><i class="bi bi-pencil-square"></i> Editar OS</a>
+                                    <form method="POST" class="form-reprovar" onsubmit="return prepararReprovacao(this);">
+                                        <input type="hidden" name="os_id" value="<?= (int) $os['id'] ?>">
+                                        <input type="hidden" name="acao" value="reprovar">
+                                        <input type="hidden" name="motivo" class="campo-motivo-reprovacao">
+                                        <input type="hidden" name="usuario" value="">
+                                        <button type="submit" class="btn-os btn-os-reprovar"><i class="bi bi-x-circle"></i> Reprovar OS</button>
+                                    </form>
+                                </div>
+                            <?php endif; ?>
                         </details></div>
                     </article>
                 <?php endforeach; ?>
@@ -171,6 +258,20 @@ function itensPorCaminhao($itens): array
         </main>
     </div>
     <script src="../../assets/js/common.js"></script><script src="../../assets/js/pages.js"></script>
-    <script>document.addEventListener('DOMContentLoaded', function () { document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('revisao')); document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML()); });</script>
+    <script>
+        function prepararReprovacao(form) {
+            const motivo = prompt('Informe o motivo da reprovação desta OS:');
+            if (motivo === null) return false; // usuário cancelou
+            const motivoLimpo = motivo.trim();
+            if (motivoLimpo === '') {
+                alert('É necessário informar um motivo para reprovar a OS.');
+                return false;
+            }
+            form.querySelector('.campo-motivo-reprovacao').value = motivoLimpo;
+            form.usuario.value = getCurrentUserName();
+            return confirm('Reprovar esta OS com o motivo informado?');
+        }
+        document.addEventListener('DOMContentLoaded', function () { document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('revisao')); document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML()); });
+    </script>
 </body>
 </html>

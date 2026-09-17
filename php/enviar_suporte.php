@@ -1,7 +1,5 @@
 <?php
-// ==========================================
-// CONFIGURAÇÕES DO FORMULÁRIO DE SUPORTE
-// ==========================================
+require_once __DIR__ . '/validacoes.php';
 
 // Habilitar CORS se necessário
 header('Content-Type: application/json; charset=utf-8');
@@ -30,24 +28,28 @@ $mensagem = isset($_POST['mensagem']) ? trim(htmlspecialchars($_POST['mensagem']
 // Validações básicas
 $erros = [];
 
-if (empty($nome)) {
-    $erros[] = 'Nome é obrigatório.';
+if (!nexusTextoValido($nome, 3)) {
+    $erros[] = 'Informe seu nome completo (mínimo 3 caracteres).';
 }
 
-if (empty($assunto)) {
-    $erros[] = 'Assunto é obrigatório.';
+if (!nexusTextoValido($assunto, 3)) {
+    $erros[] = 'Informe o assunto (mínimo 3 caracteres).';
 }
 
-if (empty($mensagem)) {
-    $erros[] = 'Mensagem é obrigatória.';
+if (!nexusTextoValido($mensagem, 10)) {
+    $erros[] = 'Descreva sua dúvida com mais detalhes (mínimo 10 caracteres).';
 }
 
 if (empty($email) && empty($telefone)) {
     $erros[] = 'Forneça pelo menos um meio de contato (e-mail ou telefone).';
 }
 
-if (!empty($email) && !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+if (!empty($email) && !nexusValidarEmail($email)) {
     $erros[] = 'E-mail inválido.';
+}
+
+if (!empty($telefone) && !nexusValidarTelefone($telefone)) {
+    $erros[] = 'Telefone inválido. Informe DDD + número, ex: (11) 98765-4321.';
 }
 
 // Se há erros, retornar

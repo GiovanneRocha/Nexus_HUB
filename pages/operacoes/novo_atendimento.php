@@ -1,5 +1,7 @@
 <?php
 require_once __DIR__ . '/../../php/db.php';
+require_once __DIR__ . '/../../php/validacoes.php';
+require_once __DIR__ . '/../../php/historico_helper.php';
 
 $pdo = nexusDb();
 
@@ -90,11 +92,13 @@ foreach ($relacoes as [$tabela, $relacao, $coluna, $tabelaReferenciada, $colunaR
 }
 
 // Processar submissão do formulário
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'salvar_os') {
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array($_POST['action'], ['salvar_os', 'atualizar_os'], true)) {
     try {
+        $action = $_POST['action'];
         $empresaId = (int) ($_POST['empresa_id'] ?? 0);
-        $valorTotal = (float) ($_POST['valor_total'] ?? 0);
         $descricaoGeral = trim((string) ($_POST['descricao_geral'] ?? ''));
+        $osIdExistente = (int) ($_POST['os_id'] ?? 0);
+        $usuarioAtual = nexusUsuarioAtual($_POST);
 
         if ($empresaId <= 0) {
             throw new Exception('Selecione uma empresa válida.');
@@ -110,12 +114,45 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             throw new Exception('A empresa selecionada não foi encontrada.');
         }
 
-        $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, status) VALUES (:empresa_id, 0, :descricao_geral, "pendente_revisao")');
-        $stmtOS->execute([
-            ':empresa_id' => $empresaId,
-            ':descricao_geral' => $descricaoGeral,
-        ]);
-        $osId = $pdo->lastInsertId();
+        if ($action === 'atualizar_os') {
+            if ($osIdExistente <= 0) {
+                throw new Exception('OS inválida para edição.');
+            }
+
+            $stmtOsAtual = $pdo->prepare('SELECT id, status FROM ordens_servico WHERE id = :id LIMIT 1');
+            $stmtOsAtual->execute(['id' => $osIdExistente]);
+            $osAtual = $stmtOsAtual->fetch();
+            if (!$osAtual) {
+                throw new Exception('OS não encontrada.');
+            }
+            if ($osAtual['status'] !== 'pendente_revisao') {
+                throw new Exception('Só é possível editar OS que ainda estejam em revisão.');
+            }
+
+            // Devolve ao estoque as peças já reservadas por esta OS antes de reconstruir os itens,
+            // para então descontar de novo com as quantidades atualizadas mais abaixo.
+            $stmtPecasAntigas = $pdo->prepare('SELECT peca_id, quantidade FROM itens_os WHERE os_id = :os_id AND tipo = "peca" AND peca_id IS NOT NULL');
+            $stmtPecasAntigas->execute(['os_id' => $osIdExistente]);
+            $stmtRestaurarEstoque = $pdo->prepare('UPDATE pecas SET estoque = estoque + :quantidade WHERE id = :id');
+            foreach ($stmtPecasAntigas->fetchAll() as $itemAntigo) {
+                $stmtRestaurarEstoque->execute(['quantidade' => $itemAntigo['quantidade'], 'id' => $itemAntigo['peca_id']]);
+            }
+
+            // Remove os itens antigos - serão reconstruídos com os dados enviados no formulário.
+            $pdo->prepare('DELETE FROM itens_os WHERE os_id = :os_id')->execute(['os_id' => $osIdExistente]);
+
+            $pdo->prepare('UPDATE ordens_servico SET empresa_id = :empresa_id, descricao_geral = :descricao_geral WHERE id = :id')
+                ->execute([':empresa_id' => $empresaId, ':descricao_geral' => $descricaoGeral, ':id' => $osIdExistente]);
+
+            $osId = $osIdExistente;
+        } else {
+            $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, status) VALUES (:empresa_id, 0, :descricao_geral, "pendente_revisao")');
+            $stmtOS->execute([
+                ':empresa_id' => $empresaId,
+                ':descricao_geral' => $descricaoGeral,
+            ]);
+            $osId = $pdo->lastInsertId();
+        }
 
         // Processar veículos (enviados como JSON)
         $frota = json_decode($_POST['frota_json'] ?? '[]', true, 512, JSON_THROW_ON_ERROR);
@@ -128,32 +165,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $stmtItem = $pdo->prepare('INSERT INTO itens_os (os_id, tipo, empresa_id, veiculo_id, servico_id, peca_id, placa, modelo, ano, cor, data_execucao, descricao, valor, valor_unitario, quantidade) VALUES (:os_id, :tipo, :empresa_id, :veiculo_id, :servico_id, :peca_id, :placa, :modelo, :ano, :cor, :data_execucao, :descricao, :valor, :valor_unitario, :quantidade)');
         $totalCalculado = 0.0;
 
+        // Validação server-side de toda a frota (o JS pode ser burlado).
+        $limitesAno = nexusLimitesAnoVeiculo();
+        foreach ($frota as $indiceVeiculo => $veiculoValidacao) {
+            $numero = $indiceVeiculo + 1;
+            $dados = $veiculoValidacao['dadosVeiculo'] ?? [];
+
+            if (!nexusValidarPlaca((string) ($dados['placa'] ?? ''))) {
+                throw new Exception("Veículo {$numero}: placa inválida (use ABC-1234 ou ABC1D23).");
+            }
+            if (!nexusTextoValido((string) ($dados['modelo'] ?? ''), 2)) {
+                throw new Exception("Veículo {$numero}: informe o modelo.");
+            }
+            if (!nexusTextoValido((string) ($dados['cor'] ?? ''), 3)) {
+                throw new Exception("Veículo {$numero}: informe a cor.");
+            }
+            if (!nexusValidarAnoVeiculo($dados['ano'] ?? null)) {
+                throw new Exception("Veículo {$numero}: ano inválido (entre {$limitesAno['min']} e {$limitesAno['max']}).");
+            }
+
+            foreach ($veiculoValidacao['servicos'] ?? [] as $indiceServico => $servicoValidacao) {
+                $numeroServico = $indiceServico + 1;
+                if (!nexusValidarData((string) ($servicoValidacao['data'] ?? ''))) {
+                    throw new Exception("Veículo {$numero}, serviço {$numeroServico}: informe uma data válida.");
+                }
+            }
+
+            foreach ($veiculoValidacao['pecas'] ?? [] as $indicePeca => $pecaValidacao) {
+                $numeroPeca = $indicePeca + 1;
+                $qtde = $pecaValidacao['quantidade'] ?? null;
+                if (!nexusValidarInteiroNaoNegativo($qtde) || (int) $qtde < 1) {
+                    throw new Exception("Veículo {$numero}, peça {$numeroPeca}: quantidade inválida (mínimo 1).");
+                }
+            }
+        }
+
         foreach ($frota as $veiculo) {
             $dadosVeiculo = $veiculo['dadosVeiculo'] ?? [];
             $veiculoId = (int) ($dadosVeiculo['id'] ?? 0);
+
+            // Valores enviados pelo formulário (já validados acima).
+            $placaEnviada = nexusNormalizarPlaca((string) ($dadosVeiculo['placa'] ?? ''));
+            $modeloEnviado = trim((string) ($dadosVeiculo['modelo'] ?? ''));
+            $anoEnviado = (int) ($dadosVeiculo['ano'] ?? 0) ?: null;
+            $corEnviada = trim((string) ($dadosVeiculo['cor'] ?? ''));
+
             $stmtVeiculo->execute(['id' => $veiculoId, 'empresa_id' => $empresaId, 'nome_empresa' => $empresa['nome']]);
             $veiculoBanco = $veiculoId > 0 ? $stmtVeiculo->fetch() : false;
             if ($veiculoId > 0 && !$veiculoBanco) {
                 throw new Exception('O veículo selecionado não pertence à empresa informada.');
             }
+
             if (!$veiculoBanco) {
+                // Veículo novo (não veio da frota cadastrada): cria o registro.
                 $stmtNovoVeiculo->execute([
                     'empresa_id' => $empresaId,
                     'nome_caminhao' => $empresa['nome'],
-                    'modelo' => trim((string) ($dadosVeiculo['modelo'] ?? '')),
-                    'placa' => strtoupper(trim((string) ($dadosVeiculo['placa'] ?? ''))),
-                    'ano' => (int) ($dadosVeiculo['ano'] ?? 0) ?: null,
-                    'cor' => trim((string) ($dadosVeiculo['cor'] ?? '')),
+                    'modelo' => $modeloEnviado,
+                    'placa' => $placaEnviada,
+                    'ano' => $anoEnviado,
+                    'cor' => $corEnviada,
                 ]);
                 $veiculoId = (int) $pdo->lastInsertId();
-                $veiculoBanco = [
-                    'id' => $veiculoId,
-                    'placa' => strtoupper(trim((string) ($dadosVeiculo['placa'] ?? ''))),
-                    'modelo' => trim((string) ($dadosVeiculo['modelo'] ?? '')),
-                    'ano' => (int) ($dadosVeiculo['ano'] ?? 0) ?: null,
-                    'cor' => trim((string) ($dadosVeiculo['cor'] ?? '')),
-                ];
+                nexusRegistrarHistoricoEmpresa($pdo, $empresaId, 'frota', "Veículo adicionado à frota: {$placaEnviada} ({$modeloEnviado}).", $usuarioAtual);
             }
+            // Veículo já cadastrado: o cadastro da frota NÃO é alterado aqui.
+            // Alterações no cadastro são feitas apenas em "Gestão de Veículos".
+
+            // A OS guarda o que foi enviado no formulário (snapshot próprio da OS).
+            $veiculoBanco = [
+                'id' => $veiculoId,
+                'placa' => $placaEnviada,
+                'modelo' => $modeloEnviado,
+                'ano' => $anoEnviado,
+                'cor' => $corEnviada,
+            ];
 
             $stmtItem->execute([
                 ':os_id' => $osId,
@@ -182,7 +268,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                 if (!$servicoBanco) {
                     throw new Exception('Um dos serviços selecionados não foi encontrado.');
                 }
-                $valorServico = (float) ($servicoBanco['preco'] ?? 0);
+
+                // O valor e a descrição são editáveis na tela da OS (o catálogo serve
+                // apenas como valor padrão). Sem isto, o total salvo divergiria do
+                // total exibido para o usuário.
+                $valorServico = isset($servico['valor']) && $servico['valor'] !== ''
+                    ? (float) $servico['valor']
+                    : (float) ($servicoBanco['preco'] ?? 0);
+
+                if (!nexusValidarValorMonetario($valorServico) || $valorServico <= 0) {
+                    throw new Exception('Informe um valor válido para o serviço "' . $servicoBanco['nome_servico'] . '".');
+                }
+
+                $descricaoServico = trim((string) ($servico['descricao'] ?? ''));
+                if ($descricaoServico === '') {
+                    $descricaoServico = (string) $servicoBanco['descricao'];
+                }
+
                 $totalCalculado += $valorServico;
                 $stmtItem->execute([
                     ':os_id' => $osId,
@@ -196,7 +298,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
                     ':ano' => null,
                     ':cor' => null,
                     ':data_execucao' => $servico['data'] ?? null,
-                    ':descricao' => $servicoBanco['descricao'],
+                    ':descricao' => $descricaoServico,
                     ':valor' => $valorServico,
                     ':valor_unitario' => $valorServico,
                     ':quantidade' => 1,
@@ -245,11 +347,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
         $pdo->commit();
 
+        $valorFormatado = number_format($totalCalculado, 2, ',', '.');
+        $mensagemHistorico = $action === 'atualizar_os'
+            ? "Relatório de serviço (OS #{$osId}) atualizado. Novo valor total: R$ {$valorFormatado}."
+            : "Novo relatório de serviço (OS #{$osId}) criado. Valor total: R$ {$valorFormatado}.";
+        nexusRegistrarHistoricoEmpresa($pdo, $empresaId, 'relatorio', $mensagemHistorico, $usuarioAtual);
+
         // Retornar sucesso
         header('Content-Type: application/json');
         echo json_encode([
             'sucesso' => true,
-            'mensagem' => 'OS criada com sucesso!',
+            'mensagem' => $action === 'atualizar_os' ? 'OS atualizada com sucesso!' : 'OS criada com sucesso!',
             'os_id' => $osId,
         ]);
         exit;
@@ -279,11 +387,91 @@ $pecas = $pdo->query('SELECT id, nome, valor, unidade, estoque FROM pecas WHERE 
 // Buscar veículos cadastrados para referência
 $veiculos = $pdo->query('SELECT id, empresa_id, nome_caminhao as empresa, placa, modelo, ano, cor FROM caminhoes ORDER BY nome_caminhao ASC')->fetchAll();
 
+// --------------------------------------------------------------
+// MODO EDIÇÃO: carrega uma OS existente (?editar_os=ID) para pré-preencher o formulário.
+// Só é permitido editar OS que ainda estejam "pendente_revisao" (mesma regra do botão
+// Editar em revisao.php).
+// --------------------------------------------------------------
+$osEditando = null;
+$frotaExistente = [];
+if (isset($_GET['editar_os'])) {
+    $osEditandoId = (int) $_GET['editar_os'];
+    $stmtOsEdit = $pdo->prepare('SELECT * FROM ordens_servico WHERE id = :id LIMIT 1');
+    $stmtOsEdit->execute(['id' => $osEditandoId]);
+    $osEditando = $stmtOsEdit->fetch();
+
+    if (!$osEditando) {
+        header('Location: revisao.php?erro=os_nao_encontrada');
+        exit;
+    }
+    if ($osEditando['status'] !== 'pendente_revisao') {
+        header('Location: revisao.php?erro=os_bloqueada');
+        exit;
+    }
+
+    $stmtItensEdit = $pdo->prepare('SELECT * FROM itens_os WHERE os_id = :os_id ORDER BY id ASC');
+    $stmtItensEdit->execute(['os_id' => $osEditandoId]);
+    $itensEditando = $stmtItensEdit->fetchAll();
+
+    $veiculosAgrupados = [];
+    foreach ($itensEditando as $item) {
+        if ($item['tipo'] === 'veiculo') {
+            $chave = (int) $item['veiculo_id'];
+            $veiculosAgrupados[$chave] = [
+                'dadosVeiculo' => [
+                    'id' => $item['veiculo_id'],
+                    'placa' => $item['placa'],
+                    'modelo' => $item['modelo'],
+                    'ano' => $item['ano'],
+                    'cor' => $item['cor'],
+                ],
+                'servicos' => [],
+                'pecas' => [],
+            ];
+        }
+    }
+    foreach ($itensEditando as $item) {
+        $chave = (int) $item['veiculo_id'];
+        if ($item['tipo'] === 'veiculo' || !isset($veiculosAgrupados[$chave])) {
+            continue;
+        }
+
+        if ($item['tipo'] === 'servico' && $item['servico_id']) {
+            $veiculosAgrupados[$chave]['servicos'][] = [
+                'tipo' => 'banco_' . $item['servico_id'],
+                'data' => $item['data_execucao'],
+                'descricao' => $item['descricao'],
+                'valor' => (float) $item['valor'],
+            ];
+        } elseif ($item['tipo'] === 'peca' && $item['peca_id']) {
+            $veiculosAgrupados[$chave]['pecas'][] = [
+                'pecaId' => (int) $item['peca_id'],
+                'nome' => $item['descricao'],
+                'quantidade' => (int) $item['quantidade'],
+                'valorUnitario' => (float) $item['valor_unitario'],
+                'valorTotal' => (float) $item['valor'],
+            ];
+
+            // Devolve, só para exibição no formulário, a quantidade que esta própria OS já
+            // reservou - assim o técnico consegue manter (ou reduzir) a quantidade atual.
+            // O banco só é alterado de verdade dentro da transação do POST (atualizar_os).
+            foreach ($pecas as &$pecaRef) {
+                if ((int) $pecaRef['id'] === (int) $item['peca_id']) {
+                    $pecaRef['estoque'] = (int) $pecaRef['estoque'] + (int) $item['quantidade'];
+                }
+            }
+            unset($pecaRef);
+        }
+    }
+    $frotaExistente = array_values($veiculosAgrupados);
+}
+
 // Converter para JSON para JavaScript
 $empresasJSON = json_encode($empresas, JSON_UNESCAPED_UNICODE);
 $servicosJSON = json_encode($servicos, JSON_UNESCAPED_UNICODE);
 $pecasJSON = json_encode($pecas, JSON_UNESCAPED_UNICODE);
 $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
+$frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
 ?>
 <!DOCTYPE html>
 <html lang="pt-br">
@@ -304,12 +492,17 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
         <main class="conteudo-principal">
             <!-- Success Message -->
             <div id="successMessage" style="display: none; position: fixed; top: 20px; right: 20px; background: #d4edda; color: #155724; padding: 15px 20px; border: 1px solid #c3e6cb; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; font-weight: 500; animation: slideIn 0.3s ease-out; max-width: 300px;">
-                <i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href='revisao.php'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>
+                <i class="bi bi-check-circle-fill"></i> <span id="successMessageTexto">OS registrada com sucesso!</span> <button onclick="window.location.href='revisao.php'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>
             </div>
 
             <section class="titulo-pagina-stack">
-                <h1><i class="bi bi-plus-circle"></i> Registrar Nova OS</h1>
-                <p>Preencha os dados do cliente e serviços. O sistema valida duplicatas automaticamente.</p>
+                <?php if ($osEditando): ?>
+                    <h1><i class="bi bi-pencil-square"></i> Editar OS #<?= (int) $osEditando['id'] ?></h1>
+                    <p>Corrija os dados desta ordem de serviço antes de aprovar ou reprovar.</p>
+                <?php else: ?>
+                    <h1><i class="bi bi-plus-circle"></i> Registrar Nova OS</h1>
+                    <p>Preencha os dados do cliente e serviços. O sistema valida duplicatas automaticamente.</p>
+                <?php endif; ?>
             </section>
 
             <form id="formNovoAtendimento">
@@ -351,12 +544,12 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                         
                         <div class="area-botoes" style="margin-top: 24px;">
                             <button type="submit" class="botao-acao" style="flex: 1; background: linear-gradient(135deg, var(--verde-esmeralda) 0%, var(--verde-escuro) 100%); display: flex; align-items: center; justify-content: center; gap: 8px;">
-                                <i class="bi bi-check-circle"></i> Registrar Atendimento
+                                <i class="bi bi-check-circle"></i> <?= $osEditando ? 'Salvar Alterações' : 'Registrar Atendimento' ?>
                             </button>
                             <button type="button" onclick="limparFormulario()" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="bi bi-trash"></i> Limpar
                             </button>
-                            <button type="button" onclick="window.location.href='menu.php'" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                            <button type="button" onclick="window.location.href='<?= $osEditando ? 'revisao.php' : 'menu.php' ?>'" class="botao-cancelar" style="display: flex; align-items: center; justify-content: center; gap: 8px;">
                                 <i class="bi bi-arrow-left"></i> Voltar
                             </button>
                         </div>
@@ -364,7 +557,8 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 </div>
 
                 <!-- Campo oculto para enviar dados JSON -->
-                <input type="hidden" name="action" value="salvar_os">
+                <input type="hidden" name="action" value="<?= $osEditando ? 'atualizar_os' : 'salvar_os' ?>">
+                <input type="hidden" name="os_id" value="<?= $osEditando ? (int) $osEditando['id'] : '' ?>">
                 <input type="hidden" name="empresa_id" id="empresa-id-hidden" value="">
                 <input type="hidden" name="valor_total" id="valor-total-hidden" value="0">
                 <input type="hidden" name="descricao_geral" id="descricao-geral-hidden" value="">
@@ -380,12 +574,33 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
         const PECAS_BANCO = <?= $pecasJSON ?>;
         const VEICULOS_BANCO = <?= $veiculosJSON ?>;
 
+        // Dados da OS em edição (null quando estamos criando uma OS nova)
+        const OS_EDITANDO_ID = <?= $osEditando ? (int) $osEditando['id'] : 'null' ?>;
+        const EMPRESA_OS_EDITANDO = <?= $osEditando ? (int) $osEditando['empresa_id'] : 'null' ?>;
+        const FROTA_EXISTENTE = <?= $frotaExistenteJSON ?>;
+
+        // Limites/regras vindos do PHP para o JS usar as MESMAS regras do servidor.
+        const ANO_VEICULO_MIN = <?= nexusLimitesAnoVeiculo()['min'] ?>;
+        const ANO_VEICULO_MAX = <?= nexusLimitesAnoVeiculo()['max'] ?>;
+
+        // Placa: formato antigo (ABC1234) ou Mercosul (ABC1D23)
+        function validarPlacaJS(valor) {
+            const limpa = String(valor || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+            return /^[A-Z]{3}(\d{4}|\d[A-Z]\d{2})$/.test(limpa);
+        }
+
+        function aplicarMascaraPlaca(input) {
+            let v = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 7);
+            if (v.length > 3) v = v.slice(0, 3) + '-' + v.slice(3);
+            input.value = v;
+        }
+
         // Manter compatibilidade com lógica antiga (CONFIG_SERVICOS vazio, dados do banco acima)
         const CONFIG_SERVICOS = {};
 
         let contagemVeiculos = 0;
 
-        function adicionarCamposVeiculo() {
+        function adicionarCamposVeiculo(dadosPreenchidos) {
             contagemVeiculos++;
             const container = document.getElementById('container-veiculos');
             const div = document.createElement('div');
@@ -408,7 +623,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                         <input type="hidden" class="v-veiculo-id" value="">
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-tag"></i> Placa</label>
-                            <input type="text" class="v-placa" placeholder="ABC-1234" required>
+                            <input type="text" class="v-placa" placeholder="ABC-1234 ou ABC1D23" maxlength="8" required oninput="aplicarMascaraPlaca(this)">
                         </div>
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-type"></i> Modelo</label>
@@ -416,7 +631,7 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                         </div>
                         <div class="bloco-campo-novo">
                             <label><i class="bi bi-calendar-event"></i> Ano</label>
-                            <input type="number" class="v-ano" placeholder="2024" min="1900" max="2025" step="1" required oninput="validarAnoVeiculo(this)">
+                            <input type="number" class="v-ano" placeholder="2024" min="<?= nexusLimitesAnoVeiculo()['min'] ?>" max="<?= nexusLimitesAnoVeiculo()['max'] ?>" step="1" required oninput="validarAnoVeiculo(this)">
                             <small class="aviso-ano" style="display:none; color:#ef4444; font-size:0.75rem; margin-top:4px;"></small>
                         </div>
                         <div class="bloco-campo-novo">
@@ -438,7 +653,70 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 </div>
             `;
             container.appendChild(div);
-            adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+            if (dadosPreenchidos) {
+                preencherBlocoVeiculo(div, dadosPreenchidos);
+            } else {
+                adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+            }
+        }
+
+        // Preenche um bloco de veículo recém-criado com dados de uma OS já existente
+        // (usado no modo de edição, ?editar_os=ID).
+        function preencherBlocoVeiculo(div, veiculoData) {
+            const dv = veiculoData.dadosVeiculo || {};
+            div.querySelector('.v-veiculo-id').value = dv.id || '';
+            div.querySelector('.v-placa').value = dv.placa || '';
+            div.querySelector('.v-modelo').value = dv.modelo || '';
+            div.querySelector('.v-ano').value = dv.ano || '';
+            div.querySelector('.v-cor').value = dv.cor || '';
+
+            const servicos = veiculoData.servicos || [];
+            if (servicos.length === 0) {
+                adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+            } else {
+                servicos.forEach(servico => {
+                    adicionarServicoAoVeiculo(div.querySelector('button[onclick*="adicionarServicoAoVeiculo"]'));
+                    const blocos = div.querySelectorAll('.item-servico');
+                    const novoBloco = blocos[blocos.length - 1];
+                    const selectTipo = novoBloco.querySelector('.s-tipo');
+                    if (![...selectTipo.options].some(o => o.value === servico.tipo)) {
+                        const opt = document.createElement('option');
+                        opt.value = servico.tipo;
+                        opt.textContent = servico.descricao || servico.tipo;
+                        selectTipo.appendChild(opt);
+                    }
+                    selectTipo.value = servico.tipo;
+                    novoBloco.querySelector('.s-data').value = servico.data || '';
+                    novoBloco.querySelector('.s-desc').value = servico.descricao || '';
+                    novoBloco.querySelector('.s-valor').value = servico.valor || 0;
+                });
+            }
+
+            (veiculoData.pecas || []).forEach(peca => {
+                adicionarPecaAoVeiculo(div.querySelector('button[onclick*="adicionarPecaAoVeiculo"]'));
+                const blocosPeca = div.querySelectorAll('.item-peca');
+                const novoBlocoPeca = blocosPeca[blocosPeca.length - 1];
+                const selectPeca = novoBlocoPeca.querySelector('.p-peca');
+                const valorFmt = parseFloat(peca.valorUnitario || 0).toFixed(2);
+                const valorOpcao = `peca_${peca.pecaId}`;
+                if (![...selectPeca.options].some(o => o.value === valorOpcao)) {
+                    const opt = document.createElement('option');
+                    opt.value = valorOpcao;
+                    opt.dataset.id = peca.pecaId;
+                    opt.dataset.valor = valorFmt;
+                    opt.dataset.nome = peca.nome;
+                    opt.textContent = `${peca.nome} — R$ ${valorFmt}`;
+                    selectPeca.appendChild(opt);
+                }
+                selectPeca.value = valorOpcao;
+                novoBlocoPeca.querySelector('.p-qtde').value = peca.quantidade || 1;
+                novoBlocoPeca.querySelector('.p-valor-unitario').value = valorFmt;
+                novoBlocoPeca.querySelector('.p-total').value = 'R$ ' + parseFloat(peca.valorTotal || 0).toFixed(2).replace('.', ',');
+                novoBlocoPeca.querySelector('.p-nome').value = peca.nome || '';
+                novoBlocoPeca.querySelector('.p-peca-id').value = peca.pecaId || '';
+            });
+
+            calcularTotalGeral();
         }
 
         function removerCamposVeiculo(botao) {
@@ -729,8 +1007,8 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 return;
             }
 
-            if (isNaN(ano) || ano < 1900 || ano > 2025) {
-                aviso.textContent = 'Ano inválido. Informe entre 1900 e 2025.';
+            if (isNaN(ano) || ano < ANO_VEICULO_MIN || ano > ANO_VEICULO_MAX) {
+                aviso.textContent = `Ano inválido. Informe entre ${ANO_VEICULO_MIN} e ${ANO_VEICULO_MAX}.`;
                 aviso.style.display = 'block';
                 input.style.border = '2px solid #ef4444';
             } else {
@@ -773,14 +1051,18 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
                 const anoEl  = bloco.querySelector('.v-ano');
                 const ano    = parseInt(anoEl.value);
 
-                if (!placa)  errosEncontrados.push(`Veículo ${numVeiculo}: informe a placa.`);
+                if (!placa) {
+                    errosEncontrados.push(`Veículo ${numVeiculo}: informe a placa.`);
+                } else if (!validarPlacaJS(placa)) {
+                    errosEncontrados.push(`Veículo ${numVeiculo}: placa inválida (use ABC-1234 ou ABC1D23).`);
+                }
                 if (!modelo) errosEncontrados.push(`Veículo ${numVeiculo}: informe o modelo.`);
                 if (!corEl)  errosEncontrados.push(`Veículo ${numVeiculo}: informe a cor.`);
 
                 if (!anoEl.value.trim()) {
                     errosEncontrados.push(`Veículo ${numVeiculo}: informe o ano.`);
-                } else if (isNaN(ano) || ano < 1900 || ano > 2025) {
-                    errosEncontrados.push(`Veículo ${numVeiculo}: ano inválido (deve ser entre 1900 e 2025).`);
+                } else if (isNaN(ano) || ano < ANO_VEICULO_MIN || ano > ANO_VEICULO_MAX) {
+                    errosEncontrados.push(`Veículo ${numVeiculo}: ano inválido (deve ser entre ${ANO_VEICULO_MIN} e ${ANO_VEICULO_MAX}).`);
                 }
 
                 bloco.querySelectorAll('.item-servico').forEach((srv, si) => {
@@ -858,7 +1140,8 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
 
             // Enviar via AJAX
             const formData = new FormData(this);
-            
+            formData.append('usuario', getCurrentUserName());
+
             fetch('novo_atendimento.php', {
                 method: 'POST',
                 body: formData
@@ -866,8 +1149,12 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
             .then(res => res.json())
             .then(data => {
                 if (data.sucesso) {
+                    if (OS_EDITANDO_ID) {
+                        // Em modo edição, não faz sentido "limpar e recomeçar" - volta para a revisão.
+                        window.location.href = 'revisao.php?atualizado=1';
+                        return;
+                    }
                     const successDiv = document.getElementById('successMessage');
-                    successDiv.innerHTML = '<i class="bi bi-check-circle-fill"></i> OS registrada com sucesso! <button onclick="window.location.href=\'revisao.php\'" style="background: none; border: none; color: #155724; text-decoration: underline; cursor: pointer; margin-left: 10px;">Ver em Revisão</button>';
                     successDiv.style.display = 'block';
                     limparFormularioCompleto();
                 } else {
@@ -901,7 +1188,13 @@ $veiculosJSON = json_encode($veiculos, JSON_UNESCAPED_UNICODE);
         }
 
         window.onload = () => {
-            adicionarCamposVeiculo();
+            if (OS_EDITANDO_ID && Array.isArray(FROTA_EXISTENTE) && FROTA_EXISTENTE.length > 0) {
+                document.getElementById('selecao-empresa').value = EMPRESA_OS_EDITANDO;
+                preencherDadosEmpresa();
+                FROTA_EXISTENTE.forEach(veiculoData => adicionarCamposVeiculo(veiculoData));
+            } else {
+                adicionarCamposVeiculo();
+            }
         };
     </script>
 

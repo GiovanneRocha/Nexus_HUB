@@ -15,6 +15,7 @@
     />
     <link rel="stylesheet" href="../../assets/css/style.css" />
     <link rel="stylesheet" href="../../assets/css/pages.css" />
+    <script src="../../assets/js/validacoes-cliente.js"></script>
     <script src="../../assets/js/pages.js"></script>
   </head>
   <body>
@@ -55,20 +56,20 @@
               <label for="nome"
                 ><i class="bi bi-person"></i> Nome Completo</label
               >
-              <input type="text" id="nome" placeholder="Seu nome" required />
+              <input type="text" id="nome" placeholder="Seu nome" maxlength="100" required />
             </div>
 
             <div class="opcoes-contato">
               <div class="bloco-campo">
                 <label for="email"><i class="bi bi-envelope"></i> E-mail</label>
-                <input type="email" id="email" placeholder="seu@email.com" />
+                <input type="email" id="email" placeholder="seu@email.com" maxlength="100" />
               </div>
 
               <div class="bloco-campo">
                 <label for="telefone"
                   ><i class="bi bi-telephone"></i> Telefone</label
                 >
-                <input type="tel" id="telefone" placeholder="(11) 98765-4321" />
+                <input type="tel" id="telefone" placeholder="(11) 98765-4321" maxlength="15" inputmode="numeric" data-mascara="telefone" />
               </div>
             </div>
 
@@ -80,6 +81,7 @@
                 type="text"
                 id="assunto"
                 placeholder="Qual é sua dúvida?"
+                maxlength="150"
                 required
               />
             </div>
@@ -91,6 +93,7 @@
               <textarea
                 id="mensagem"
                 placeholder="Descreva seu problema ou dúvida em detalhes..."
+                maxlength="2000"
                 required
               ></textarea>
             </div>
@@ -124,9 +127,22 @@
         const mensagem = document.getElementById("mensagem").value.trim()
 
         // Validações
-        if (!nome || !assunto || !mensagem) {
+        if (nome.length < 3 || !nome.trim()) {
           mostrarAlerta(
-            "Por favor, preencha todos os campos obrigatórios.",
+            "Informe seu nome completo (mínimo 3 caracteres).",
+            "erro",
+          )
+          return
+        }
+
+        if (!assunto || assunto.length < 3) {
+          mostrarAlerta("Informe o assunto (mínimo 3 caracteres).", "erro")
+          return
+        }
+
+        if (!mensagem || mensagem.length < 10) {
+          mostrarAlerta(
+            "Descreva sua dúvida com mais detalhes (mínimo 10 caracteres).",
             "erro",
           )
           return
@@ -142,6 +158,14 @@
 
         if (email && !validarEmail(email)) {
           mostrarAlerta("Por favor, insira um e-mail válido.", "erro")
+          return
+        }
+
+        if (telefone && !validarTelefone(telefone)) {
+          mostrarAlerta(
+            "Telefone inválido. Informe DDD + número, ex: (11) 98765-4321.",
+            "erro",
+          )
           return
         }
 
@@ -206,6 +230,11 @@
       function validarEmail(email) {
         const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
         return regex.test(email)
+      }
+
+      function validarTelefone(telefone) {
+        const numeros = telefone.replace(/\D/g, "")
+        return numeros.length === 10 || numeros.length === 11
       }
     </script>
   </body>

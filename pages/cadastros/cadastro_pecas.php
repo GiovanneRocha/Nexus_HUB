@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../php/db.php';
+require_once __DIR__ . '/../../php/validacoes.php';
 
 $pdo = nexusDb();
 $pdo->exec("CREATE TABLE IF NOT EXISTS pecas (
@@ -18,8 +19,10 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS pecas (
     data_cadastro TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
+
 $mensagem = '';
-$registro = null;
+$erros = [];
+$valoresDigitados = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'create';
@@ -31,68 +34,114 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensagem = '<div class="alerta sucesso">Peça removida com sucesso.</div>';
         }
     } else {
-        $nome = trim((string) ($_POST['nome'] ?? ''));
-        $categoria = trim((string) ($_POST['categoria'] ?? ''));
-        $marca = trim((string) ($_POST['marca'] ?? ''));
-        $fornecedor = trim((string) ($_POST['fornecedor'] ?? ''));
-        $codigo = trim((string) ($_POST['codigo'] ?? ''));
-        $estoque = (int) ($_POST['estoque'] ?? 0);
-        $unidade = trim((string) ($_POST['unidade'] ?? 'Unidade'));
-        $valor = (float) ($_POST['valor'] ?? 0);
-        $status = trim((string) ($_POST['status'] ?? 'Ativa'));
-        $imagem = trim((string) ($_POST['imagem'] ?? ''));
-        $descricao = trim((string) ($_POST['descricao'] ?? ''));
+        $valores = [
+            'nome' => trim((string) ($_POST['nome'] ?? '')),
+            'categoria' => trim((string) ($_POST['categoria'] ?? '')),
+            'marca' => trim((string) ($_POST['marca'] ?? '')),
+            'fornecedor' => trim((string) ($_POST['fornecedor'] ?? '')),
+            'codigo' => trim((string) ($_POST['codigo'] ?? '')),
+            'estoque' => trim((string) ($_POST['estoque'] ?? '')),
+            'unidade' => trim((string) ($_POST['unidade'] ?? 'Unidade')),
+            'valor' => trim((string) ($_POST['valor'] ?? '')),
+            'status' => trim((string) ($_POST['status'] ?? 'Ativa')),
+            'descricao' => trim((string) ($_POST['descricao'] ?? '')),
+        ];
 
-        if ($nome === '' || $codigo === '') {
-            $mensagem = '<div class="alerta erro">Nome e código da peça são obrigatórios.</div>';
-        } else {
+        if (!nexusTextoValido($valores['nome'], 3)) {
+            $erros['nome'] = 'O nome da peça deve ter pelo menos 3 caracteres.';
+            $valores['nome'] = '';
+        }
+        if (!nexusTextoValido($valores['codigo'], 2)) {
+            $erros['codigo'] = 'Informe o código/referência da peça.';
+            $valores['codigo'] = '';
+        }
+        if (!nexusValidarInteiroNaoNegativo($valores['estoque'])) {
+            $erros['estoque'] = 'Quantidade em estoque inválida.';
+            $valores['estoque'] = '';
+        }
+        if (!nexusValidarValorMonetario($valores['valor'])) {
+            $erros['valor'] = 'Informe um valor válido (entre R$ 0,00 e R$ 999.999,99).';
+            $valores['valor'] = '';
+        }
+
+        if (empty($erros)) {
+            $estoque = (int) $valores['estoque'];
+            $valor = (float) $valores['valor'];
+            $codigo = nexusMaiusculas($valores['codigo']);
+
+            // Código duplicado: apenas avisa, não bloqueia o cadastro.
+            $avisoDuplicado = '';
+            $idAtual = $action === 'update' ? (int) ($_POST['id'] ?? 0) : 0;
+            $dup = $pdo->prepare('SELECT nome FROM pecas WHERE UPPER(codigo) = :codigo AND id != :id LIMIT 1');
+            $dup->execute([':codigo' => $codigo, ':id' => $idAtual]);
+            if ($existente = $dup->fetch()) {
+                $avisoDuplicado = '<div class="alerta erro">Atenção: já existe uma peça cadastrada com o código ' . htmlspecialchars($codigo) . ' (' . htmlspecialchars((string) $existente['nome']) . '). Cadastro salvo mesmo assim.</div>';
+            }
             if ($action === 'update') {
                 $id = (int) ($_POST['id'] ?? 0);
                 if ($id > 0) {
-                    $stmt = $pdo->prepare('UPDATE pecas SET nome = :nome, categoria = :categoria, marca = :marca, fornecedor = :fornecedor, codigo = :codigo, estoque = :estoque, unidade = :unidade, valor = :valor, status = :status, imagem = :imagem, descricao = :descricao WHERE id = :id');
+                    $stmt = $pdo->prepare('UPDATE pecas SET nome = :nome, categoria = :categoria, marca = :marca, fornecedor = :fornecedor, codigo = :codigo, estoque = :estoque, unidade = :unidade, valor = :valor, status = :status, descricao = :descricao WHERE id = :id');
                     $stmt->execute([
-                        ':nome' => $nome,
-                        ':categoria' => $categoria,
-                        ':marca' => $marca,
-                        ':fornecedor' => $fornecedor,
+                        ':nome' => $valores['nome'],
+                        ':categoria' => $valores['categoria'],
+                        ':marca' => $valores['marca'],
+                        ':fornecedor' => $valores['fornecedor'],
                         ':codigo' => $codigo,
                         ':estoque' => $estoque,
-                        ':unidade' => $unidade,
+                        ':unidade' => $valores['unidade'],
                         ':valor' => $valor,
-                        ':status' => $status,
-                        ':imagem' => $imagem,
-                        ':descricao' => $descricao,
+                        ':status' => $valores['status'],
+                        ':descricao' => $valores['descricao'],
                         ':id' => $id,
                     ]);
-                    $mensagem = '<div class="alerta sucesso">Peça atualizada com sucesso.</div>';
+                    $mensagem = $avisoDuplicado . '<div class="alerta sucesso">Peça atualizada com sucesso.</div>';
                 }
             } else {
-                $stmt = $pdo->prepare('INSERT INTO pecas (nome, categoria, marca, fornecedor, codigo, estoque, unidade, valor, status, imagem, descricao) VALUES (:nome, :categoria, :marca, :fornecedor, :codigo, :estoque, :unidade, :valor, :status, :imagem, :descricao)');
+                $stmt = $pdo->prepare('INSERT INTO pecas (nome, categoria, marca, fornecedor, codigo, estoque, unidade, valor, status, descricao) VALUES (:nome, :categoria, :marca, :fornecedor, :codigo, :estoque, :unidade, :valor, :status, :descricao)');
                 $stmt->execute([
-                    ':nome' => $nome,
-                    ':categoria' => $categoria,
-                    ':marca' => $marca,
-                    ':fornecedor' => $fornecedor,
+                    ':nome' => $valores['nome'],
+                    ':categoria' => $valores['categoria'],
+                    ':marca' => $valores['marca'],
+                    ':fornecedor' => $valores['fornecedor'],
                     ':codigo' => $codigo,
                     ':estoque' => $estoque,
-                    ':unidade' => $unidade,
+                    ':unidade' => $valores['unidade'],
                     ':valor' => $valor,
-                    ':status' => $status,
-                    ':imagem' => $imagem,
-                    ':descricao' => $descricao,
+                    ':status' => $valores['status'],
+                    ':descricao' => $valores['descricao'],
                 ]);
-                $mensagem = '<div class="alerta sucesso">Peça cadastrada com sucesso.</div>';
+                $mensagem = $avisoDuplicado . '<div class="alerta sucesso">Peça cadastrada com sucesso.</div>';
             }
+        } else {
+            $mensagem = '<div class="alerta erro">Corrija o(s) campo(s) destacado(s) abaixo.</div>';
+            $valoresDigitados = $valores;
         }
     }
 }
 
+$registro = null;
 if (isset($_GET['edit'])) {
     $id = (int) $_GET['edit'];
-    $registro = $pdo->prepare('SELECT * FROM pecas WHERE id = :id');
-    $registro->execute([':id' => $id]);
-    $registro = $registro->fetch();
+    $stmtRegistro = $pdo->prepare('SELECT * FROM pecas WHERE id = :id');
+    $stmtRegistro->execute([':id' => $id]);
+    $registro = $stmtRegistro->fetch();
 }
+
+$valoresForm = $valoresDigitados ?? [
+    'nome' => $registro['nome'] ?? '',
+    'categoria' => $registro['categoria'] ?? '',
+    'marca' => $registro['marca'] ?? '',
+    'fornecedor' => $registro['fornecedor'] ?? '',
+    'codigo' => $registro['codigo'] ?? '',
+    'estoque' => $registro['estoque'] ?? 0,
+    'unidade' => $registro['unidade'] ?? 'Unidade',
+    'valor' => $registro['valor'] ?? 0,
+    'status' => $registro['status'] ?? 'Ativa',
+    'descricao' => $registro['descricao'] ?? '',
+];
+
+$emEdicao = $registro !== null || ($valoresDigitados !== null && ($_POST['action'] ?? '') === 'update');
+$idFormulario = $registro['id'] ?? (int) ($_POST['id'] ?? 0);
 
 $lista = $pdo->query('SELECT * FROM pecas ORDER BY id DESC')->fetchAll();
 ?>
@@ -107,8 +156,13 @@ $lista = $pdo->query('SELECT * FROM pecas ORDER BY id DESC')->fetchAll();
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/pages.css">
     <link rel="stylesheet" href="../../assets/css/admin-forms.css">
+    <script src="../../assets/js/validacoes-cliente.js"></script>
     <script src="../../assets/js/common.js"></script>
     <script src="../../assets/js/pages.js"></script>
+    <style>
+        .erro-campo { display: block; color: #ef4444; font-size: .78rem; margin-top: 4px; }
+        .form-group input.campo-invalido { border-color: #ef4444 !important; }
+    </style>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
@@ -121,63 +175,63 @@ $lista = $pdo->query('SELECT * FROM pecas ORDER BY id DESC')->fetchAll();
             <?= $mensagem ?>
 
             <form method="POST" action="">
-                <input type="hidden" name="action" value="<?= $registro ? 'update' : 'create' ?>">
-                <?php if ($registro): ?>
-                    <input type="hidden" name="id" value="<?= (int) $registro['id'] ?>">
+                <input type="hidden" name="action" value="<?= $emEdicao ? 'update' : 'create' ?>">
+                <?php if ($emEdicao): ?>
+                    <input type="hidden" name="id" value="<?= (int) $idFormulario ?>">
                 <?php endif; ?>
                 <div class="form-card">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Nome da peça *</label>
-                            <input type="text" name="nome" value="<?= htmlspecialchars($registro['nome'] ?? '') ?>" required>
+                            <input type="text" name="nome" value="<?= htmlspecialchars($valoresForm['nome']) ?>" maxlength="150" class="<?= isset($erros['nome']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['nome'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['nome']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group">
                             <label>Código *</label>
-                            <input type="text" name="codigo" value="<?= htmlspecialchars($registro['codigo'] ?? '') ?>" required>
+                            <input type="text" name="codigo" value="<?= htmlspecialchars($valoresForm['codigo']) ?>" maxlength="80" class="<?= isset($erros['codigo']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['codigo'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['codigo']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group">
                             <label>Categoria</label>
-                            <input type="text" name="categoria" value="<?= htmlspecialchars($registro['categoria'] ?? '') ?>">
+                            <input type="text" name="categoria" value="<?= htmlspecialchars($valoresForm['categoria']) ?>" maxlength="100">
                         </div>
                         <div class="form-group">
                             <label>Marca</label>
-                            <input type="text" name="marca" value="<?= htmlspecialchars($registro['marca'] ?? '') ?>">
+                            <input type="text" name="marca" value="<?= htmlspecialchars($valoresForm['marca']) ?>" maxlength="100">
                         </div>
                         <div class="form-group">
                             <label>Fornecedor</label>
-                            <input type="text" name="fornecedor" value="<?= htmlspecialchars($registro['fornecedor'] ?? '') ?>">
+                            <input type="text" name="fornecedor" value="<?= htmlspecialchars($valoresForm['fornecedor']) ?>" maxlength="150">
                         </div>
                         <div class="form-group">
                             <label>Estoque</label>
-                            <input type="number" name="estoque" value="<?= htmlspecialchars((string) ($registro['estoque'] ?? 0)) ?>">
+                            <input type="number" name="estoque" min="0" max="9999999" value="<?= htmlspecialchars((string) $valoresForm['estoque']) ?>" class="<?= isset($erros['estoque']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['estoque'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['estoque']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group">
                             <label>Unidade</label>
-                            <input type="text" name="unidade" value="<?= htmlspecialchars($registro['unidade'] ?? 'Unidade') ?>">
+                            <input type="text" name="unidade" value="<?= htmlspecialchars($valoresForm['unidade']) ?>" maxlength="40">
                         </div>
                         <div class="form-group">
                             <label>Valor</label>
-                            <input type="number" step="0.01" name="valor" value="<?= htmlspecialchars((string) ($registro['valor'] ?? 0)) ?>">
+                            <input type="number" step="0.01" min="0" max="999999.99" name="valor" value="<?= htmlspecialchars((string) $valoresForm['valor']) ?>" class="<?= isset($erros['valor']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['valor'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['valor']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group">
                             <label>Status</label>
                             <select name="status">
-                                <option value="Ativa" <?= (($registro['status'] ?? 'Ativa') === 'Ativa') ? 'selected' : '' ?>>Ativa</option>
-                                <option value="Inativa" <?= (($registro['status'] ?? 'Ativa') === 'Inativa') ? 'selected' : '' ?>>Inativa</option>
+                                <option value="Ativa" <?= ($valoresForm['status'] === 'Ativa') ? 'selected' : '' ?>>Ativa</option>
+                                <option value="Inativa" <?= ($valoresForm['status'] === 'Inativa') ? 'selected' : '' ?>>Inativa</option>
                             </select>
                         </div>
                         <div class="form-group form-grid-full">
-                            <label>Imagem (URL)</label>
-                            <input type="text" name="imagem" value="<?= htmlspecialchars($registro['imagem'] ?? '') ?>">
-                        </div>
-                        <div class="form-group form-grid-full">
                             <label>Descrição</label>
-                            <textarea name="descricao"><?= htmlspecialchars($registro['descricao'] ?? '') ?></textarea>
+                            <textarea name="descricao"><?= htmlspecialchars($valoresForm['descricao']) ?></textarea>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> <?= $registro ? 'Salvar alterações' : 'Cadastrar peça' ?></button>
-                        <?php if ($registro): ?>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> <?= $emEdicao ? 'Salvar alterações' : 'Cadastrar peça' ?></button>
+                        <?php if ($emEdicao): ?>
                             <a href="cadastro_pecas.php" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancelar</a>
                         <?php endif; ?>
                     </div>

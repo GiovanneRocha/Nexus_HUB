@@ -419,10 +419,6 @@ function getSidebarHTML(activePage = "home") {
                         <img src="${resolveAssetPath("assets/images/icon-sistem.png")}" alt="Nexus" class="logo-icon-small">
                         <span class="logo-texto">Nexus HUB</span>
                     </button>
-                    <div class="busca-global">
-                        <i class="bi bi-search"></i>
-                        <input type="text" placeholder="Buscar...">
-                    </div>
                 </div>
             </div>
 

@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../../php/db.php';
+require_once __DIR__ . '/../../php/validacoes.php';
 
 $pdo = nexusDb();
 $pdo->exec("CREATE TABLE IF NOT EXISTS cod_servicos (
@@ -11,7 +12,8 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS cod_servicos (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 
 $mensagem = '';
-$registro = null;
+$erros = [];
+$valoresDigitados = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $action = $_POST['action'] ?? 'create';
@@ -23,20 +25,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $mensagem = '<div class="alerta sucesso">Serviço removido com sucesso.</div>';
         }
     } else {
-        $nome_servico = trim((string) ($_POST['nome_servico'] ?? ''));
-        $descricao = trim((string) ($_POST['descricao'] ?? ''));
-        $preco = (float) ($_POST['preco'] ?? 0);
+        $valores = [
+            'nome_servico' => trim((string) ($_POST['nome_servico'] ?? '')),
+            'descricao' => trim((string) ($_POST['descricao'] ?? '')),
+            'preco' => trim((string) ($_POST['preco'] ?? '')),
+        ];
 
-        if ($nome_servico === '') {
-            $mensagem = '<div class="alerta erro">Nome do serviço é obrigatório.</div>';
-        } else {
+        if (!nexusTextoValido($valores['nome_servico'], 3)) {
+            $erros['nome_servico'] = 'O nome do serviço deve ter pelo menos 3 caracteres.';
+            $valores['nome_servico'] = '';
+        }
+        if (!nexusValidarValorMonetario($valores['preco']) || (float) $valores['preco'] <= 0) {
+            $erros['preco'] = 'Informe um valor maior que R$ 0,00 (limite: R$ 999.999,99).';
+            $valores['preco'] = '';
+        }
+        if (!nexusTextoValido($valores['descricao'], 5)) {
+            $erros['descricao'] = 'A descrição do serviço é obrigatória (mínimo 5 caracteres).';
+            $valores['descricao'] = '';
+        }
+
+        if (empty($erros)) {
+            $preco = (float) $valores['preco'];
             if ($action === 'update') {
                 $id = (int) ($_POST['id'] ?? 0);
                 if ($id > 0) {
                     $stmt = $pdo->prepare('UPDATE cod_servicos SET nome_servico = :nome_servico, descricao = :descricao, preco = :preco WHERE id = :id');
                     $stmt->execute([
-                        ':nome_servico' => $nome_servico,
-                        ':descricao' => $descricao,
+                        ':nome_servico' => $valores['nome_servico'],
+                        ':descricao' => $valores['descricao'],
                         ':preco' => $preco,
                         ':id' => $id,
                     ]);
@@ -45,22 +61,35 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             } else {
                 $stmt = $pdo->prepare('INSERT INTO cod_servicos (nome_servico, descricao, preco) VALUES (:nome_servico, :descricao, :preco)');
                 $stmt->execute([
-                    ':nome_servico' => $nome_servico,
-                    ':descricao' => $descricao,
+                    ':nome_servico' => $valores['nome_servico'],
+                    ':descricao' => $valores['descricao'],
                     ':preco' => $preco,
                 ]);
                 $mensagem = '<div class="alerta sucesso">Serviço cadastrado com sucesso.</div>';
             }
+        } else {
+            $mensagem = '<div class="alerta erro">Corrija o(s) campo(s) destacado(s) abaixo.</div>';
+            $valoresDigitados = $valores;
         }
     }
 }
 
+$registro = null;
 if (isset($_GET['edit'])) {
     $id = (int) $_GET['edit'];
-    $registro = $pdo->prepare('SELECT * FROM cod_servicos WHERE id = :id');
-    $registro->execute([':id' => $id]);
-    $registro = $registro->fetch();
+    $stmtRegistro = $pdo->prepare('SELECT * FROM cod_servicos WHERE id = :id');
+    $stmtRegistro->execute([':id' => $id]);
+    $registro = $stmtRegistro->fetch();
 }
+
+$valoresForm = $valoresDigitados ?? [
+    'nome_servico' => $registro['nome_servico'] ?? '',
+    'descricao' => $registro['descricao'] ?? '',
+    'preco' => $registro['preco'] ?? '',
+];
+
+$emEdicao = $registro !== null || ($valoresDigitados !== null && ($_POST['action'] ?? '') === 'update');
+$idFormulario = $registro['id'] ?? (int) ($_POST['id'] ?? 0);
 
 $lista = $pdo->query('SELECT * FROM cod_servicos ORDER BY id DESC')->fetchAll();
 ?>
@@ -75,8 +104,13 @@ $lista = $pdo->query('SELECT * FROM cod_servicos ORDER BY id DESC')->fetchAll();
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/pages.css">
     <link rel="stylesheet" href="../../assets/css/admin-forms.css">
+    <script src="../../assets/js/validacoes-cliente.js"></script>
     <script src="../../assets/js/common.js"></script>
     <script src="../../assets/js/pages.js"></script>
+    <style>
+        .erro-campo { display: block; color: #ef4444; font-size: .78rem; margin-top: 4px; }
+        .form-group input.campo-invalido, .form-group textarea.campo-invalido { border-color: #ef4444 !important; }
+    </style>
 </head>
 <body class="corpo-dashboard">
     <div class="layout-erp">
@@ -89,28 +123,31 @@ $lista = $pdo->query('SELECT * FROM cod_servicos ORDER BY id DESC')->fetchAll();
             <?= $mensagem ?>
 
             <form method="POST" action="">
-                <input type="hidden" name="action" value="<?= $registro ? 'update' : 'create' ?>">
-                <?php if ($registro): ?>
-                    <input type="hidden" name="id" value="<?= (int) $registro['id'] ?>">
+                <input type="hidden" name="action" value="<?= $emEdicao ? 'update' : 'create' ?>">
+                <?php if ($emEdicao): ?>
+                    <input type="hidden" name="id" value="<?= (int) $idFormulario ?>">
                 <?php endif; ?>
                 <div class="form-card">
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Nome do serviço *</label>
-                            <input type="text" name="nome_servico" value="<?= htmlspecialchars($registro['nome_servico'] ?? '') ?>" required>
+                            <input type="text" name="nome_servico" value="<?= htmlspecialchars($valoresForm['nome_servico']) ?>" maxlength="100" class="<?= isset($erros['nome_servico']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['nome_servico'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['nome_servico']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group">
-                            <label>Preço</label>
-                            <input type="number" step="0.01" name="preco" value="<?= htmlspecialchars((string) ($registro['preco'] ?? 0)) ?>">
+                            <label>Preço *</label>
+                            <input type="number" step="0.01" min="0" max="999999.99" name="preco" value="<?= htmlspecialchars((string) $valoresForm['preco']) ?>" placeholder="0,00" class="<?= isset($erros['preco']) ? 'campo-invalido' : '' ?>" required>
+                            <?php if (isset($erros['preco'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['preco']) ?></small><?php endif; ?>
                         </div>
                         <div class="form-group form-grid-full">
-                            <label>Descrição</label>
-                            <textarea name="descricao"><?= htmlspecialchars($registro['descricao'] ?? '') ?></textarea>
+                            <label>Descrição *</label>
+                            <textarea name="descricao" minlength="5" placeholder="Descreva o serviço (mínimo 5 caracteres)..." class="<?= isset($erros['descricao']) ? 'campo-invalido' : '' ?>" required><?= htmlspecialchars($valoresForm['descricao']) ?></textarea>
+                            <?php if (isset($erros['descricao'])): ?><small class="erro-campo"><?= htmlspecialchars($erros['descricao']) ?></small><?php endif; ?>
                         </div>
                     </div>
                     <div class="form-actions">
-                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> <?= $registro ? 'Salvar alterações' : 'Cadastrar serviço' ?></button>
-                        <?php if ($registro): ?>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-check-circle"></i> <?= $emEdicao ? 'Salvar alterações' : 'Cadastrar serviço' ?></button>
+                        <?php if ($emEdicao): ?>
                             <a href="cadastro_servicos.php" class="btn btn-secondary"><i class="bi bi-x-circle"></i> Cancelar</a>
                         <?php endif; ?>
                     </div>
