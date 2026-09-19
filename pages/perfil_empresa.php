@@ -83,8 +83,10 @@ $historicoJson = array_map(static function (array $item): array {
 .perfil-topo{display:flex;flex-direction:column;gap:16px}
 .perfil-topo-linha-acoes{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
 .perfil-topo-acoes-esquerda{display:flex;gap:10px;flex-wrap:wrap}
-.perfil-topo-linha-acoes .botao-acao,.perfil-topo-linha-acoes .botao-secundario{width:auto}
+.perfil-topo-linha-acoes .botao-acao,.perfil-topo-linha-acoes .botao-secundario,.perfil-topo-linha-acoes .botao-cinza{width:auto}
 .perfil-topo-linha-acoes a{display:inline-flex;align-items:center;justify-content:center;gap:7px;text-align:center}
+.botao-cinza{padding:10px 14px;background:linear-gradient(135deg,#64748b 0%,#475569 100%);color:#fff;border:none;border-radius:9px;cursor:pointer;font-weight:700;letter-spacing:.02em;box-shadow:0 8px 16px rgba(71,85,105,.16);transition:transform .25s ease,opacity .25s ease,box-shadow .25s ease}
+.botao-cinza:hover{opacity:.92;transform:translateY(-1px)}
 .perfil-grid{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:22px;margin-top:20px;align-items:start}
 @media(max-width:1180px){.perfil-grid{grid-template-columns:1fr 1fr}}
 @media(max-width:820px){.perfil-grid{grid-template-columns:1fr}}
@@ -138,9 +140,9 @@ $historicoJson = array_map(static function (array $item): array {
     <div class="perfil-topo-linha-acoes">
         <div class="perfil-topo-acoes-esquerda">
             <a href="operacoes/novo_atendimento.php" class="botao-acao"><i class="bi bi-plus-circle"></i> Nova OS</a>
-            <a href="cadastros/cadastrar_empresa.php?edit=<?= (int) $empresa['id'] ?>" class="botao-acao"><i class="bi bi-pencil"></i> Editar dados</a>
+            <a href="cadastros/cadastrar_empresa.php?edit=<?= (int) $empresa['id'] ?>" class="botao-cinza"><i class="bi bi-pencil"></i> Editar dados</a>
         </div>
-        <a href="clientes.php" class="botao-acao"><i class="bi bi-arrow-left"></i> Voltar</a>
+        <a href="clientes.php" class="botao-cinza"><i class="bi bi-arrow-left"></i> Voltar</a>
     </div>
 </section>
 

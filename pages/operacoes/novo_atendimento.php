@@ -5,6 +5,16 @@ require_once __DIR__ . '/../../php/historico_helper.php';
 
 $pdo = nexusDb();
 
+// IMPORTANTE: garantir a tabela de histórico ANTES de qualquer transação.
+// nexusRegistrarHistoricoEmpresa() é chamada de dentro da transação (ex: ao
+// cadastrar um veículo novo durante a OS) e ela roda "CREATE TABLE IF NOT
+// EXISTS" internamente - um DDL causa COMMIT IMPLÍCITO no MySQL mesmo quando
+// a tabela já existe, encerrando a transação sem avisar e quebrando o
+// $pdo->commit() final ("There is no active transaction"). Chamando aqui,
+// fora de qualquer transação, o flag estático da função evita que o CREATE
+// TABLE rode de novo mais tarde.
+nexusGarantirTabelaHistoricoEmpresas($pdo);
+
 // Criar tabela de OS se não existir
 $pdo->exec("CREATE TABLE IF NOT EXISTS ordens_servico (
     id INT NOT NULL AUTO_INCREMENT,
@@ -14,6 +24,9 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS ordens_servico (
     status VARCHAR(50) DEFAULT 'pendente_revisao',
     valor_total DECIMAL(12,2) DEFAULT 0.00,
     descricao_geral TEXT DEFAULT NULL,
+    nome_os VARCHAR(150) DEFAULT NULL,
+    motivo_reprovacao TEXT DEFAULT NULL,
+    relatorio_dados MEDIUMTEXT DEFAULT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (empresa_id) REFERENCES empresas_cadastradas(id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
@@ -52,6 +65,11 @@ $pdo->exec("CREATE TABLE IF NOT EXISTS itens_os (
 
 // Atualiza instalações que já possuem as tabelas sem apagar dados existentes.
 $colunas = [
+    'ordens_servico' => [
+        'nome_os' => 'VARCHAR(150) DEFAULT NULL',
+        'motivo_reprovacao' => 'TEXT DEFAULT NULL',
+        'relatorio_dados' => 'MEDIUMTEXT DEFAULT NULL',
+    ],
     'caminhoes' => [
         'empresa_id' => 'INT DEFAULT NULL',
         'ano' => 'INT DEFAULT NULL',
@@ -97,6 +115,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
         $action = $_POST['action'];
         $empresaId = (int) ($_POST['empresa_id'] ?? 0);
         $descricaoGeral = trim((string) ($_POST['descricao_geral'] ?? ''));
+        $nomeOS = trim((string) ($_POST['nome_os'] ?? ''));
         $osIdExistente = (int) ($_POST['os_id'] ?? 0);
         $usuarioAtual = nexusUsuarioAtual($_POST);
 
@@ -141,15 +160,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
             // Remove os itens antigos - serão reconstruídos com os dados enviados no formulário.
             $pdo->prepare('DELETE FROM itens_os WHERE os_id = :os_id')->execute(['os_id' => $osIdExistente]);
 
-            $pdo->prepare('UPDATE ordens_servico SET empresa_id = :empresa_id, descricao_geral = :descricao_geral WHERE id = :id')
-                ->execute([':empresa_id' => $empresaId, ':descricao_geral' => $descricaoGeral, ':id' => $osIdExistente]);
+            $pdo->prepare('UPDATE ordens_servico SET empresa_id = :empresa_id, descricao_geral = :descricao_geral, nome_os = :nome_os WHERE id = :id')
+                ->execute([':empresa_id' => $empresaId, ':descricao_geral' => $descricaoGeral, ':nome_os' => ($nomeOS ?: null), ':id' => $osIdExistente]);
 
             $osId = $osIdExistente;
         } else {
-            $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, status) VALUES (:empresa_id, 0, :descricao_geral, "pendente_revisao")');
+            $stmtOS = $pdo->prepare('INSERT INTO ordens_servico (empresa_id, valor_total, descricao_geral, nome_os, status) VALUES (:empresa_id, 0, :descricao_geral, :nome_os, "pendente_revisao")');
             $stmtOS->execute([
                 ':empresa_id' => $empresaId,
                 ':descricao_geral' => $descricaoGeral,
+                ':nome_os' => ($nomeOS ?: null),
             ]);
             $osId = $pdo->lastInsertId();
         }
@@ -376,7 +396,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && in_array
 }
 
 // Buscar empresas para o select
-$empresas = $pdo->query('SELECT id, nome, cnpj FROM empresas_cadastradas ORDER BY nome ASC')->fetchAll();
+$empresas = $pdo->query('SELECT id, nome, cnpj, contato, email, telefone FROM empresas_cadastradas ORDER BY nome ASC')->fetchAll();
 
 // Buscar serviços para popular JavaScript
 $servicos = $pdo->query('SELECT id, nome_servico as nome, preco as valor, descricao FROM cod_servicos ORDER BY nome_servico ASC')->fetchAll();
@@ -484,6 +504,10 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/pages.css">
     <link rel="stylesheet" href="../../assets/css/admin-forms.css">
+    <link rel="stylesheet" href="../../assets/css/relatorio-visualizador.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="../../assets/js/relatorio-visualizador.js"></script>
     <script src="../../assets/js/common.js"></script>
     <script src="../../assets/js/pages.js"></script>
 </head>
@@ -512,7 +536,7 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
                         <div class="linha-campos">
                             <div class="bloco-campo-novo">
                                 <label><i class="bi bi-shop"></i> Selecionar Empresa</label>
-                                <select id="selecao-empresa" required onchange="preencherDadosEmpresa()">
+                                <select id="selecao-empresa" required onchange="preencherDadosEmpresa()" style="min-height:48px; padding:12px 14px; font-size:0.95rem; box-sizing:border-box;">
                                     <option value="">Escolha uma empresa cadastrada...</option>
                                     <?php foreach ($empresas as $emp): ?>
                                         <option value="<?= (int)$emp['id'] ?>" data-cnpj="<?= htmlspecialchars($emp['cnpj'] ?? '') ?>">
@@ -523,7 +547,13 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
                             </div>
                             <div class="bloco-campo-novo">
                                 <label><i class="bi bi-card-text"></i> CNPJ</label>
-                                <input type="text" id="display-cnpj" readonly>
+                                <input type="text" id="display-cnpj" readonly style="min-height:48px; padding:12px 14px; font-size:0.95rem; box-sizing:border-box;">
+                            </div>
+                        </div>
+                        <div class="linha-campos">
+                            <div class="bloco-campo-novo" style="grid-column: 1 / -1;">
+                                <label><i class="bi bi-tag"></i> Nome da OS <span style="text-transform:none; font-weight:400; opacity:.7;">(opcional, para identificar facilmente esta ordem depois)</span></label>
+                                <input type="text" id="nome-os" name="nome_os" maxlength="150" placeholder="Ex.: Manutenção preventiva - Frota Sul" style="min-height:48px; padding:12px 14px; font-size:0.95rem; box-sizing:border-box;" value="<?= $osEditando ? htmlspecialchars($osEditando['nome_os'] ?? '') : '' ?>">
                             </div>
                         </div>
                     </div>
@@ -1154,6 +1184,9 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
                         window.location.href = 'revisao.php?atualizado=1';
                         return;
                     }
+
+                    abrirPreVisualizacaoRelatorio(data.os_id, frotaCompleta);
+
                     const successDiv = document.getElementById('successMessage');
                     successDiv.style.display = 'block';
                     limparFormularioCompleto();
@@ -1166,6 +1199,51 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
                 alert('Erro ao salvar OS. Tente novamente.');
             });
         });
+
+        function abrirPreVisualizacaoRelatorio(osId, frota) {
+            const empresaId = document.getElementById('selecao-empresa').value;
+            const empresaDados = EMPRESAS_BANCO.find(e => String(e.id) === String(empresaId)) || {};
+
+            const caminhoes = frota.map(veiculo => {
+                const dv = veiculo.dadosVeiculo;
+                const itens = [
+                    ...veiculo.servicos.map(s => ({ tipo: 'servico', descricao: s.descricao, valor: Number(s.valor || 0), quantidade: 1, data: s.data })),
+                    ...veiculo.pecas.map(p => ({ tipo: 'peca', descricao: p.nome, valor: Number(p.valorTotal || 0), quantidade: Number(p.quantidade || 1) }))
+                ];
+                const valorTotal = itens.reduce((soma, item) => soma + item.valor, 0);
+                const primeiraData = veiculo.servicos.length ? veiculo.servicos[0].data : '';
+                return {
+                    chave: dv.placa || ('veiculo-' + Math.random().toString(36).slice(2)),
+                    modelo: dv.modelo,
+                    placa: dv.placa,
+                    dataServico: primeiraData ? new Date(primeiraData + 'T00:00:00').toLocaleDateString('pt-BR') : '-',
+                    itens: itens,
+                    valorTotal: valorTotal
+                };
+            });
+
+            const valorTotalGeral = caminhoes.reduce((soma, c) => soma + c.valorTotal, 0);
+
+            NexusRelatorio.abrir({
+                osId: osId,
+                nomeOS: document.getElementById('nome-os').value.trim(),
+                logoUrl: '../../assets/images/icon-sistem.png',
+                salvarUrl: '../../php/relatorio_crud.php',
+                podeSalvar: true,
+                empresa: {
+                    nome: empresaDados.nome || '',
+                    cnpj: empresaDados.cnpj || '',
+                    contato: empresaDados.contato || '',
+                    email: empresaDados.email || '',
+                    telefone: empresaDados.telefone || ''
+                },
+                dataEmissao: new Date().toLocaleDateString('pt-BR'),
+                caminhoes: caminhoes,
+                valorTotalGeral: valorTotalGeral,
+                relatorioSalvo: null,
+                aoFechar: function () { window.location.href = 'revisao.php'; }
+            });
+        }
 
         function limparFormulario() {
             if(confirm("Deseja realmente limpar todos os dados?")) {

@@ -2067,6 +2067,11 @@ textarea {
   background: #f8f9fc;
 }
 
+.tabela-historico tbody tr:hover td,
+.tabela-historico tbody tr:hover td strong {
+  color: #1a2233;
+}
+
 .link-menu {
   text-decoration: none;
   color: inherit;
