@@ -128,11 +128,6 @@
             ></div>
           </form>
 
-          <div class="area-novo-cadastro">
-            Ainda não possui acesso?
-            <a href="php/cadastro.php">Cadastre-se aqui</a>
-          </div>
-
           <div class="rodape-tela">
             <div class="links-institucionais">
               <a href="pages/info/suporte.html"
@@ -147,32 +142,7 @@
       </div>
     </div>
 
-    <script>
-      const formLogin = document.getElementById("formLogin")
-      const mensagemLogin = document.getElementById("mensagemLogin")
-
-      formLogin.addEventListener("submit", function (evento) {
-        evento.preventDefault()
-
-        const campoEmail = document.getElementById("email").value.trim()
-        const campoSenha = document.getElementById("senha").value.trim()
-
-        if (!campoEmail || !campoSenha) {
-          mensagemLogin.textContent = "Preencha e-mail e senha para continuar."
-          mensagemLogin.classList.add("visible")
-          return
-        }
-
-        const emailValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(campoEmail)
-        if (!emailValido) {
-          mensagemLogin.textContent = "Informe um e-mail válido (ex: nome@empresa.com.br)."
-          mensagemLogin.classList.add("visible")
-          return
-        }
-
-        mensagemLogin.classList.remove("visible")
-        window.location.href = "pages/operacoes/home.html"
-      })
-    </script>
+    <script src="assets/js/common.js"></script>
+    <script src="assets/js/pages.js"></script>
   </body>
 </html>

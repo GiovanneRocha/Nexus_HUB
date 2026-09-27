@@ -210,7 +210,20 @@ function getCurrentUserName() {
   const savedName =
     localStorage.getItem("nexus-user-name") ||
     sessionStorage.getItem("nexus-user-name")
-  return savedName || "Julian Vane"
+  return savedName || "Usuário"
+}
+
+function getCurrentUserAvatar() {
+  return (
+    localStorage.getItem("nexus-user-avatar") ||
+    sessionStorage.getItem("nexus-user-avatar") ||
+    getCurrentUserFallbackAvatar()
+  )
+}
+
+function getCurrentUserFallbackAvatar() {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="160" height="160" viewBox="0 0 160 160"><rect width="160" height="160" rx="80" fill="#e5e7eb"/><circle cx="80" cy="58" r="29" fill="#6b7280"/><path d="M27 145c3-31 24-49 53-49s50 18 53 49" fill="#6b7280"/></svg>`
+  return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`
 }
 
 function getRoleLabel(role) {
@@ -235,6 +248,7 @@ function getAllowedPageKeysForRole(role) {
       "cadastro_pecas",
       "cadastro_veiculo",
       "historico",
+      "admin_usuarios",
     ],
     mecanico: ["home", "menu", "novo_atendimento", "revisao", "historico"],
     usuario: ["home", "menu", "clientes", "historico"],
@@ -247,14 +261,41 @@ function getDefaultPageForRole(role) {
   return normalizeRole(role) === "mecanico" ? "home.html" : "home.html"
 }
 
-function setCurrentUserRole(role, name = "") {
+function setCurrentUserRole(
+  role,
+  name = "",
+  email = "",
+  avatar = "",
+  id = "",
+  persist = true,
+) {
   const normalizedRole = normalizeRole(role)
-  localStorage.setItem("nexus-role", normalizedRole)
   sessionStorage.setItem("nexus-role", normalizedRole)
+  if (persist) localStorage.setItem("nexus-role", normalizedRole)
+  else localStorage.removeItem("nexus-role")
 
   if (name) {
-    localStorage.setItem("nexus-user-name", name)
     sessionStorage.setItem("nexus-user-name", name)
+    if (persist) localStorage.setItem("nexus-user-name", name)
+    else localStorage.removeItem("nexus-user-name")
+  }
+
+  if (email) {
+    sessionStorage.setItem("nexus-user-email", email)
+    if (persist) localStorage.setItem("nexus-user-email", email)
+    else localStorage.removeItem("nexus-user-email")
+  }
+
+  if (avatar) {
+    sessionStorage.setItem("nexus-user-avatar", avatar)
+    if (persist) localStorage.setItem("nexus-user-avatar", avatar)
+    else localStorage.removeItem("nexus-user-avatar")
+  }
+
+  if (id) {
+    sessionStorage.setItem("nexus-user-id", String(id))
+    if (persist) localStorage.setItem("nexus-user-id", String(id))
+    else localStorage.removeItem("nexus-user-id")
   }
 }
 
@@ -367,11 +408,19 @@ function getSidebarHTML(activePage = "home") {
       text: "OS Aprovadas",
       key: "historico",
     },
+    {
+      href: resolveRootLink("pages/admin/usuarios.php"),
+      icon: "bi-person-gear",
+      text: "Usuários",
+      key: "admin_usuarios",
+      adminOnly: true,
+    },
   ]
 
   const role = getCurrentUserRole()
   const allowed = new Set(getAllowedPageKeysForRole(role))
   const filteredMenuItems = menuItems.filter((item) => {
+    if (item.adminOnly && role !== "administrador") return false
     if (item.children) {
       const children = item.children.filter((child) => allowed.has(child.key))
       if (!children.length) return false
@@ -441,6 +490,7 @@ function getSidebarHTML(activePage = "home") {
 function getHeaderHTML() {
   const usuarioNome = getCurrentUserName()
   const cargo = getRoleLabel(getCurrentUserRole())
+  const avatar = getCurrentUserAvatar()
 
   return `
         <header class="cabecalho-topo">
@@ -455,7 +505,7 @@ function getHeaderHTML() {
                     <p class="usuario-nome">${usuarioNome}</p>
                     <p class="usuario-cargo">${cargo}</p>
                 </div>
-                <img src="${resolveAssetPath("assets/images/manoel.jpeg")}" alt="Perfil" class="foto-perfil">
+                <img src="${avatar}" alt="Foto de perfil de ${usuarioNome}" class="foto-perfil" onerror="this.onerror=null;this.src='${getCurrentUserFallbackAvatar()}'">
                 
                 <div class="menu-opcoes-container">
                     <button class="botao-menu-trigger" onclick="alternarMenu()">

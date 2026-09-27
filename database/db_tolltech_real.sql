@@ -12,7 +12,8 @@ CREATE TABLE IF NOT EXISTS cargos (
 INSERT INTO cargos (id, nome, descricao)
 VALUES
   (1, 'Administrador', 'Acesso total ao sistema'),
-  (2, 'usuario_comum', 'Acesso limitado às suas próprias informações')
+  (2, 'usuario_comum', 'Acesso limitado às suas próprias informações'),
+  (3, 'Mecânico', 'Acesso operacional')
 ON DUPLICATE KEY UPDATE nome = VALUES(nome), descricao = VALUES(descricao);
 
 CREATE TABLE IF NOT EXISTS empresas_cadastradas (

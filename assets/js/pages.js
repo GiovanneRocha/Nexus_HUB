@@ -34,6 +34,7 @@
       "administrador"
     ).toLowerCase()
     const currentPage = getActivePageFromURL()
+    if (currentPage === "admin_usuarios") return
     const allowedPages = {
       administrador: [
         "home",
@@ -45,6 +46,7 @@
         "cadastro_pecas",
         "cadastro_veiculo",
         "historico",
+        "admin_usuarios",
       ],
       mecanico: ["home", "menu", "novo_atendimento", "revisao", "historico"],
       usuario: ["home", "menu", "clientes", "historico"],
@@ -94,6 +96,7 @@
       "demo.php": "demo",
       "cadastrar_empresa.html": "clientes",
       "cadastrar_empresa.php": "clientes",
+      "usuarios.php": "admin_usuarios",
     }
     return pageMap[currentPage] || ""
   }
@@ -156,29 +159,51 @@
     const formLogin = document.getElementById("formLogin")
     if (!formLogin) return
 
-    formLogin.addEventListener("submit", function (evento) {
+    formLogin.addEventListener("submit", async function (evento) {
       evento.preventDefault()
       const email = document.getElementById("email").value.trim()
       const senha = document.getElementById("senha").value.trim()
-      const perfilSelecionado =
-        document.getElementById("perfilAcesso")?.value || "administrador"
+      const mensagem = document.getElementById("mensagemLogin")
 
       if (!email || !senha) {
-        alert("Por favor, preencha todos os campos para acessar o sistema.")
+        if (mensagem) {
+          mensagem.textContent =
+            "Por favor, preencha todos os campos para acessar o sistema."
+          mensagem.classList.add("visible")
+        }
         return
       }
 
-      const role = perfilSelecionado || "administrador"
-      const userName = email.includes("@")
-        ? email.split("@")[0].replace(/[._-]/g, " ")
-        : "Usuário"
-      const formattedName = userName
-        .split(" ")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ")
+      try {
+        const resposta = await fetch("php/login.php", {
+          method: "POST",
+          headers: { "Content-Type": "application/x-www-form-urlencoded" },
+          body: new URLSearchParams({ email, senha }),
+        })
+        const dados = await resposta.json()
 
-      setCurrentUserRole(role, formattedName)
-      window.location.href = "pages/home.html"
+        if (!resposta.ok || !dados.sucesso) {
+          throw new Error(dados.mensagem || "Não foi possível entrar.")
+        }
+
+        const usuario = dados.usuario
+        const manterSessao =
+          document.getElementById("permanecer-logado")?.checked
+        setCurrentUserRole(
+          usuario.cargo,
+          usuario.nome,
+          usuario.email,
+          usuario.avatar,
+          usuario.id,
+          manterSessao,
+        )
+        window.location.href = "pages/home.html"
+      } catch (erro) {
+        if (mensagem) {
+          mensagem.textContent = erro.message
+          mensagem.classList.add("visible")
+        }
+      }
     })
   }
 

@@ -2,6 +2,12 @@
 require_once __DIR__ . '/db.php';
 require_once __DIR__ . '/validacoes.php';
 
+session_start();
+if (($_SESSION['usuario_role'] ?? '') !== 'administrador') {
+    http_response_code(403);
+    exit('O cadastro de usuários está disponível somente para administradores.');
+}
+
 $mensagem = '';
 $nome = '';
 $email = '';
