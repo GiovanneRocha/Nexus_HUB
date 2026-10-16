@@ -465,7 +465,7 @@ function getSidebarHTML(activePage = "home") {
             <div class="barra-lateral-topo">
                 <div class="topo-lateral">
                     <button type="button" class="logo-erp logo-toggle" onclick="toggleSidebarCollapse()" aria-label="Expandir menu lateral">
-                        <img src="${resolveAssetPath("assets/images/icon-sistem.png")}" alt="Nexus" class="logo-icon-small">
+                        <img src="${resolveRootLink("assets/images/icon-sistem.png")}" alt="Nexus" class="logo-icon-small">
                         <span class="logo-texto">Nexus HUB</span>
                     </button>
                 </div>

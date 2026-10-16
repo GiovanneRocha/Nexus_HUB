@@ -26,19 +26,78 @@ if ($status !== 'todos') { $where[] = 'os.status = :status'; $params['status'] =
 if ($empresaId) { $where[] = 'os.empresa_id = :empresa_id'; $params['empresa_id'] = $empresaId; }
 if ($inicio) { $where[] = 'os.data_criacao >= :inicio'; $params['inicio'] = $inicio->format('Y-m-d H:i:s'); $where[] = 'os.data_criacao < :fim'; $params['fim'] = $fim->format('Y-m-d H:i:s'); }
 $whereSql = $where ? 'WHERE ' . implode(' AND ', $where) : '';
-$stmt = $pdo->prepare('SELECT os.id, os.empresa_id, os.status, os.valor_total, os.data_criacao, empresas_cadastradas.nome AS empresa_nome FROM ordens_servico os INNER JOIN empresas_cadastradas ON empresas_cadastradas.id = os.empresa_id ' . $whereSql . ' ORDER BY os.data_criacao DESC');
+$stmt = $pdo->prepare('SELECT os.id, os.empresa_id, os.status, os.valor_total, os.data_criacao, os.nome_os, empresas_cadastradas.nome AS empresa_nome FROM ordens_servico os INNER JOIN empresas_cadastradas ON empresas_cadastradas.id = os.empresa_id ' . $whereSql . ' ORDER BY os.data_criacao DESC');
 $stmt->execute($params);
 $ordens = $stmt->fetchAll();
 if (($_GET['exportar'] ?? '') === 'csv') {
+    $stmtItens = $pdo->prepare(
+        'SELECT i.id, i.os_id, i.tipo, i.veiculo_id, i.placa, i.modelo, i.descricao, i.valor_unitario
+         FROM itens_os i
+         INNER JOIN ordens_servico os ON os.id = i.os_id
+         ' . $whereSql . '
+         ORDER BY os.data_criacao DESC, os.id DESC, i.id ASC'
+    );
+    $stmtItens->execute($params);
+    $veiculosPorOS = [];
+    foreach ($stmtItens->fetchAll() as $item) {
+        $osId = (int) $item['os_id'];
+        $veiculoId = $item['veiculo_id'] !== null ? (string) $item['veiculo_id'] : 'sem-veiculo-' . (int) $item['id'];
+        if (!isset($veiculosPorOS[$osId][$veiculoId])) {
+            $veiculosPorOS[$osId][$veiculoId] = [
+                'caminhao' => '',
+                'servicos' => [],
+                'pecas' => [],
+            ];
+        }
+
+        if ($item['tipo'] === 'veiculo') {
+            $veiculosPorOS[$osId][$veiculoId]['caminhao'] = trim((string) ($item['placa'] ?: $item['modelo']));
+        } elseif ($item['tipo'] === 'servico') {
+            $veiculosPorOS[$osId][$veiculoId]['servicos'][] = [
+                'descricao' => (string) $item['descricao'],
+                'valor_unitario' => (float) $item['valor_unitario'],
+            ];
+        } elseif ($item['tipo'] === 'peca') {
+            $veiculosPorOS[$osId][$veiculoId]['pecas'][] = [
+                'descricao' => (string) $item['descricao'],
+                'valor_unitario' => (float) $item['valor_unitario'],
+            ];
+        }
+    }
+
     header('Content-Type: text/csv; charset=UTF-8');
-    header('Content-Disposition: attachment; filename="ordens-servico-' . date('Y-m-d') . '.csv"');
+    header('Content-Disposition: attachment; filename="relatorio-financeiro-' . date('Y-m-d') . '.csv"');
     $arquivo = fopen('php://output', 'wb');
     fwrite($arquivo, "\xEF\xBB\xBF");
-    fputcsv($arquivo, ['OS', 'Empresa', 'Status', 'Data', 'Valor total'], ';', '"', '\\');
+    fputcsv($arquivo, ['Nome Relatório', 'Empresa Cliente do Relatório', 'Caminhão', 'Serviços Feitos', 'Valor Unitário', 'Peças Usadas', 'Valor Unitário'], ';', '"', '\\');
+    $protegerFormula = static function ($valor): string {
+        $texto = (string) $valor;
+        return preg_match('/^[\x00-\x20]*[=+\-@]/', $texto) ? "'" . $texto : $texto;
+    };
     foreach ($ordens as $os) {
-        $empresaNome = (string) $os['empresa_nome'];
-        if (preg_match('/^[\x00-\x20]*[=+\-@]/', $empresaNome)) $empresaNome = "'" . $empresaNome;
-        fputcsv($arquivo, [(int) $os['id'], $empresaNome, statusPainel($os['status']), date('d/m/Y H:i', strtotime($os['data_criacao'])), number_format((float) $os['valor_total'], 2, ',', '')], ';', '"', '\\');
+        $osId = (int) $os['id'];
+        $nomeRelatorio = trim((string) ($os['nome_os'] ?? '')) ?: 'Relatório ' . $osId;
+        $veiculos = array_values($veiculosPorOS[$osId] ?? []);
+        if (!$veiculos) {
+            $veiculos[] = ['caminhao' => '', 'servicos' => [], 'pecas' => []];
+        }
+
+        foreach ($veiculos as $veiculo) {
+            $quantidadeLinhas = max(count($veiculo['servicos']), count($veiculo['pecas']), 1);
+            for ($indice = 0; $indice < $quantidadeLinhas; $indice++) {
+                $servico = $veiculo['servicos'][$indice] ?? null;
+                $peca = $veiculo['pecas'][$indice] ?? null;
+                fputcsv($arquivo, [
+                    $protegerFormula($nomeRelatorio),
+                    $protegerFormula($os['empresa_nome']),
+                    $protegerFormula($veiculo['caminhao'] ?: '-'),
+                    $protegerFormula($servico['descricao'] ?? ''),
+                    $servico ? number_format($servico['valor_unitario'], 2, ',', '') : '',
+                    $protegerFormula($peca['descricao'] ?? ''),
+                    $peca ? number_format($peca['valor_unitario'], 2, ',', '') : '',
+                ], ';', '"', '\\');
+            }
+        }
     }
     fclose($arquivo);
     exit;
@@ -118,7 +177,7 @@ function statusPainel($valor): string { return ['pendente_revisao' => 'Em revis�
 </head>
 <body class="corpo-dashboard"><div class="layout-erp"><main class="conteudo-principal">
 <section class="titulo-pagina-stack"><h1><i class="bi bi-speedometer2"></i> Painel de Controle</h1><p>Visão operacional das empresas, ordens de serviço, frota e estoque.</p></section>
-<form class="painel-filtros-php" method="GET"><div><label for="status">Status das OS</label><select id="status" name="status"><option value="todos" <?= $status === 'todos' ? 'selected' : '' ?>>Todos os status</option><option value="pendente_revisao" <?= $status === 'pendente_revisao' ? 'selected' : '' ?>>Em revisão</option><option value="finalizada" <?= $status === 'finalizada' ? 'selected' : '' ?>>Aprovadas</option><option value="reprovada" <?= $status === 'reprovada' ? 'selected' : '' ?>>Reprovadas</option></select></div><div><label for="periodo">Período</label><select id="periodo" name="periodo"><option value="mes_atual" <?= $periodo === 'mes_atual' ? 'selected' : '' ?>>Mês atual</option><option value="30_dias" <?= $periodo === '30_dias' ? 'selected' : '' ?>>Últimos 30 dias</option><option value="ano_atual" <?= $periodo === 'ano_atual' ? 'selected' : '' ?>>Ano atual</option><option value="todos" <?= $periodo === 'todos' ? 'selected' : '' ?>>Todo período</option></select></div><div><label for="empresa_id">Empresa</label><select id="empresa_id" name="empresa_id"><option value="0">Todas as empresas</option><?php foreach ($empresasFiltro as $empresa): ?><option value="<?= (int) $empresa['id'] ?>" <?= $empresaId === (int) $empresa['id'] ? 'selected' : '' ?>><?= hPainel($empresa['nome']) ?></option><?php endforeach; ?></select></div><div class="painel-filtros-acoes"><button class="botao-acao" type="submit"><i class="bi bi-funnel"></i> Filtrar</button><button class="botao-secundario" type="submit" name="exportar" value="csv"><i class="bi bi-file-earmark-spreadsheet"></i> Excel CSV</button></div></form>
+<form class="painel-filtros-php" method="GET"><div><label for="status">Status das OS</label><select id="status" name="status"><option value="todos" <?= $status === 'todos' ? 'selected' : '' ?>>Todos os status</option><option value="pendente_revisao" <?= $status === 'pendente_revisao' ? 'selected' : '' ?>>Em revisão</option><option value="finalizada" <?= $status === 'finalizada' ? 'selected' : '' ?>>Aprovadas</option><option value="reprovada" <?= $status === 'reprovada' ? 'selected' : '' ?>>Reprovadas</option></select></div><div><label for="periodo">Período</label><select id="periodo" name="periodo"><option value="mes_atual" <?= $periodo === 'mes_atual' ? 'selected' : '' ?>>Mês atual</option><option value="30_dias" <?= $periodo === '30_dias' ? 'selected' : '' ?>>Últimos 30 dias</option><option value="ano_atual" <?= $periodo === 'ano_atual' ? 'selected' : '' ?>>Ano atual</option><option value="todos" <?= $periodo === 'todos' ? 'selected' : '' ?>>Todo período</option></select></div><div><label for="empresa_id">Empresa</label><select id="empresa_id" name="empresa_id"><option value="0">Todas as empresas</option><?php foreach ($empresasFiltro as $empresa): ?><option value="<?= (int) $empresa['id'] ?>" <?= $empresaId === (int) $empresa['id'] ? 'selected' : '' ?>><?= hPainel($empresa['nome']) ?></option><?php endforeach; ?></select></div><div class="painel-filtros-acoes"><button class="botao-acao" type="submit"><i class="bi bi-funnel"></i> Filtrar</button><button class="botao-secundario" type="submit" name="exportar" value="csv"><i class="bi bi-file-earmark-spreadsheet"></i> Excel Financeiro</button></div></form>
 <div class="bi-grid-painel"><div class="bi-metrica"><p><i class="bi bi-hourglass-split"></i> Em revisão</p><h2><?= $pendentes ?></h2><span>OS pendentes</span><?php if ($comparativo): ?><span class="bi-comparacao"><?= hPainel(variacaoPainel($pendentes, $comparativo['pendentes'])) ?></span><?php endif; ?></div><div class="bi-metrica"><p><i class="bi bi-check-circle"></i> Aprovadas</p><h2><?= $aprovadas ?></h2><span>Dentro do filtro</span><?php if ($comparativo): ?><span class="bi-comparacao"><?= hPainel(variacaoPainel($aprovadas, $comparativo['aprovadas'])) ?></span><?php endif; ?></div><div class="bi-metrica"><p><i class="bi bi-currency-dollar"></i> Receita</p><h2><?= moedaPainel($receita) ?></h2><span>OS aprovadas</span><?php if ($comparativo): ?><span class="bi-comparacao"><?= hPainel(variacaoPainel($receita, $comparativo['receita'])) ?></span><?php endif; ?></div><div class="bi-metrica"><p><i class="bi bi-wallet2"></i> Ticket médio</p><h2><?= moedaPainel($ticket) ?></h2><span>Por OS aprovada</span><?php if ($comparativo): ?><span class="bi-comparacao"><?= hPainel(variacaoPainel($ticket, $comparativo['ticket'])) ?></span><?php endif; ?></div><div class="bi-metrica"><p><i class="bi bi-building"></i> Empresas</p><h2><?= $totalEmpresas ?></h2><span><?= $totalCaminhoes ?> caminhões na frota</span></div><div class="bi-metrica"><p><i class="bi bi-percent"></i> Aprovação</p><h2><?= number_format($taxa, 1, ',', '.') ?>%</h2><span><?= $reprovadas ?> reprovada(s)</span><?php if ($comparativo): ?><span class="bi-comparacao"><?= hPainel(pontosPercentuaisPainel($taxa, $comparativo['taxa'])) ?></span><?php endif; ?></div></div>
 <div class="bi-grid-conteudo"><section class="bi-painel"><h3><i class="bi bi-bar-chart"></i> Tendência mensal</h3><p>Últimos seis meses · status e empresa selecionados</p><div class="bi-barras"><?php foreach ($meses as $mes): ?><div class="bi-barra-coluna" title="<?= (int) $mes['quantidade'] ?> OS · <?= hPainel(moedaPainel($mes['receita'])) ?>"><strong><?= (int) $mes['quantidade'] ?></strong><div class="bi-barra-grupo"><div class="bi-barra" style="height:<?= max(4, ($mes['quantidade'] / $maxMensal) * 140) ?>px"></div><div class="bi-barra receita" style="height:<?= max(4, ($mes['receita'] / $maxReceitaMensal) * 140) ?>px"></div></div><small><?= hPainel($mes['label']) ?></small></div><?php endforeach; ?></div><div class="bi-legenda"><span><i></i> Ordens de serviço</span><span><i class="receita"></i> Receita aprovada</span></div></section><section class="bi-painel"><h3><i class="bi bi-pie-chart"></i> Status da operação</h3><p>Distribuição no período selecionado</p><div class="bi-status-lista"><?php foreach (['finalizada' => ['Aprovadas', $aprovadas], 'pendente_revisao' => ['Em revisão', $pendentes], 'reprovada' => ['Reprovadas', $reprovadas]] as $chave => [$label, $quantidade]): ?><div class="bi-status-linha"><span><?= $label ?></span><div class="bi-status-trilho"><div class="bi-status-fill <?= $chave ?>" style="width:<?= $totalOS ? ($quantidade / $totalOS) * 100 : 0 ?>%"></div></div><strong><?= $quantidade ?></strong></div><?php endforeach; ?></div><p style="margin-top:22px">Estoque baixo: <strong class="bi-alerta"><?= $estoqueBaixo ?></strong> peça(s) com até 5 unidades.</p></section><section class="bi-painel"><h3><i class="bi bi-building"></i> Empresas em destaque</h3><p>Mais OS no recorte selecionado</p><?php if ($empresasResumo): ?><div class="bi-ranking"><?php foreach ($empresasResumo as $indice => $empresaResumo): ?><div class="bi-ranking-item"><strong title="<?= hPainel($empresaResumo['nome']) ?>"><?= $indice + 1 ?>. <?= hPainel($empresaResumo['nome']) ?></strong><small><?= (int) $empresaResumo['quantidade'] ?> OS · <?= hPainel(moedaPainel($empresaResumo['receita'])) ?></small><div class="bi-ranking-trilho"><div class="bi-ranking-fill" style="width:<?= ($empresaResumo['quantidade'] / $maxEmpresaOS) * 100 ?>%"></div></div></div><?php endforeach; ?></div><?php else: ?><p class="bi-vazio">Sem empresas com OS neste recorte.</p><?php endif; ?></section></div>
 <section class="bi-painel bi-tabela"><div class="bi-acoes"><div><h3><i class="bi bi-clock-history"></i> Últimas ordens de serviço</h3><p>Registros mais recentes encontrados no banco.</p></div><a class="botao-secundario" href="historico.php">Ver histórico</a><a class="botao-secundario" href="revisao.php">Revisar OS</a></div><table class="tabela-historico"><thead><tr><th>OS</th><th>Empresa</th><th>Status</th><th>Data</th><th>Total</th></tr></thead><tbody><?php if (!$ordens): ?><tr><td colspan="5" class="sem-dados">Nenhuma OS encontrada para os filtros.</td></tr><?php else: foreach (array_slice($ordens, 0, 8) as $os): ?><tr><td><strong>#<?= (int) $os['id'] ?></strong></td><td><?= hPainel($os['empresa_nome']) ?></td><td><?= hPainel(statusPainel($os['status'])) ?></td><td><?= hPainel(dataPainel($os['data_criacao'])) ?></td><td><?= moedaPainel($os['valor_total']) ?></td></tr><?php endforeach; endif; ?></tbody></table></section>
