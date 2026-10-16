@@ -156,7 +156,7 @@ $lista = $pdo->query('SELECT * FROM empresas_cadastradas ORDER BY id DESC')->fet
     <link rel="stylesheet" href="../../assets/css/pages.css">
     <link rel="stylesheet" href="../../assets/css/admin-forms.css">
     <script src="../../assets/js/validacoes-cliente.js"></script>
-    <script src="../../assets/js/common.js"></script>
+    <script src="../../assets/js/common.js?v=20261015-3"></script>
     <script src="../../assets/js/pages.js"></script>
     <style>
         .erro-campo { display: block; color: #ef4444; font-size: .78rem; margin-top: 4px; }

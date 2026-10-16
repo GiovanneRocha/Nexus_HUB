@@ -57,7 +57,7 @@
             <div class="opcoes-contato">
               <div class="bloco-campo">
                 <label for="email"><i class="bi bi-envelope"></i> E-mail</label>
-                <input type="email" id="email" placeholder="seu@email.com" />
+                <input type="email" id="email" placeholder="seu@email.com" maxlength="254" autocomplete="email" required />
               </div>
 
               <div class="bloco-campo">
@@ -128,15 +128,7 @@
           return
         }
 
-        if (!email && !telefone) {
-          mostrarAlerta(
-            "Por favor, forneça pelo menos um meio de contato (e-mail ou telefone).",
-            "erro",
-          )
-          return
-        }
-
-        if (email && !validarEmail(email)) {
+        if (!validarEmail(email)) {
           mostrarAlerta("Por favor, insira um e-mail válido.", "erro")
           return
         }

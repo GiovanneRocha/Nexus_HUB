@@ -257,7 +257,7 @@ function itensPorCaminhao($itens): array
             <?php endif; ?>
         </main>
     </div>
-    <script src="../../assets/js/common.js"></script><script src="../../assets/js/pages.js"></script>
+    <script src="../../assets/js/common.js?v=20261015-3"></script><script src="../../assets/js/pages.js"></script>
     <script>
         function prepararReprovacao(form) {
             const motivo = prompt('Informe o motivo da reprovação desta OS:');

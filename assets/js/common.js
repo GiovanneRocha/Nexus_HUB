@@ -497,9 +497,6 @@ function getHeaderHTML() {
             <button class="botao-abre-menu-lateral" type="button" onclick="toggleSidebar()" aria-label="Abrir menu">
                 <i class="bi bi-list"></i>
             </button>
-            <div class="alerta-notificacao">
-                <i class="bi bi-bell"></i>
-            </div>
             <div class="perfil-usuario">
                 <div class="info-usuario">
                     <p class="usuario-nome">${usuarioNome}</p>
@@ -513,8 +510,7 @@ function getHeaderHTML() {
                     </button>
                     <div class="menu-suspenso" id="menuSuspenso">
                         <button id="themeToggleButton" type="button" onclick="toggleTheme()"><i class="bi bi-circle-half"></i> Modo Claro</button>
-                        <a href="#"><i class="bi bi-gear"></i> Configurações</a>
-                        <a href="#"><i class="bi bi-headset"></i> Suporte</a>
+                        <a href="${resolveRootLink("pages/info/suporte.html")}"><i class="bi bi-headset"></i> Suporte</a>
                         <hr>
                         <a href="${resolveRootLink("index.html")}" class="logout"><i class="bi bi-box-arrow-right"></i> Logout</a>
                     </div>

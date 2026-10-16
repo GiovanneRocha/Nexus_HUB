@@ -92,7 +92,8 @@ Nexus_HUB-main/
 ├── php/
 │   ├── cadastro.php
 │   ├── env.php
-│   └── enviar_suporte.php
+│   ├── enviar_suporte.php
+│   └── smtp.php
 └── .gitignore
 ```
 
@@ -103,6 +104,20 @@ Nexus_HUB-main/
 3. Faça login com qualquer e-mail e senha válidos para avançar para a home do sistema.
 
 > O projeto é front-end estático e utiliza armazenamento local do navegador para persistência de dados em `localStorage`.
+
+### Envio de e-mail do formulário de suporte
+
+O formulário de suporte envia uma confirmação para o endereço informado pelo usuário, incluindo os detalhes da solicitação. O envio usa SMTP autenticado do Outlook, com o remetente `tooltech.solutions@outlook.com`. Crie um arquivo `.env.local` na raiz do projeto (ele é ignorado pelo Git) e configure:
+
+```env
+SMTP_HOST=smtp-mail.outlook.com
+SMTP_PORT=587
+SMTP_ENCRYPTION=tls
+SMTP_USERNAME=tooltech.solutions@outlook.com
+SMTP_PASSWORD=sua-senha-ou-senha-de-aplicativo
+```
+
+`SMTP_PASSWORD` deve ser a senha de aplicativo da conta quando a Microsoft exigir autenticação em duas etapas. Não coloque credenciais SMTP no `.env` versionado. Sem uma configuração SMTP válida, o formulário apresenta um erro e não informa falsamente que a mensagem foi enviada.
 
 ## Tecnologias
 

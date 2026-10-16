@@ -82,8 +82,8 @@ $historicoJson = array_map(static function (array $item): array {
 <style>
 .perfil-topo{display:flex;flex-direction:column;gap:16px}
 .perfil-topo-linha-acoes{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
-.perfil-topo-acoes-esquerda{display:flex;gap:10px;flex-wrap:wrap}
-.perfil-topo-linha-acoes .botao-acao,.perfil-topo-linha-acoes .botao-secundario,.perfil-topo-linha-acoes .botao-cinza{width:auto}
+.perfil-topo-acoes-esquerda{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.perfil-topo-linha-acoes .botao-acao,.perfil-topo-linha-acoes .botao-secundario,.perfil-topo-linha-acoes .botao-cinza{width:auto;min-height:44px;margin:0;padding:0 16px;box-sizing:border-box}
 .perfil-topo-linha-acoes a{display:inline-flex;align-items:center;justify-content:center;gap:7px;text-align:center}
 .botao-cinza{padding:10px 14px;background:linear-gradient(135deg,#64748b 0%,#475569 100%);color:#fff;border:none;border-radius:9px;cursor:pointer;font-weight:700;letter-spacing:.02em;box-shadow:0 8px 16px rgba(71,85,105,.16);transition:transform .25s ease,opacity .25s ease,box-shadow .25s ease}
 .botao-cinza:hover{opacity:.92;transform:translateY(-1px)}
@@ -220,7 +220,7 @@ $historicoJson = array_map(static function (array $item): array {
 </div>
 
 </main></div>
-<script src="../assets/js/common.js"></script><script src="../assets/js/pages.js"></script>
+<script src="../assets/js/common.js?v=20261015-3"></script><script src="../assets/js/pages.js"></script>
 <script>
 const EMPRESA_ID = <?= (int) $empresa['id'] ?>;
 let HISTORICO_ATUAL = <?= json_encode($historicoJson, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?>;

@@ -29,3 +29,4 @@ function loadEnvFile($path)
 }
 
 loadEnvFile(__DIR__ . '/../.env');
+loadEnvFile(__DIR__ . '/../.env.local');

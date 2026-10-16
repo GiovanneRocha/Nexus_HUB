@@ -1297,6 +1297,7 @@ textarea {
   margin: 18px 0;
 }
 .bloco-veiculo {
+  min-width: 0;
   border: 1px solid var(--bordar);
   border-left: 4px solid var(--verde-esmeralda);
   border-radius: 8px;
@@ -1305,6 +1306,8 @@ textarea {
 .painel-veiculo {
   margin: 0;
   padding: 16px;
+  width: 100%;
+  min-width: 0;
   border: 0;
   background: transparent;
 }
@@ -2416,6 +2419,7 @@ body.light-mode .modal-revisao {
   }
   .conteudo-principal {
     padding: 28px 32px;
+    min-width: 0;
   }
   .barra-lateral {
     width: 240px;
@@ -2522,12 +2526,39 @@ body.light-mode .modal-revisao {
     padding: 18px;
   }
   .cabecalho-topo {
-    flex-direction: column;
-    align-items: stretch;
+    flex-direction: row;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
   }
   .perfil-usuario {
-    width: 100%;
-    justify-content: space-between;
+    flex: 1;
+    width: auto;
+    min-width: 0;
+    flex-direction: row;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 8px;
+  }
+  .cabecalho-topo > .botao-abre-menu-lateral {
+    width: auto;
+    flex: 0 0 auto;
+  }
+  .cabecalho-topo .info-usuario {
+    min-width: 0;
+  }
+  .cabecalho-topo .usuario-nome {
+    max-width: 90px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .cabecalho-topo .usuario-cargo {
+    display: none;
+  }
+  .cabecalho-topo .foto-perfil,
+  .cabecalho-topo .menu-opcoes-container {
+    flex: 0 0 auto;
   }
   .botao-voltar {
     position: static;
@@ -2554,7 +2585,11 @@ body.light-mode .modal-revisao {
   }
   .acoes-veiculo {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+  }
+  .acoes-veiculo > * {
+    min-width: 0;
   }
   .acoes-veiculo .botao-remover-veiculo {
     width: 100%;

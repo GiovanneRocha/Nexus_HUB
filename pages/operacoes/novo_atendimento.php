@@ -508,7 +508,7 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="../../assets/js/relatorio-visualizador.js"></script>
-    <script src="../../assets/js/common.js"></script>
+    <script src="../../assets/js/common.js?v=20261015-3"></script>
     <script src="../../assets/js/pages.js"></script>
 </head>
 <body class="corpo-dashboard">

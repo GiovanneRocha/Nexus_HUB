@@ -47,6 +47,7 @@ function hClientes($valor): string
 
         .clientes-busca {
             display: flex;
+            align-items: center;
             gap: 8px;
             flex: 1;
             max-width: 620px
@@ -73,6 +74,7 @@ function hClientes($valor): string
         .clientes-busca .botao-acao {
             min-height: 44px;
             height: 44px;
+            margin: 0;
             box-sizing: border-box;
             padding: 0 20px;
             display: inline-flex;
@@ -131,7 +133,8 @@ function hClientes($valor): string
 
             .clientes-busca {
                 max-width: none;
-                flex-direction: column
+                flex-direction: column;
+                align-items: stretch
             }
 
             .clientes-toolbar>.botao-acao {
@@ -202,7 +205,7 @@ function hClientes($valor): string
             </div>
         </main>
     </div>
-    <script src="../assets/js/common.js"></script>
+    <script src="../assets/js/common.js?v=20261015-3"></script>
     <script src="../assets/js/pages.js"></script>
     <script>document.addEventListener('DOMContentLoaded', () => { document.querySelector('.layout-erp').insertAdjacentHTML('afterbegin', getSidebarHTML('clientes')); document.querySelector('main').insertAdjacentHTML('afterbegin', getHeaderHTML()) })</script>
 </body>

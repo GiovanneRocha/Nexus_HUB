@@ -94,7 +94,7 @@ function caminhoesHistorico($itens): array {
     <?php endforeach; ?></div><?php endif; ?>
 </main></div>
 <script src="../../assets/js/relatorio-visualizador.js"></script>
-<script src="../../assets/js/common.js"></script><script src="../../assets/js/pages.js"></script>
+<script src="../../assets/js/common.js?v=20261015-3"></script><script src="../../assets/js/pages.js"></script>
 <script>
 const relatorios = <?= json_encode(array_reduce($ordens, function ($resultado, $os) use ($itensPorOS) {
     $resultado[$os['id']] = [
