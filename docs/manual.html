@@ -159,12 +159,17 @@
           <h2>Índice rápido</h2>
           <a href="#fluxo">Fluxo da OS</a><a href="#cadastros">Cadastros</a
           ><a href="#revisao">Revisão</a><a href="#historico">Histórico e PDF</a
+          ><a href="#usuarios">Gestão de usuários</a
           ><a href="#atalhos">Atalhos do sistema</a>
         </nav>
         <div>
           <section class="manual-section" id="fluxo">
             <h2><i class="bi bi-diagram-3"></i> Fluxo recomendado</h2>
             <ol>
+              <li>
+                Crie as contas da equipe em <strong>Usuários</strong> (somente
+                administrador).
+              </li>
               <li>Cadastre a empresa em <strong>Clientes</strong>.</li>
               <li>Cadastre o caminhão e associe-o à empresa.</li>
               <li>Cadastre serviços e peças disponíveis.</li>
@@ -269,6 +274,69 @@
               ><i class="bi bi-arrow-right-circle"></i> Abrir histórico</a
             >
           </section>
+          <section class="manual-section" id="usuarios">
+            <h2><i class="bi bi-person-gear"></i> Gestão de usuários</h2>
+            <p>
+              Tela exclusiva do <strong>administrador</strong> para controlar
+              quem pode acessar o Nexus HUB. Ela aparece no menu lateral como
+              <strong>Usuários</strong> e também como atalho na tela de início.
+              Outros perfis que tentarem abrir o endereço recebem a mensagem
+              “Acesso restrito a administradores”.
+            </p>
+            <h3>Cadastrar um usuário</h3>
+            <ol>
+              <li>Abra <strong>Usuários</strong> no menu lateral.</li>
+              <li>
+                Preencha <strong>nome</strong> (até 100 caracteres),
+                <strong>e-mail</strong> válido (único no sistema) e
+                <strong>senha</strong> com no mínimo 6 caracteres.
+              </li>
+              <li>Escolha o <strong>perfil de acesso</strong>.</li>
+              <li>Salve. A conta já nasce <strong>ativa</strong>.</li>
+            </ol>
+            <h3>Perfis de acesso</h3>
+            <ul>
+              <li>
+                <strong>Administrador:</strong> acesso total — painel, clientes,
+                Nova OS, revisão, cadastros (serviços, peças, veículos),
+                histórico e usuários.
+              </li>
+              <li>
+                <strong>Mecânico:</strong> acesso operacional — painel, Nova OS,
+                revisão e histórico.
+              </li>
+              <li>
+                <strong>Usuário:</strong> acesso de consulta — painel, clientes
+                e histórico.
+              </li>
+            </ul>
+            <h3>Gerenciar contas existentes</h3>
+            <ul>
+              <li>
+                <strong>Ativar/Desativar</strong> (botão de energia): a conta
+                inativa deixa de conseguir entrar, mas o registro é mantido.
+                Prefira desativar a excluir.
+              </li>
+              <li>
+                <strong>Excluir</strong> (lixeira): remove a conta de forma
+                definitiva, após confirmação.
+              </li>
+              <li>
+                Você <strong>não pode desativar nem excluir a própria
+                conta</strong>; isso evita ficar sem acesso administrativo.
+              </li>
+            </ul>
+            <div class="manual-note">
+              <i class="bi bi-shield-lock"></i> As senhas são armazenadas com
+              hash e as ações da tela são protegidas por token de segurança
+              (CSRF). Compartilhe credenciais apenas com o próprio titular e
+              desative contas de quem deixar a equipe.
+            </div>
+            <a class="manual-link" href="../pages/admin/usuarios.php"
+              ><i class="bi bi-arrow-right-circle"></i> Abrir gestão de
+              usuários</a
+            >
+          </section>
           <section class="manual-section" id="atalhos">
             <h2><i class="bi bi-command"></i> Atalhos do sistema</h2>
             <div class="manual-shortcuts">
@@ -282,6 +350,8 @@
                 ><i class="bi bi-check-square"></i> Revisão</a
               ><a class="manual-link" href="../pages/operacoes/historico.php"
                 ><i class="bi bi-clock-history"></i> Histórico</a
+              ><a class="manual-link" href="../pages/admin/usuarios.php"
+                ><i class="bi bi-person-gear"></i> Usuários (admin)</a
               >
             </div>
             <div class="manual-note">
