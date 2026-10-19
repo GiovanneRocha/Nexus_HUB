@@ -504,10 +504,10 @@ $frotaExistenteJSON = json_encode($frotaExistente, JSON_UNESCAPED_UNICODE);
     <link rel="stylesheet" href="../../assets/css/style.css">
     <link rel="stylesheet" href="../../assets/css/pages.css">
     <link rel="stylesheet" href="../../assets/css/admin-forms.css">
-    <link rel="stylesheet" href="../../assets/css/relatorio-visualizador.css">
+    <link rel="stylesheet" href="../../assets/css/relatorio-visualizador.css?v=20261018-1">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="../../assets/js/relatorio-visualizador.js"></script>
+    <script src="../../assets/js/relatorio-visualizador.js?v=20261018-1"></script>
     <script src="../../assets/js/common.js?v=20261015-3"></script>
     <script src="../../assets/js/pages.js"></script>
 </head>

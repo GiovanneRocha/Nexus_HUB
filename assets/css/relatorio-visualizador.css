@@ -72,37 +72,6 @@
     box-sizing: border-box;
 }
 
-/* Faixas diagonais decorativas (canto superior/inferior direito), como no modelo */
-.rv-pagina::before,
-.rv-pagina::after {
-    content: "";
-    position: absolute;
-    pointer-events: none;
-}
-.rv-pagina::before {
-    top: 0; right: 0;
-    width: 380px; height: 220px;
-    background: linear-gradient(135deg, #bcd2ea 0%, #6f95c4 45%, #3b6bb0 100%);
-    clip-path: polygon(100% 0, 100% 100%, 30% 0);
-    opacity: .9;
-}
-.rv-pagina::after {
-    bottom: 0; right: 0;
-    width: 55%; height: 90px;
-    background: linear-gradient(100deg, transparent 0%, #b9c3cf 42%, #8b96a5 60%, transparent 61%);
-    clip-path: polygon(100% 100%, 100% 0, 0 100%);
-    opacity: .85;
-}
-.rv-marca-dagua {
-    position: absolute;
-    right: -40px;
-    top: 46%;
-    width: 300px;
-    opacity: .05;
-    pointer-events: none;
-    transform: rotate(8deg);
-}
-
 .rv-cabecalho-marca { display: flex; align-items: center; gap: 12px; margin-bottom: 34px; position: relative; z-index: 2; }
 .rv-cabecalho-marca img { width: 44px; height: 44px; object-fit: contain; border-radius: 8px; }
 .rv-cabecalho-marca span { font-size: 1.15rem; font-weight: 800; color: #0f172a; }
@@ -177,5 +146,4 @@
 
 @media (max-width: 720px) {
     .rv-pagina { padding: 34px 26px; min-height: auto; }
-    .rv-pagina::before { width: 220px; height: 130px; }
 }

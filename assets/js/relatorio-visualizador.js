@@ -82,7 +82,6 @@ window.NexusRelatorio = (function () {
 
         return `
         <section class="rv-pagina" data-pagina="capa">
-            <img class="rv-marca-dagua" src="${cfg.logoUrl}" alt="">
             <div class="rv-cabecalho-marca"><img src="${cfg.logoUrl}" alt="Logo"><span>Nexus HUB</span></div>
             <div class="rv-conteudo">
                 <h1 class="rv-titulo-editavel rv-editavel" contenteditable="true" data-campo="titulo" data-placeholder="Título do relatório">${escapar(titulo)}</h1>
@@ -124,7 +123,6 @@ window.NexusRelatorio = (function () {
 
         return `
         <section class="rv-pagina" data-pagina="caminhao" data-chave="${escapar(caminhao.chave)}">
-            <img class="rv-marca-dagua" src="${cfg.logoUrl}" alt="">
             <div class="rv-cabecalho-marca"><img src="${cfg.logoUrl}" alt="Logo"><span>Nexus HUB</span></div>
             <div class="rv-conteudo">
                 <h2 class="rv-titulo-editavel" style="font-size:1.35rem;">${escapar(caminhao.modelo || 'Modelo não informado')}${caminhao.placa ? ' · ' + escapar(caminhao.placa) : ''}</h2>

@@ -373,16 +373,6 @@ body.light-mode .fundo-estoque {
     box-sizing: border-box;
     border-left: 8px solid #4f46e5;
 }
-.folha-pdf::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    right: 0;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #4f46e5 0%, transparent 100%);
-    border-radius: 0 0 0 100%;
-}
 [contenteditable="true"] {
     border: 1px dashed transparent;
     transition: 0.3s;
